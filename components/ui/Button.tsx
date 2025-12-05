@@ -29,7 +29,7 @@ export default function Button({
 
   return (
     <button
-      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
       {...props}
     >
       {children}

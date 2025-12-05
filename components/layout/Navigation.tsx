@@ -13,19 +13,25 @@ export default function Navigation() {
   if (!user) return null
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 max-w-md mx-auto">
-      <div className="flex items-center justify-around h-16">
+    <nav
+      className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 max-w-md mx-auto"
+      aria-label="주요 네비게이션"
+    >
+      <div className="flex items-center justify-around h-16" role="list">
         <Link
           href="/recipes"
-          className={`flex flex-col items-center justify-center flex-1 h-full ${
+          className={`flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded ${
             isActive('/recipes') ? 'text-blue-600' : 'text-gray-600'
           }`}
+          aria-label="조리법 목록"
+          aria-current={isActive('/recipes') ? 'page' : undefined}
         >
           <svg
             className="w-6 h-6 mb-1"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -38,13 +44,15 @@ export default function Navigation() {
         </Link>
         <button
           onClick={() => signOut()}
-          className="flex flex-col items-center justify-center flex-1 h-full text-gray-600"
+          className="flex flex-col items-center justify-center flex-1 h-full text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+          aria-label="로그아웃"
         >
           <svg
             className="w-6 h-6 mb-1"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
