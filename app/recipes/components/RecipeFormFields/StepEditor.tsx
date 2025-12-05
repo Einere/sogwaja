@@ -20,13 +20,15 @@ import {
   handleMentionNavigation,
   handleMentionDeletion,
 } from './StepEditor/mentionNavigation'
-import { calculateDropdownPosition } from './StepEditor/mentionDropdown'
+import { calculateDropdownPosition } from './StepEditor/mentionDropdownPosition'
+import type { MentionItem } from './StepEditor/types'
 import { withMentions } from './StepEditor/editorPlugins'
 import {
   MentionElement,
   DefaultElement,
   Leaf,
 } from './StepEditor/renderers'
+import MentionDropdown from './StepEditor/MentionDropdown'
 
 interface StepEditorProps {
   value: { children: Descendant[] } | null | undefined
@@ -271,47 +273,12 @@ export default function StepEditor({
           aria-label="조리법 흐름 에디터"
         />
         {target && filteredItems.length > 0 && dropdownPosition && (
-          <div
-            className="absolute z-50 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
-            style={{
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-              minWidth: '200px',
-            }}
-            role="listbox"
-            aria-label="멘션 목록"
-            aria-expanded="true"
-          >
-            {filteredItems.map((item, i) => (
-              <div
-                key={item.id}
-                className={`px-3 py-2 cursor-pointer ${
-                  i === index
-                    ? item.type === 'equipment'
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-green-100 text-green-700'
-                    : 'hover:bg-gray-100'
-                }`}
-                onClick={() => {
-                  handleInsertMention(item, target)
-                }}
-                role="option"
-                aria-selected={i === index}
-                aria-label={`${item.type === 'equipment' ? '장비' : '재료'}: ${item.displayName}`}
-              >
-                <span
-                  className={`inline-block px-2 py-0.5 rounded text-xs mr-2 ${
-                    item.type === 'equipment'
-                      ? 'bg-blue-200 text-blue-800'
-                      : 'bg-green-200 text-green-800'
-                  }`}
-                >
-                  {item.type === 'equipment' ? '장비' : '재료'}
-                </span>
-                {item.displayName}
-              </div>
-            ))}
-          </div>
+          <MentionDropdown
+            items={filteredItems}
+            selectedIndex={index}
+            position={dropdownPosition}
+            onSelect={(item: MentionItem) => handleInsertMention(item, target)}
+          />
         )}
       </Slate>
     </div>
