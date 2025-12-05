@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { notFound } from 'next/navigation'
 import type { Database } from '@/types/database'
 
 type Experiment = Database['public']['Tables']['recipe_experiments']['Row']
@@ -99,7 +100,7 @@ export async function getExperiment(
       .single()
 
     if (experimentError) {
-      return { error: experimentError.message }
+      notFound()
     }
 
     // Verify recipe ownership
@@ -111,7 +112,7 @@ export async function getExperiment(
       .single()
 
     if (recipeError || !recipe) {
-      return { error: '권한이 없습니다.' }
+      notFound()
     }
 
     // Load photos

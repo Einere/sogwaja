@@ -50,37 +50,8 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
   const result = await getRecipes(sortBy)
 
   if (result.error) {
-    return (
-      <div className="min-h-screen pb-20">
-        <Suspense
-          fallback={
-            <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
-              <div className="flex items-center justify-between mb-3">
-                <h1 className="text-2xl font-bold">조리법 목록</h1>
-              </div>
-            </header>
-          }
-        >
-          <RecipeListHeader />
-        </Suspense>
-        <div className="px-4 py-4">
-          <div
-            className="flex flex-col items-center justify-center min-h-[400px] p-4"
-            role="alert"
-            aria-live="assertive"
-          >
-            <p className="text-red-600 mb-4">{result.error}</p>
-            <Link
-              href="/recipes"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="다시 시도"
-            >
-              다시 시도
-            </Link>
-          </div>
-        </div>
-      </div>
-    )
+    // Throw error to be caught by error.tsx
+    throw new Error(result.error)
   }
 
   const recipes = result.data || []

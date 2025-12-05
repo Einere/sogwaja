@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { notFound } from 'next/navigation'
 import type { Database } from '@/types/database'
 import type { Json } from '@/types/database'
 
@@ -46,7 +47,7 @@ export async function getRecipeData(id: string): Promise<ActionResult<RecipeData
     }
 
     if (!recipeData) {
-      return { error: '조리법을 찾을 수 없습니다.' }
+      notFound()
     }
 
     // Load equipment
