@@ -94,7 +94,7 @@ export async function getRecipeData(id: string): Promise<ActionResult<RecipeData
 
 export async function updateEquipment(
   recipeId: string,
-  equipment: Omit<Equipment, 'recipe_id' | 'created_at'>[]
+  equipment: Omit<Equipment, 'recipe_id' | 'created_at' | 'id'>[]
 ): Promise<ActionResult<Equipment[]>> {
   try {
     const supabase = await createClient()
@@ -120,22 +120,11 @@ export async function updateEquipment(
     // Delete all existing equipment
     await supabase.from('recipe_equipment').delete().eq('recipe_id', recipeId)
 
-    // Insert new equipment (filter out temp IDs)
-    const equipmentToInsert = equipment
-      .filter((eq) => !eq.id.startsWith('temp-'))
-      .map(({ id, ...eq }) => ({
-        ...eq,
-        recipe_id: recipeId,
-      }))
-
-    const newEquipment = equipment.filter((eq) => eq.id.startsWith('temp-'))
-    const allEquipment = [
-      ...equipmentToInsert,
-      ...newEquipment.map(({ id, ...eq }) => ({
-        ...eq,
-        recipe_id: recipeId,
-      })),
-    ]
+    // Insert new equipment
+    const allEquipment = equipment.map((eq) => ({
+      ...eq,
+      recipe_id: recipeId,
+    }))
 
     if (allEquipment.length > 0) {
       const { data, error } = await supabase
@@ -162,7 +151,7 @@ export async function updateEquipment(
 
 export async function updateIngredients(
   recipeId: string,
-  ingredients: Omit<Ingredient, 'recipe_id' | 'created_at'>[]
+  ingredients: Omit<Ingredient, 'recipe_id' | 'created_at' | 'id'>[]
 ): Promise<ActionResult<Ingredient[]>> {
   try {
     const supabase = await createClient()
@@ -189,21 +178,10 @@ export async function updateIngredients(
     await supabase.from('recipe_ingredients').delete().eq('recipe_id', recipeId)
 
     // Insert new ingredients
-    const ingredientsToInsert = ingredients
-      .filter((ing) => !ing.id.startsWith('temp-'))
-      .map(({ id, ...ing }) => ({
-        ...ing,
-        recipe_id: recipeId,
-      }))
-
-    const newIngredients = ingredients.filter((ing) => ing.id.startsWith('temp-'))
-    const allIngredients = [
-      ...ingredientsToInsert,
-      ...newIngredients.map(({ id, ...ing }) => ({
-        ...ing,
-        recipe_id: recipeId,
-      })),
-    ]
+    const allIngredients = ingredients.map((ing) => ({
+      ...ing,
+      recipe_id: recipeId,
+    }))
 
     if (allIngredients.length > 0) {
       const { data, error } = await supabase
@@ -230,7 +208,7 @@ export async function updateIngredients(
 
 export async function updateOutputs(
   recipeId: string,
-  outputs: Omit<Output, 'recipe_id' | 'created_at'>[]
+  outputs: Omit<Output, 'recipe_id' | 'created_at' | 'id'>[]
 ): Promise<ActionResult<Output[]>> {
   try {
     const supabase = await createClient()
@@ -257,21 +235,10 @@ export async function updateOutputs(
     await supabase.from('recipe_outputs').delete().eq('recipe_id', recipeId)
 
     // Insert new outputs
-    const outputsToInsert = outputs
-      .filter((out) => !out.id.startsWith('temp-'))
-      .map(({ id, ...out }) => ({
-        ...out,
-        recipe_id: recipeId,
-      }))
-
-    const newOutputs = outputs.filter((out) => out.id.startsWith('temp-'))
-    const allOutputs = [
-      ...outputsToInsert,
-      ...newOutputs.map(({ id, ...out }) => ({
-        ...out,
-        recipe_id: recipeId,
-      })),
-    ]
+    const allOutputs = outputs.map((out) => ({
+      ...out,
+      recipe_id: recipeId,
+    }))
 
     if (allOutputs.length > 0) {
       const { data, error } = await supabase

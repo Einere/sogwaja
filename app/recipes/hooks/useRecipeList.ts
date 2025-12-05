@@ -33,7 +33,7 @@ export function useRecipeList(): UseRecipeListResult {
       } else {
         setRecipes(result.data || [])
       }
-    } catch (err) {
+    } catch {
       setError('조리법 목록을 불러오는 중 오류가 발생했습니다.')
       setRecipes([])
     } finally {

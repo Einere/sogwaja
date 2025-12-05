@@ -9,24 +9,25 @@ import ErrorMessage from '@/components/shared/ErrorMessage'
 import EmptyState from '@/components/shared/EmptyState'
 import Link from 'next/link'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
+import type { Database } from '@/types/database'
+
+type Experiment = Database['public']['Tables']['recipe_experiments']['Row']
+type Photo = Database['public']['Tables']['experiment_photos']['Row']
+
+interface ExperimentWithPhotos extends Experiment {
+  photos: Photo[]
+  thumbnail?: string
+}
 
 export default function ExperimentsPage() {
   const params = useParams()
   const router = useRouter()
   const recipeId = params.id as string
   const { user, loading: authLoading } = useAuth()
-  const [experiments, setExperiments] = useState<any[]>([])
+  const [experiments, setExperiments] = useState<ExperimentWithPhotos[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null)
-
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-      return
-    }
-    loadExperiments()
-  }, [user, recipeId])
 
   const loadExperiments = async () => {
     setLoading(true)
@@ -38,12 +39,21 @@ export default function ExperimentsPage() {
         return
       }
       setExperiments(result.data || [])
-    } catch (err) {
+    } catch {
       setError('실험 목록을 불러오는 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    loadExperiments()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, recipeId])
 
   const handleDelete = async (id: string) => {
     try {
@@ -53,7 +63,7 @@ export default function ExperimentsPage() {
       }
       await loadExperiments()
       setDeleteConfirm(null)
-    } catch (err) {
+    } catch {
       alert('삭제 중 오류가 발생했습니다.')
     }
   }

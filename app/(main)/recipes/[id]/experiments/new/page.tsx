@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useExperimentForm } from '@/app/recipes/[id]/experiments/hooks/useExperimentForm'

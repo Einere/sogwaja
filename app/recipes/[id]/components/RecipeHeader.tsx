@@ -3,14 +3,12 @@
 import Link from 'next/link'
 
 interface RecipeHeaderProps {
-  recipeId: string
   title: string
   onTitleChange: (title: string) => void
   saving?: boolean
 }
 
 export default function RecipeHeader({
-  recipeId,
   title,
   onTitleChange,
   saving = false,

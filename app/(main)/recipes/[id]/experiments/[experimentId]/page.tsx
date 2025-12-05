@@ -13,6 +13,21 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import ErrorMessage from '@/components/shared/ErrorMessage'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import Link from 'next/link'
+import type { Database } from '@/types/database'
+import type { Json } from '@/types/database'
+import type { Descendant } from 'slate'
+
+type Experiment = Database['public']['Tables']['recipe_experiments']['Row']
+type Photo = Database['public']['Tables']['experiment_photos']['Row']
+type Recipe = Database['public']['Tables']['recipes']['Row']
+type Equipment = Database['public']['Tables']['recipe_equipment']['Row']
+type Ingredient = Database['public']['Tables']['recipe_ingredients']['Row']
+type Output = Database['public']['Tables']['recipe_outputs']['Row']
+
+interface ExperimentWithPhotos extends Experiment {
+  photos: Photo[]
+  thumbnail?: string
+}
 
 export default function ExperimentDetailPage() {
   const params = useParams()
@@ -20,23 +35,15 @@ export default function ExperimentDetailPage() {
   const recipeId = params.id as string
   const experimentId = params.experimentId as string
   const { user, loading: authLoading } = useAuth()
-  const [experiment, setExperiment] = useState<any>(null)
-  const [recipe, setRecipe] = useState<any>(null)
-  const [equipment, setEquipment] = useState<any[]>([])
-  const [ingredients, setIngredients] = useState<any[]>([])
-  const [outputs, setOutputs] = useState<any[]>([])
-  const [steps, setSteps] = useState<any>(null)
+  const [experiment, setExperiment] = useState<ExperimentWithPhotos | null>(null)
+  const [recipe, setRecipe] = useState<Recipe | null>(null)
+  const [equipment, setEquipment] = useState<Equipment[]>([])
+  const [ingredients, setIngredients] = useState<Ingredient[]>([])
+  const [outputs, setOutputs] = useState<Output[]>([])
+  const [steps, setSteps] = useState<Json | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
-
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-      return
-    }
-    loadData()
-  }, [user, recipeId, experimentId])
 
   const loadData = async () => {
     setLoading(true)
@@ -68,12 +75,21 @@ export default function ExperimentDetailPage() {
         setOutputs(recipeResult.data.outputs)
         setSteps(recipeResult.data.steps)
       }
-    } catch (err) {
+    } catch {
       setError('데이터를 불러오는 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, recipeId, experimentId])
 
   const handleDelete = async () => {
     try {
@@ -82,7 +98,7 @@ export default function ExperimentDetailPage() {
         throw new Error(result.error)
       }
       router.push(`/recipes/${recipeId}/experiments`)
-    } catch (err) {
+    } catch {
       alert('삭제 중 오류가 발생했습니다.')
     }
   }
@@ -105,9 +121,11 @@ export default function ExperimentDetailPage() {
     return null
   }
 
-  const initialSteps = steps || {
-    children: [{ type: 'paragraph', children: [{ text: '' }] }],
-  }
+  const initialSteps: { children: Descendant[] } = steps && typeof steps === 'object' && 'children' in steps
+    ? (steps as unknown as { children: Descendant[] })
+    : {
+        children: [{ type: 'paragraph', children: [{ text: '' }] }] as unknown as Descendant[],
+      }
 
   return (
     <>
@@ -192,7 +210,7 @@ export default function ExperimentDetailPage() {
                 사진
               </h3>
               <div className="grid grid-cols-2 gap-2" role="list" aria-label="실험 사진">
-                {experiment.photos.map((photo: any) => (
+                {experiment.photos.map((photo: Photo) => (
                   <img
                     key={photo.id}
                     src={photo.url}

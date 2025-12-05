@@ -17,7 +17,7 @@ export default function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
     if (confirm('정말 삭제하시겠습니까?')) {
       try {
         await onDelete(recipe.id)
-      } catch (error) {
+      } catch {
         alert('삭제 중 오류가 발생했습니다.')
       }
     }

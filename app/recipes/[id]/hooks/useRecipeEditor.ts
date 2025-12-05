@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { getRecipeData, updateEquipment, updateIngredients, updateOutputs, updateSteps, updateRecipeTitle } from '../actions'
+import { getRecipeData, updateEquipment, updateIngredients, updateOutputs, updateSteps } from '../actions'
+import { updateRecipeTitle } from '../../actions'
 import { calculateIngredients, calculateEquipment } from '@/lib/utils/calculations'
 import type { Database } from '@/types/database'
 import type { Json } from '@/types/database'
+import type { Descendant } from 'slate'
 
 type Recipe = Database['public']['Tables']['recipes']['Row']
 type Equipment = Database['public']['Tables']['recipe_equipment']['Row']
@@ -25,7 +27,7 @@ interface UseRecipeEditorResult {
   setEquipment: (equipment: Equipment[]) => void
   setIngredients: (ingredients: Ingredient[]) => void
   setOutputs: (outputs: Output[]) => void
-  setSteps: (steps: Json) => void
+  setSteps: (steps: { children: Descendant[] }) => void
   handleOutputQuantityChange: (quantity: number, unit: string) => void
   refresh: () => Promise<void>
 }
@@ -105,7 +107,7 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
     if (!recipe) return
     setSaving(true)
     try {
-      const equipmentToSave = newEquipment.map(({ id, created_at, recipe_id, ...eq }) => eq)
+      const equipmentToSave = newEquipment.map(({ created_at: _created_at, recipe_id: _recipe_id, id: _id, ...eq }) => eq)
       const result = await updateEquipment(recipeId, equipmentToSave)
       if (result.error) {
         console.error('Error saving equipment:', result.error)
@@ -126,7 +128,7 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
     if (!recipe) return
     setSaving(true)
     try {
-      const ingredientsToSave = newIngredients.map(({ id, created_at, recipe_id, ...ing }) => ing)
+      const ingredientsToSave = newIngredients.map(({ created_at: _created_at, recipe_id: _recipe_id, id: _id, ...ing }) => ing)
       const result = await updateIngredients(recipeId, ingredientsToSave)
       if (result.error) {
         console.error('Error saving ingredients:', result.error)
@@ -147,7 +149,7 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
     if (!recipe) return
     setSaving(true)
     try {
-      const outputsToSave = newOutputs.map(({ id, created_at, recipe_id, ...out }) => out)
+      const outputsToSave = newOutputs.map(({ created_at: _created_at, recipe_id: _recipe_id, ...out }) => out)
       const result = await updateOutputs(recipeId, outputsToSave)
       if (result.error) {
         console.error('Error saving outputs:', result.error)
@@ -206,10 +208,10 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
     return () => clearTimeout(timeoutId)
   }, [saveOutputs])
 
-  const handleStepsChange = useCallback((newSteps: Json) => {
-    setSteps(newSteps)
+  const handleStepsChange = useCallback((newSteps: { children: Descendant[] }) => {
+    setSteps(newSteps as unknown as Json)
     const timeoutId = setTimeout(() => {
-      saveSteps(newSteps)
+      saveSteps(newSteps as unknown as Json)
     }, 1000)
     return () => clearTimeout(timeoutId)
   }, [saveSteps])

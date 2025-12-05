@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import type { Database } from '@/types/database'
 import RecipeCard from './RecipeCard'
 

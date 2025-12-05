@@ -27,7 +27,7 @@ export function calculateDropdownPosition(
       top: rect.bottom - editorRect.top + 4,
       left: rect.left - editorRect.left,
     }
-  } catch (error) {
+  } catch {
     // DOM 변환 실패 시 기본 위치 사용
     return { top: 200, left: 0 }
   }

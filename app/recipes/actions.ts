@@ -5,8 +5,6 @@ import { revalidatePath } from 'next/cache'
 import type { Database } from '@/types/database'
 
 type Recipe = Database['public']['Tables']['recipes']['Row']
-type RecipeInsert = Database['public']['Tables']['recipes']['Insert']
-type RecipeUpdate = Database['public']['Tables']['recipes']['Update']
 
 export type SortOption = 'name' | 'updated'
 

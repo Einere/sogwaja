@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { useDebounce } from '@/lib/hooks/useDebounce'
 
 interface UseAutoSaveOptions<T> {
@@ -21,7 +21,7 @@ export function useAutoSave<T>({
   const debouncedValue = useDebounce(value, debounceMs)
   const initialValueRef = useRef<T | null>(null)
   const isInitializingRef = useRef(true)
-  const savingRef = useRef(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   // Initialize with first value
   useEffect(() => {
@@ -48,23 +48,39 @@ export function useAutoSave<T>({
   useEffect(() => {
     if (!enabled) return
     if (!hasChanges()) return
-    if (savingRef.current) return
+    if (isSaving) return
 
-    savingRef.current = true
-    onSave(debouncedValue)
-      .then(() => {
-        initialValueRef.current = debouncedValue
-      })
-      .catch((error) => {
-        console.error('Auto-save error:', error)
-      })
-      .finally(() => {
-        savingRef.current = false
-      })
-  }, [debouncedValue, enabled, hasChanges, onSave])
+    let cancelled = false
+    
+    // Use setTimeout to avoid synchronous setState in effect
+    const timeoutId = setTimeout(() => {
+      setIsSaving(true)
+      onSave(debouncedValue)
+        .then(() => {
+          if (!cancelled) {
+            initialValueRef.current = debouncedValue
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            console.error('Auto-save error')
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setIsSaving(false)
+          }
+        })
+    }, 0)
+
+    return () => {
+      cancelled = true
+      clearTimeout(timeoutId)
+    }
+  }, [debouncedValue, enabled, hasChanges, onSave, isSaving])
 
   return {
-    isSaving: savingRef.current,
+    isSaving,
   }
 }
 

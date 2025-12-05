@@ -64,7 +64,7 @@ export function insertMention(
           return
         }
       }
-    } catch (error) {
+    } catch {
       // DOM 변환 실패 시 기존 로직 사용
     }
     

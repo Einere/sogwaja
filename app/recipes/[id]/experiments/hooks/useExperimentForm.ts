@@ -53,7 +53,7 @@ export function useExperimentForm(): UseExperimentFormResult {
         return { success: false, error: result.error }
       }
       return { success: true }
-    } catch (err) {
+    } catch {
       const errorMessage = '실험 결과 저장 중 오류가 발생했습니다.'
       setError(errorMessage)
       return { success: false, error: errorMessage }

@@ -52,7 +52,6 @@ export default function RecipeEditorPage() {
   return (
     <div className="min-h-screen pb-20">
       <RecipeHeader
-        recipeId={recipeId}
         title={title}
         onTitleChange={setTitle}
         saving={saving}

@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import Navigation from '@/components/layout/Navigation'
 
 export default async function MainLayout({

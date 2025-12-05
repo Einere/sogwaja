@@ -1,15 +1,11 @@
 import type { MentionElement } from './types'
+import type { RenderElementProps as SlateRenderElementProps, RenderLeafProps as SlateRenderLeafProps } from 'slate-react'
 
-interface RenderElementProps {
-  attributes: any
-  children: any
-  element: any
+interface RenderElementProps extends SlateRenderElementProps {
+  element: SlateRenderElementProps['element'] | MentionElement
 }
 
-interface RenderLeafProps {
-  attributes: any
-  children: any
-}
+type RenderLeafProps = SlateRenderLeafProps
 
 export function MentionElement({ attributes, children, element }: RenderElementProps) {
   const mentionElement = element as MentionElement

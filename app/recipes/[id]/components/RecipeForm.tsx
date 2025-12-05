@@ -7,6 +7,7 @@ import OutputEditor from '../../components/RecipeFormFields/OutputEditor'
 import StepEditor from '../../components/RecipeFormFields/StepEditor'
 import type { Database } from '@/types/database'
 import type { Json } from '@/types/database'
+import type { Descendant } from 'slate'
 
 type Equipment = Database['public']['Tables']['recipe_equipment']['Row']
 type Ingredient = Database['public']['Tables']['recipe_ingredients']['Row']
@@ -21,7 +22,7 @@ interface RecipeFormProps {
   onEquipmentChange: (equipment: Equipment[]) => void
   onIngredientsChange: (ingredients: Ingredient[]) => void
   onOutputsChange: (outputs: Output[]) => void
-  onStepsChange: (steps: Json) => void
+  onStepsChange: (steps: { children: Descendant[] }) => void
   onOutputQuantityChange: (quantity: number, unit: string) => void
   user: { id: string } | null
 }
@@ -39,9 +40,11 @@ export default function RecipeForm({
   onOutputQuantityChange,
   user,
 }: RecipeFormProps) {
-  const initialSteps = steps || {
-    children: [{ type: 'paragraph', children: [{ text: '' }] }],
-  }
+  const initialSteps: { children: Descendant[] } = steps && typeof steps === 'object' && 'children' in steps
+    ? (steps as unknown as { children: Descendant[] })
+    : {
+        children: [{ type: 'paragraph', children: [{ text: '' }] }] as unknown as Descendant[],
+      }
 
   return (
     <main className="px-4 py-6 space-y-6">
