@@ -1,40 +1,24 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/hooks/useAuth'
-import { useRecipeList } from '@/app/recipes/hooks/useRecipeList'
-import RecipeList from '@/app/recipes/components/RecipeList'
+import { Suspense } from 'react'
+import { createClient } from '@/lib/supabase/server'
+import { getRecipes, type SortOption } from '@/app/recipes/actions'
 import RecipeListHeader from '@/app/recipes/components/RecipeListHeader'
-import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import RecipeListContent from '@/app/recipes/components/RecipeListContent'
 import EmptyState from '@/components/shared/EmptyState'
-import ErrorMessage from '@/components/shared/ErrorMessage'
 import Link from 'next/link'
 
-export default function RecipesPage() {
-  const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+interface RecipesPageProps {
+  searchParams: Promise<{
+    sort?: string
+  }> | {
+    sort?: string
+  }
+}
+
+export default async function RecipesPage({ searchParams }: RecipesPageProps) {
+  const supabase = await createClient()
   const {
-    recipes,
-    loading,
-    error,
-    sortBy,
-    setSortBy,
-    handleDelete,
-  } = useRecipeList()
-
-  if (authLoading || loading) {
-    return <LoadingSpinner message="로딩 중..." />
-  }
-
-  if (error) {
-    return (
-      <ErrorMessage
-        message={error}
-        onRetry={() => router.push('/recipes')}
-        retryLabel="다시 시도"
-      />
-    )
-  }
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return (
@@ -53,9 +37,67 @@ export default function RecipesPage() {
     )
   }
 
+  // Handle searchParams - it might be a Promise in Next.js 16
+  const params = searchParams instanceof Promise ? await searchParams : searchParams
+
+  // Validate and set sort option
+  const sortBy: SortOption =
+    params.sort === 'name' || params.sort === 'updated'
+      ? params.sort
+      : 'updated'
+  
+  // Fetch recipes from server
+  const result = await getRecipes(sortBy)
+
+  if (result.error) {
+    return (
+      <div className="min-h-screen pb-20">
+        <Suspense
+          fallback={
+            <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
+              <div className="flex items-center justify-between mb-3">
+                <h1 className="text-2xl font-bold">조리법 목록</h1>
+              </div>
+            </header>
+          }
+        >
+          <RecipeListHeader />
+        </Suspense>
+        <div className="px-4 py-4">
+          <div
+            className="flex flex-col items-center justify-center min-h-[400px] p-4"
+            role="alert"
+            aria-live="assertive"
+          >
+            <p className="text-red-600 mb-4">{result.error}</p>
+            <Link
+              href="/recipes"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="다시 시도"
+            >
+              다시 시도
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const recipes = result.data || []
+
   return (
     <div className="min-h-screen pb-20">
-      <RecipeListHeader sortBy={sortBy} onSortChange={setSortBy} />
+      <Suspense
+        fallback={
+          <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
+            <div className="flex items-center justify-between mb-3">
+              <h1 className="text-2xl font-bold">조리법 목록</h1>
+            </div>
+          </header>
+        }
+      >
+        <RecipeListHeader />
+      </Suspense>
       <div className="px-4 py-4">
         {recipes.length === 0 ? (
           <EmptyState
@@ -66,7 +108,7 @@ export default function RecipesPage() {
             }}
           />
         ) : (
-          <RecipeList recipes={recipes} onDelete={handleDelete} />
+          <RecipeListContent recipes={recipes} />
         )}
       </div>
     </div>

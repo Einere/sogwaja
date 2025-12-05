@@ -8,19 +8,14 @@ type Recipe = Database['public']['Tables']['recipes']['Row']
 interface RecipeCardProps {
   recipe: Recipe
   onDelete: (id: string) => Promise<void>
+  isDeleting?: boolean
 }
 
-export default function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
+export default function RecipeCard({ recipe, onDelete, isDeleting = false }: RecipeCardProps) {
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (confirm('정말 삭제하시겠습니까?')) {
-      try {
-        await onDelete(recipe.id)
-      } catch {
-        alert('삭제 중 오류가 발생했습니다.')
-      }
-    }
+    await onDelete(recipe.id)
   }
 
   return (
@@ -52,10 +47,11 @@ export default function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
         </Link>
         <button
           onClick={handleDelete}
-          className="text-sm text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+          disabled={isDeleting}
+          className="text-sm text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-500 rounded disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label={`${recipe.title} 삭제`}
         >
-          삭제
+          {isDeleting ? '삭제 중...' : '삭제'}
         </button>
       </div>
     </article>

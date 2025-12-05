@@ -1,17 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import type { SortOption } from '../actions'
 
-interface RecipeListHeaderProps {
-  sortBy: SortOption
-  onSortChange: (sort: SortOption) => void
-}
+export default function RecipeListHeader() {
+  const searchParams = useSearchParams()
+  const sortBy: SortOption =
+    (searchParams.get('sort') as SortOption) || 'updated'
 
-export default function RecipeListHeader({
-  sortBy,
-  onSortChange,
-}: RecipeListHeaderProps) {
   return (
     <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
       <div className="flex items-center justify-between mb-3">
@@ -25,8 +22,8 @@ export default function RecipeListHeader({
         </Link>
       </div>
       <div className="flex gap-2" role="group" aria-label="정렬 옵션">
-        <button
-          onClick={() => onSortChange('name')}
+        <Link
+          href="/recipes?sort=name"
           className={`px-3 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
             sortBy === 'name'
               ? 'bg-blue-600 text-white'
@@ -36,9 +33,9 @@ export default function RecipeListHeader({
           aria-label="가나다순으로 정렬"
         >
           가나다순
-        </button>
-        <button
-          onClick={() => onSortChange('updated')}
+        </Link>
+        <Link
+          href="/recipes?sort=updated"
           className={`px-3 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
             sortBy === 'updated'
               ? 'bg-blue-600 text-white'
@@ -48,9 +45,8 @@ export default function RecipeListHeader({
           aria-label="최근 수정순으로 정렬"
         >
           최근 수정순
-        </button>
+        </Link>
       </div>
     </header>
   )
 }
-
