@@ -1,16 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useAuth } from '@/lib/hooks/useAuth'
+import { usePathname, useParams } from 'next/navigation'
+import { PencilIcon, ClipboardIcon } from '@/components/icons'
 
 export default function Navigation() {
   const pathname = usePathname()
-  const { user, signOut } = useAuth()
-
-  const isActive = (path: string) => pathname === path
-
-  if (!user) return null
+  const params = useParams()
+  const recipeId = params.id as string | undefined
 
   return (
     <nav
@@ -18,51 +15,32 @@ export default function Navigation() {
       aria-label="주요 네비게이션"
     >
       <div className="flex items-center justify-around h-16" role="list">
-        <Link
-          href="/recipes"
-          className={`flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded ${
-            isActive('/recipes') ? 'text-blue-600' : 'text-gray-600'
-          }`}
-          aria-label="조리법 목록"
-          aria-current={isActive('/recipes') ? 'page' : undefined}
-        >
-          <svg
-            className="w-6 h-6 mb-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <span className="text-xs">조리법</span>
-        </Link>
-        <button
-          onClick={() => signOut()}
-          className="flex flex-col items-center justify-center flex-1 h-full text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-          aria-label="로그아웃"
-        >
-          <svg
-            className="w-6 h-6 mb-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
-          <span className="text-xs">로그아웃</span>
-        </button>
+        {recipeId && (
+          <>
+            <Link
+              href={`/recipes/${recipeId}/experiments/new`}
+              className={`flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded ${
+                pathname === `/recipes/${recipeId}/experiments/new` ? 'text-green-600' : 'text-gray-600'
+              }`}
+              aria-label="실험 저장"
+              aria-current={pathname === `/recipes/${recipeId}/experiments/new` ? 'page' : undefined}
+            >
+              <PencilIcon className="w-6 h-6 mb-1" />
+              <span className="text-xs">실험 저장</span>
+            </Link>
+            <Link
+              href={`/recipes/${recipeId}/experiments`}
+              className={`flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded ${
+                pathname === `/recipes/${recipeId}/experiments` ? 'text-blue-600' : 'text-gray-600'
+              }`}
+              aria-label="실험 목록"
+              aria-current={pathname === `/recipes/${recipeId}/experiments` ? 'page' : undefined}
+            >
+              <ClipboardIcon className="w-6 h-6 mb-1" />
+              <span className="text-xs">실험 목록</span>
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   )

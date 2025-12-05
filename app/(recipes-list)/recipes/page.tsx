@@ -57,7 +57,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
   const recipes = result.data || []
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen">
       <Suspense
         fallback={
           <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
@@ -85,3 +85,4 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
     </div>
   )
 }
+

@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import EquipmentEditor from '../../components/RecipeFormFields/EquipmentEditor'
 import IngredientEditor from '../../components/RecipeFormFields/IngredientEditor'
 import OutputEditor from '../../components/RecipeFormFields/OutputEditor'
@@ -28,7 +27,6 @@ interface RecipeFormProps {
 }
 
 export default function RecipeForm({
-  recipeId,
   equipment,
   ingredients,
   outputs,
@@ -38,7 +36,6 @@ export default function RecipeForm({
   onOutputsChange,
   onStepsChange,
   onOutputQuantityChange,
-  user,
 }: RecipeFormProps) {
   const initialSteps: { children: Descendant[] } = steps && typeof steps === 'object' && 'children' in steps
     ? (steps as unknown as { children: Descendant[] })
@@ -80,7 +77,7 @@ export default function RecipeForm({
         />
       </section>
 
-      <div className="flex gap-3 pt-4">
+      {/* <div className="flex gap-3 pt-4">
         {user ? (
           <>
             <Link
@@ -99,7 +96,7 @@ export default function RecipeForm({
             </Link>
           </>
         ) : (
-          <Link
+          <Link 
             href="/login"
             className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg text-center hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
             aria-label="로그인하여 실험 저장"
@@ -107,7 +104,7 @@ export default function RecipeForm({
             로그인하여 실험 저장
           </Link>
         )}
-      </div>
+      </div> */}
     </main>
   )
 }

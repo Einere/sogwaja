@@ -1,15 +1,13 @@
-import Navigation from '@/components/layout/Navigation'
-
-export default async function MainLayout({
+export default async function RecipesListLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen">
         {children}
-        <Navigation />
       </div>
     </div>
   )
