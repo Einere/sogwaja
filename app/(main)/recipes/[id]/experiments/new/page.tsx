@@ -1,31 +1,31 @@
 'use client'
 
-import { useParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/hooks/useAuth'
+import { useParams } from 'next/navigation'
+import { useActionState, startTransition } from 'react'
+import { createExperimentAction } from '@/app/recipes/[id]/experiments/actions'
 import { useExperimentForm } from '@/app/recipes/[id]/experiments/hooks/useExperimentForm'
 import Textarea from '@/components/ui/Textarea'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
-import LoadingSpinner from '@/components/shared/LoadingSpinner'
 
+// TODO: 해당 화면에서는 레이아웃의 하단 버튼들이 보이지 않아야 함. (실험 저장, 실험 목록)
 export default function NewExperimentPage() {
   const params = useParams()
-  const router = useRouter()
   const recipeId = params.id as string
-  const { user, loading: authLoading } = useAuth()
   const {
     memo,
     photos,
     previews,
-    uploading,
-    error,
     setMemo,
     handlePhotoChange,
     removePhoto,
-    handleSubmit,
   } = useExperimentForm()
 
+  const [state, formAction, isPending] = useActionState(createExperimentAction, null)
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isPending) return
+    
     const files = Array.from(e.target.files || [])
     if (files.length + photos.length > 9) {
       alert('최대 9장까지 업로드 가능합니다.')
@@ -34,48 +34,39 @@ export default function NewExperimentPage() {
     handlePhotoChange(files)
   }
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!user) {
-      router.push('/login')
-      return
-    }
+    
+    const formData = new FormData()
+    formData.append('recipeId', recipeId)
+    formData.append('memo', memo || '')
+    
+    // Add photos to FormData
+    photos.forEach((photo) => {
+      formData.append('photos', photo)
+    })
 
-    const result = await handleSubmit(recipeId)
-    if (result.success) {
-      router.push(`/recipes/${recipeId}/experiments`)
-    } else if (result.error) {
-      alert(result.error)
-    }
-  }
-
-  if (authLoading) {
-    return <LoadingSpinner message="로딩 중..." />
-  }
-
-  if (!user) {
-    router.push('/login')
-    return null
+    startTransition(() => {
+      formAction(formData)
+    })
   }
 
   return (
     <div className="min-h-screen pb-20">
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
-        <div className="flex items-center justify-between">
+      {/* TODO: 헤더를 별도의 컴포넌트로 분리하기 */}
+      <header className="grid grid-cols-3 items-center sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
           <Link
             href={`/recipes/${recipeId}`}
-            className="text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+            className="w-fit text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
             aria-label="조리법으로 돌아가기"
           >
             ← 돌아가기
           </Link>
-          <h1 className="text-xl font-bold">실험 결과 저장</h1>
-          <div className="w-12" aria-hidden="true" />
-        </div>
+          <h1 className="text-center text-xl font-bold">실험 결과 저장</h1>
       </header>
 
-      <form onSubmit={onSubmit} className="px-4 py-6 space-y-6" aria-label="실험 결과 저장 폼">
-        <fieldset>
+      <form onSubmit={handleSubmit} className="px-4 py-6 space-y-6" aria-label="실험 결과 저장 폼">
+        <fieldset disabled={isPending}>
           <legend className="block text-sm font-medium text-gray-700 mb-2">
             사진
           </legend>
@@ -90,7 +81,8 @@ export default function NewExperimentPage() {
                 <button
                   type="button"
                   onClick={() => removePhoto(index)}
-                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs focus:outline-none focus:ring-2 focus:ring-red-500"
+                  disabled={isPending}
+                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label={`사진 ${index + 1} 삭제`}
                 >
                   ×
@@ -98,12 +90,17 @@ export default function NewExperimentPage() {
               </div>
             ))}
             {previews.length < 9 && (
-              <label className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500">
+              <label className={`flex items-center justify-center border-2 border-dashed rounded ${
+                isPending 
+                  ? 'border-gray-200 cursor-not-allowed opacity-50' 
+                  : 'border-gray-300 cursor-pointer hover:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500'
+              }`}>
                 <input
                   type="file"
                   accept="image/*"
                   multiple
                   onChange={handleFileChange}
+                  disabled={isPending}
                   className="hidden"
                   aria-label="사진 추가"
                 />
@@ -116,34 +113,42 @@ export default function NewExperimentPage() {
 
         <Textarea
           label="메모"
+          name="memo"
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
+          disabled={isPending}
           rows={6}
           placeholder="실험 결과에 대한 메모를 입력하세요..."
           aria-label="실험 메모"
         />
 
-        {error && (
-          <div role="alert" aria-live="assertive" className="text-red-600 text-sm">
-            {error}
-          </div>
+
+        {state?.error && (
+          <p role="alert" aria-live="assertive" className="text-red-600 text-sm">
+            {state.error}
+          </p>
         )}
 
         <div className="flex gap-3 pt-4">
           <Link
             href={`/recipes/${recipeId}`}
-            className="flex-1 px-6 py-3 bg-gray-200 text-gray-900 rounded-lg text-center hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            className={`flex-1 px-6 py-3 bg-gray-200 text-gray-900 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-gray-500 ${
+              isPending 
+                ? 'opacity-50 cursor-not-allowed pointer-events-none' 
+                : 'hover:bg-gray-300'
+            }`}
             aria-label="취소"
+            aria-disabled={isPending}
           >
             취소
           </Link>
           <Button
             type="submit"
-            disabled={uploading}
+            disabled={isPending}
             className="flex-1"
-            aria-label={uploading ? '저장 중' : '저장'}
+            aria-label={isPending ? '저장 중' : '저장'}
           >
-            {uploading ? '저장 중...' : '저장'}
+            {isPending ? '저장 중...' : '저장'}
           </Button>
         </div>
       </form>

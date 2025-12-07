@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+import { getServerUser } from '@/lib/supabase/auth'
 import Navigation from '@/components/layout/Navigation'
 
 export default async function MainLayout({
@@ -5,6 +7,12 @@ export default async function MainLayout({
 }: {
   children: React.ReactNode
 }) {
+  const user = await getServerUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen">

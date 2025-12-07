@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { createClient } from '@/lib/supabase/server'
+import { getServerUser } from '@/lib/supabase/auth'
 import { getRecipes, type SortOption } from '@/app/recipes/actions'
 import RecipeListHeader from '@/app/recipes/components/RecipeListHeader'
 import RecipeListContent from '@/app/recipes/components/RecipeListContent'
@@ -15,13 +15,12 @@ interface RecipesPageProps {
 }
 
 export default async function RecipesPage({ searchParams }: RecipesPageProps) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // TODO: auth guard 로직은 분리해야 함.
+  const user = await getServerUser()
 
   if (!user) {
     return (
+      // TODO: 별도의 컴포넌트로 분리하기
       <main className="flex flex-col items-center justify-center min-h-screen p-4">
         <p className="text-gray-600 mb-4 text-center">
           조리법을 저장하고 관리하려면 로그인이 필요합니다.
@@ -47,17 +46,11 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
       : 'updated'
   
   // Fetch recipes from server
-  const result = await getRecipes(sortBy)
-
-  if (result.error) {
-    // Throw error to be caught by error.tsx
-    throw new Error(result.error)
-  }
-
-  const recipes = result.data || []
+  const recipes = await getRecipes(sortBy)
 
   return (
     <div className="min-h-screen">
+      {/* TODO: Suspense로 감쌀 필요가 있는지 검증하기 */}
       <Suspense
         fallback={
           <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
