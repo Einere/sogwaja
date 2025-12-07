@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import type { SortOption } from "../actions";
 import LinkButton from "@/components/ui/LinkButton";
+import { PlusIcon } from "@/components/icons";
 
 export default function RecipeListHeader() {
   const searchParams = useSearchParams();
@@ -12,8 +13,13 @@ export default function RecipeListHeader() {
     <header className="sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
       <div className="flex items-center justify-between mb-3">
         <h1 className="text-2xl font-bold">조리법 목록</h1>
-        <LinkButton href="/recipes/new" size="sm" aria-label="새 조리법 만들기">
-          + 새 조리법
+        <LinkButton
+          href="/recipes/new"
+          size="sm"
+          className="flex items-center gap-1"
+          aria-label="새 조리법 만들기"
+        >
+          <PlusIcon className="w-4 h-4" />새 조리법
         </LinkButton>
       </div>
       <div className="flex gap-2" role="group" aria-label="정렬 옵션">

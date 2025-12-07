@@ -9,6 +9,7 @@ import OutputEditor from "@/app/recipes/components/RecipeFormFields/OutputEditor
 import StepEditor from "@/app/recipes/components/RecipeFormFields/StepEditor";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import TextLink from "@/components/ui/TextLink";
+import { ArrowLeftIcon } from "@/components/icons";
 import Button from "@/components/ui/Button";
 import type { Database } from "@/types/database";
 import type { Json } from "@/types/database";
@@ -70,17 +71,18 @@ export default function ExperimentDetailClient({
           <TextLink
             href={`/recipes/${recipeId}/experiments`}
             size="sm"
-            className="w-fit"
+            className="w-fit flex items-center gap-1"
             aria-label="실험 목록으로 돌아가기"
           >
-            ← 목록으로
+            <ArrowLeftIcon className="w-4 h-4" />
+            목록으로
           </TextLink>
           <h1 className="text-xl font-bold text-center">실험 결과</h1>
           <Button
             onClick={() => setDeleteConfirm(true)}
             variant="ghost"
             size="sm"
-            className="justify-self-end w-fit text-end text-error hover:text-error hover:underline p-0 h-auto justify-end"
+            className="justify-self-end w-fit text-end text-error hover:text-error justify-end"
             aria-label="실험 삭제"
           >
             삭제

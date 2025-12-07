@@ -1,6 +1,7 @@
 "use client";
 
 import TextLink from "@/components/ui/TextLink";
+import { ArrowLeftIcon } from "@/components/icons";
 
 interface RecipeHeaderProps {
   title: string;
@@ -12,8 +13,14 @@ export default function RecipeHeader({ title, onTitleChange, saving = false }: R
   return (
     <header className="sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
       <div className="flex items-center justify-between mb-2">
-        <TextLink href="/recipes" size="sm" className="w-fit" aria-label="조리법 목록으로 돌아가기">
-          ← 목록으로
+        <TextLink
+          href="/recipes"
+          size="sm"
+          className="w-fit flex items-center gap-1"
+          aria-label="조리법 목록으로 돌아가기"
+        >
+          <ArrowLeftIcon className="w-4 h-4" />
+          목록으로
         </TextLink>
         {saving && (
           <span

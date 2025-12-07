@@ -5,7 +5,8 @@
   --foreground: #171717;
 
   /* Primary Color - RGB 255 170 170 */
-  --primary: rgb(255, 170, 170);
+  /* --primary: rgb(255, 170, 170); */
+  --primary: rgb(145, 200, 255);
   --primary-foreground: rgb(255, 255, 255);
 
   /* Secondary Color */
@@ -33,9 +34,10 @@
   --muted-foreground: rgb(115, 115, 115);
   --accent: rgb(245, 245, 245);
   --accent-foreground: rgb(23, 23, 23);
-  --border: rgb(229, 229, 229);
-  --input: rgb(229, 229, 229);
-  --ring: rgb(255, 170, 170);
+  /* Border colors based on primary color with low opacity */
+  --border: color-mix(in srgb, var(--primary) 20%, var(--background) 80%);
+  --input: color-mix(in srgb, var(--primary) 20%, var(--background) 80%);
+  --ring: var(--primary);
 }
 
 @theme inline {
@@ -81,19 +83,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family:
-    var(--font-geist-sans),
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Roboto",
-    "Oxygen",
-    "Ubuntu",
-    "Cantarell",
-    "Fira Sans",
-    "Droid Sans",
-    "Helvetica Neue",
-    sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 }
 
 /* 모바일 최적화 */

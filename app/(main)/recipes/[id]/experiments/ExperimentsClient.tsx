@@ -4,6 +4,7 @@ import { useState } from "react";
 import { deleteExperiment } from "@/app/recipes/[id]/experiments/actions";
 import EmptyState from "@/components/shared/EmptyState";
 import TextLink from "@/components/ui/TextLink";
+import { ArrowLeftIcon } from "@/components/icons";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
@@ -47,10 +48,11 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
           <TextLink
             href={`/recipes/${recipeId}`}
             size="sm"
-            className="w-fit"
+            className="w-fit flex items-center gap-1"
             aria-label="조리법으로 돌아가기"
           >
-            ← 돌아가기
+            <ArrowLeftIcon className="w-4 h-4" />
+            돌아가기
           </TextLink>
           <h1 className="text-xl font-bold text-center">실험 목록</h1>
         </header>
@@ -102,7 +104,7 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
                       onClick={() => setDeleteConfirm({ id: experiment.id, name: "실험" })}
                       variant="ghost"
                       size="sm"
-                      className="text-error hover:text-error hover:underline p-0 h-auto"
+                      className="text-error hover:text-error"
                       aria-label="실험 삭제"
                     >
                       삭제

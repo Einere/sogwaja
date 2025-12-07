@@ -8,7 +8,7 @@ import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
 import LinkButton from "@/components/ui/LinkButton";
 import TextLink from "@/components/ui/TextLink";
-import { XIcon } from "@/components/icons";
+import { XIcon, ArrowLeftIcon, PlusIcon } from "@/components/icons";
 
 // TODO: 해당 화면에서는 레이아웃의 하단 버튼들이 보이지 않아야 함. (실험 저장, 실험 목록)
 export default function NewExperimentPage() {
@@ -53,10 +53,11 @@ export default function NewExperimentPage() {
         <TextLink
           href={`/recipes/${recipeId}`}
           size="sm"
-          className="w-fit"
+          className="w-fit flex items-center gap-1"
           aria-label="조리법으로 돌아가기"
         >
-          ← 돌아가기
+          <ArrowLeftIcon className="w-4 h-4" />
+          돌아가기
         </TextLink>
         <h1 className="text-center text-xl font-bold">실험 결과 저장</h1>
       </header>
@@ -113,9 +114,7 @@ export default function NewExperimentPage() {
                   className="hidden"
                   aria-label="사진 추가"
                 />
-                <span className="text-2xl text-muted-foreground" aria-hidden="true">
-                  +
-                </span>
+                <PlusIcon className="w-8 h-8 text-muted-foreground" />
               </label>
             )}
           </div>

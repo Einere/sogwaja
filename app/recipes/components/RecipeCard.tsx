@@ -47,7 +47,7 @@ export default function RecipeCard({ recipe, onDelete, isDeleting = false }: Rec
           disabled={isDeleting}
           variant="ghost"
           size="sm"
-          className="text-error hover:text-error hover:underline p-0 h-auto"
+          className="text-error hover:text-error"
           aria-label={`${recipe.title} 삭제`}
         >
           {isDeleting ? "삭제 중..." : "삭제"}
