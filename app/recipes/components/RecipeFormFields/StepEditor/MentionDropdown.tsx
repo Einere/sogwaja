@@ -17,7 +17,7 @@ export default function MentionDropdown({
 }: MentionDropdownProps) {
   return (
     <div
-      className="absolute z-50 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+      className="absolute z-50 bg-background border border-border rounded-lg shadow-lg max-h-60 overflow-auto"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
@@ -30,14 +30,21 @@ export default function MentionDropdown({
       {items.map((item, i) => (
         <div
           key={item.id}
-          className={`px-3 py-2 cursor-pointer ${
+          tabIndex={0}
+          className={`px-3 py-2 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
             i === selectedIndex
               ? item.type === 'equipment'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-green-100 text-green-700'
-              : 'hover:bg-gray-100'
+                ? 'bg-info/20 text-info-foreground'
+                : 'bg-warning/20 text-warning-foreground'
+              : 'hover:bg-accent'
           }`}
           onClick={() => onSelect(item)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              onSelect(item)
+            }
+          }}
           role="option"
           aria-selected={i === selectedIndex}
           aria-label={`${item.type === 'equipment' ? '장비' : '재료'}: ${item.displayName}`}
@@ -45,8 +52,8 @@ export default function MentionDropdown({
           <span
             className={`inline-block px-2 py-0.5 rounded text-xs mr-2 ${
               item.type === 'equipment'
-                ? 'bg-blue-200 text-blue-800'
-                : 'bg-green-200 text-green-800'
+                ? 'bg-info/30 text-info-foreground'
+                : 'bg-warning/30 text-warning-foreground'
             }`}
           >
             {item.type === 'equipment' ? '장비' : '재료'}

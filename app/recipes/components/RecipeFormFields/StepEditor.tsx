@@ -250,7 +250,7 @@ export default function StepEditor({
   return (
     <div
       ref={editorRef}
-      className="border border-gray-300 rounded-lg p-4 min-h-[200px] relative"
+      className="border border-input rounded-lg p-4 min-h-[200px] relative"
       role="textbox"
       aria-label="조리법 흐름 입력"
       aria-multiline="true"

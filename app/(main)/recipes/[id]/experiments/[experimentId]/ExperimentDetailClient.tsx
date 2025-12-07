@@ -8,7 +8,8 @@ import IngredientEditor from '@/app/recipes/components/RecipeFormFields/Ingredie
 import OutputEditor from '@/app/recipes/components/RecipeFormFields/OutputEditor'
 import StepEditor from '@/app/recipes/components/RecipeFormFields/StepEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import Link from 'next/link'
+import TextLink from '@/components/ui/TextLink'
+import Button from '@/components/ui/Button'
 import type { Database } from '@/types/database'
 import type { Json } from '@/types/database'
 import type { Descendant } from 'slate'
@@ -65,29 +66,32 @@ export default function ExperimentDetailClient({
     <>
       <div className="min-h-screen pb-20">
         {/* TODO: 헤더 컴포넌트를 서버 컴포넌트로 별도로 분리하고(layout 으로 만들어도 괜찮음), 삭제 버튼은 children 을 받는 방식으로 변경하여 서버 컴포넌트 영역을 최대한 넓히기  */}
-        <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3 grid grid-cols-3 items-center">
-            <Link
+        <header className="sticky top-0 bg-background border-b border-border z-10 px-4 py-3 grid grid-cols-3 items-center">
+            <TextLink
               href={`/recipes/${recipeId}/experiments`}
-              className="w-fit text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              size="sm"
+              className="w-fit"
               aria-label="실험 목록으로 돌아가기"
             >
               ← 목록으로
-            </Link>
+            </TextLink>
             <h1 className="text-xl font-bold text-center">실험 결과</h1>
-            <button
+            <Button
               onClick={() => setDeleteConfirm(true)}
-              className="text-end text-red-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+              variant="ghost"
+              size="sm"
+              className="justify-self-end w-fit text-end text-error hover:text-error hover:underline p-0 h-auto justify-end"
               aria-label="실험 삭제"
             >
               삭제
-            </button>
+            </Button>
         </header>
 
         <main className="px-4 py-6 space-y-6">
           <section>
             <h2 className="text-2xl font-bold mb-2">{recipe.title}</h2>
             <time
-              className="text-sm text-gray-500"
+              className="text-sm text-muted-foreground"
               dateTime={experiment.created_at}
             >
               {/* TODO: day.js 로 리팩토링하기 */}
@@ -170,8 +174,8 @@ export default function ExperimentDetailClient({
               <h3 id="memo-heading" className="text-lg font-semibold">
                 메모
               </h3>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-700 whitespace-pre-wrap">{experiment.memo}</p>
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="text-foreground whitespace-pre-wrap">{experiment.memo}</p>
               </div>
             </section>
           )}
@@ -183,7 +187,7 @@ export default function ExperimentDetailClient({
         message="정말 삭제하시겠습니까?"
         confirmLabel="삭제"
         cancelLabel="취소"
-        variant="danger"
+        variant="error"
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm(false)}
       />

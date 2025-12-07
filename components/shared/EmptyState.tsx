@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { ReactNode } from 'react'
+import LinkButton from '@/components/ui/LinkButton'
 
 interface EmptyStateProps {
   title: string
@@ -26,16 +26,15 @@ export default function EmptyState({
       aria-live="polite"
       aria-label={`${title}. ${description || ''}`}
     >
-      <p className="text-gray-500 mb-4">{title}</p>
-      {description && <p className="text-sm text-gray-400 mb-4">{description}</p>}
+      <p className="text-muted-foreground mb-4">{title}</p>
+      {description && <p className="text-sm text-muted-foreground/70 mb-4">{description}</p>}
       {action && (
-        <Link
+        <LinkButton
           href={action.href}
-          className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           aria-label={action.label}
         >
           {action.label}
-        </Link>
+        </LinkButton>
       )}
       {children}
     </div>

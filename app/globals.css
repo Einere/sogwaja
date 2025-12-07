@@ -3,6 +3,39 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Primary Color - RGB 255 170 170 */
+  --primary: rgb(255, 170, 170);
+  --primary-foreground: rgb(255, 255, 255);
+  
+  /* Secondary Color */
+  --secondary: rgb(245, 245, 245);
+  --secondary-foreground: rgb(23, 23, 23);
+  
+  /* Warning Color */
+  --warning: rgb(251, 191, 36);
+  --warning-foreground: rgb(23, 23, 23);
+  
+  /* Info Color */
+  --info: rgb(59, 130, 246);
+  --info-foreground: rgb(255, 255, 255);
+  
+  /* Error Color */
+  --error: rgb(239, 68, 68);
+  --error-foreground: rgb(255, 255, 255);
+  
+  /* Destructive (shadcn/ui 호환) */
+  --destructive: rgb(239, 68, 68);
+  --destructive-foreground: rgb(255, 255, 255);
+  
+  /* Neutral Colors */
+  --muted: rgb(245, 245, 245);
+  --muted-foreground: rgb(115, 115, 115);
+  --accent: rgb(245, 245, 245);
+  --accent-foreground: rgb(23, 23, 23);
+  --border: rgb(229, 229, 229);
+  --input: rgb(229, 229, 229);
+  --ring: rgb(255, 170, 170);
 }
 
 @theme inline {
@@ -10,13 +43,39 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  
+  /* Primary - RGB 255 170 170 */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  /* Secondary */
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  /* Warning */
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  
+  /* Info */
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  
+  /* Error */
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  
+  /* Destructive (shadcn/ui 호환) */
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  /* Neutral */
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 body {

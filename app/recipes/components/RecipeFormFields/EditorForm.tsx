@@ -1,5 +1,8 @@
 'use client'
 
+import Input from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
+
 interface EditorFormProps {
   name: string
   value: string
@@ -45,21 +48,21 @@ export default function EditorForm({
       role="group"
       aria-label={ariaLabel || '새 항목 추가'}
     >
-      <input
+      <Input
         type="text"
         value={name}
         onChange={(e) => onNameChange(e.target.value)}
         onKeyPress={handleKeyPress}
-        className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="flex-1 text-sm"
         placeholder={namePlaceholder}
         aria-label={`${namePlaceholder} 입력`}
       />
-      <input
+      <Input
         type="number"
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
         onKeyPress={handleKeyPress}
-        className="w-24 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-24 text-sm"
         placeholder={valuePlaceholder}
         aria-label={`${valuePlaceholder} 입력`}
       />
@@ -67,7 +70,7 @@ export default function EditorForm({
         <select
           value={unit}
           onChange={(e) => onUnitChange(e.target.value)}
-          className="w-20 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-20 px-3 py-1.5 border border-input bg-background rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           aria-label="단위 선택"
         >
           {unitOptions.map((option) => (
@@ -77,23 +80,24 @@ export default function EditorForm({
           ))}
         </select>
       ) : (
-        <input
+        <Input
           type="text"
           value={unit}
           onChange={(e) => onUnitChange(e.target.value)}
           onKeyPress={handleKeyPress}
-          className="w-16 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-16 text-sm"
           placeholder={unitPlaceholder}
           aria-label={`${unitPlaceholder} 입력`}
         />
       )}
-      <button
+      <Button
         onClick={onSubmit}
-        className="px-4 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        size="sm"
+        className="text-sm"
         aria-label={submitLabel}
       >
         {submitLabel}
-      </button>
+      </Button>
     </div>
   )
 }

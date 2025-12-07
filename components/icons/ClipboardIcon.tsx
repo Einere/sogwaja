@@ -1,9 +1,5 @@
 import React from 'react'
-
-interface IconProps {
-  className?: string
-  'aria-hidden'?: boolean
-}
+import { IconProps } from './AppleIcon'
 
 export default function ClipboardIcon({ className = 'w-6 h-6', 'aria-hidden': ariaHidden = true }: IconProps) {
   return (

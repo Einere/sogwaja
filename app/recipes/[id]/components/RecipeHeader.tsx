@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import TextLink from '@/components/ui/TextLink'
 
 interface RecipeHeaderProps {
   title: string
@@ -14,18 +14,19 @@ export default function RecipeHeader({
   saving = false,
 }: RecipeHeaderProps) {
   return (
-    <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
+    <header className="sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
       <div className="flex items-center justify-between mb-2">
-        <Link
+        <TextLink
           href="/recipes"
-          className="w-fit text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+          size="sm"
+          className="w-fit"
           aria-label="조리법 목록으로 돌아가기"
         >
           ← 목록으로
-        </Link>
+        </TextLink>
         {saving && (
           <span
-            className="text-sm text-gray-500"
+            className="text-sm text-muted-foreground"
             role="status"
             aria-live="polite"
             aria-label="저장 중"
@@ -38,7 +39,7 @@ export default function RecipeHeader({
         type="text"
         value={title}
         onChange={(e) => onTitleChange(e.target.value)}
-        className="w-full text-2xl font-bold border-none focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+        className="w-full text-2xl font-bold border-none focus:outline-none focus:ring-2 focus:ring-ring rounded"
         placeholder="조리법 제목"
         aria-label="조리법 제목"
       />

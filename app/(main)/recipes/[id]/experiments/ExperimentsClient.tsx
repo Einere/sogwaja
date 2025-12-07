@@ -3,8 +3,11 @@
 import { useState } from 'react'
 import { deleteExperiment } from '@/app/recipes/[id]/experiments/actions'
 import EmptyState from '@/components/shared/EmptyState'
-import Link from 'next/link'
+import TextLink from '@/components/ui/TextLink'
+import Button from '@/components/ui/Button'
+import Card from '@/components/ui/Card'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
+import Link from 'next/link'
 import type { Database } from '@/types/database'
 
 type Experiment = Database['public']['Tables']['recipe_experiments']['Row']
@@ -40,14 +43,15 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
     <>
       <div className="min-h-screen pb-20">
         {/* TODO: 헤더를 별도의 컴포넌트로 분리하기 */}
-        <header className="grid grid-cols-3 items-center sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
-            <Link
+        <header className="grid grid-cols-3 items-center sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
+            <TextLink
               href={`/recipes/${recipeId}`}
-              className="w-fit text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              size="sm"
+              className="w-fit"
               aria-label="조리법으로 돌아가기"
             >
               ← 돌아가기
-            </Link>
+            </TextLink>
             <h1 className="text-xl font-bold text-center">실험 목록</h1>
         </header>
 
@@ -59,9 +63,9 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
           ) : (
             <div className="space-y-4" role="list" aria-label="실험 목록">
               {experimentsList.map((experiment) => (
-                <article
+                <Card
                   key={experiment.id}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                  className="overflow-hidden"
                   aria-labelledby={`experiment-${experiment.id}`}
                 >
                   <Link href={`/recipes/${recipeId}/experiments/${experiment.id}`}>
@@ -76,7 +80,7 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
                       )}
                       <div className="flex-1">
                         <time
-                          className="text-sm text-gray-500 mb-1 block"
+                          className="text-sm text-muted-foreground mb-1 block"
                           dateTime={experiment.created_at}
                         >
                           {new Date(experiment.created_at).toLocaleDateString('ko-KR', {
@@ -88,25 +92,27 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
                           })}
                         </time>
                         {experiment.memo ? (
-                          <p className="text-sm text-gray-700 line-clamp-2">
+                          <p className="text-sm text-foreground line-clamp-2">
                             {experiment.memo}
                           </p>
                         ) : (
-                          <p className="text-sm text-gray-400">메모 없음</p>
+                          <p className="text-sm text-muted-foreground">메모 없음</p>
                         )}
                       </div>
                     </div>
                   </Link>
                   <div className="px-4 pb-4">
-                    <button
+                    <Button
                       onClick={() => setDeleteConfirm({ id: experiment.id, name: '실험' })}
-                      className="text-sm text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+                      variant="ghost"
+                      size="sm"
+                      className="text-error hover:text-error hover:underline p-0 h-auto"
                       aria-label="실험 삭제"
                     >
                       삭제
-                    </button>
+                    </Button>
                   </div>
-                </article>
+                </Card>
               ))}
             </div>
           )}
@@ -118,7 +124,7 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
         message="정말 삭제하시겠습니까?"
         confirmLabel="삭제"
         cancelLabel="취소"
-        variant="danger"
+        variant="error"
         onConfirm={() => deleteConfirm && handleDelete(deleteConfirm.id)}
         onCancel={() => setDeleteConfirm(null)}
       />

@@ -6,7 +6,9 @@ import { createExperimentAction } from '@/app/recipes/[id]/experiments/actions'
 import { useExperimentForm } from '@/app/recipes/[id]/experiments/hooks/useExperimentForm'
 import Textarea from '@/components/ui/Textarea'
 import Button from '@/components/ui/Button'
-import Link from 'next/link'
+import LinkButton from '@/components/ui/LinkButton'
+import TextLink from '@/components/ui/TextLink'
+import { XIcon } from '@/components/icons'
 
 // TODO: 해당 화면에서는 레이아웃의 하단 버튼들이 보이지 않아야 함. (실험 저장, 실험 목록)
 export default function NewExperimentPage() {
@@ -54,20 +56,21 @@ export default function NewExperimentPage() {
   return (
     <div className="min-h-screen pb-20">
       {/* TODO: 헤더를 별도의 컴포넌트로 분리하기 */}
-      <header className="grid grid-cols-3 items-center sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
-          <Link
+      <header className="grid grid-cols-3 items-center sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
+          <TextLink
             href={`/recipes/${recipeId}`}
-            className="w-fit text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+            size="sm"
+            className="w-fit"
             aria-label="조리법으로 돌아가기"
           >
             ← 돌아가기
-          </Link>
+          </TextLink>
           <h1 className="text-center text-xl font-bold">실험 결과 저장</h1>
       </header>
 
       <form onSubmit={handleSubmit} className="px-4 py-6 space-y-6" aria-label="실험 결과 저장 폼">
         <fieldset disabled={isPending}>
-          <legend className="block text-sm font-medium text-gray-700 mb-2">
+          <legend className="block text-sm font-medium text-foreground mb-2">
             사진
           </legend>
           <div className="grid grid-cols-3 gap-2 mb-2">
@@ -83,31 +86,31 @@ export default function NewExperimentPage() {
                   type="button"
                   onClick={() => removePhoto(index)}
                   disabled={isPending}
-                  className="absolute top-1 right-1 bg-gray-500/50 backdrop-blur-sm rounded-full w-7 h-7 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-500/70 transition-colors"
+                  className="absolute top-1 right-1 bg-muted-foreground/50 backdrop-blur-sm rounded-full w-7 h-7 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted-foreground/70 transition-colors"
                   aria-label={`사진 ${index + 1} 삭제`}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4 text-red-500"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
+                  <XIcon className="w-4 h-4 text-error" />
                 </button>
               </div>
             ))}
             {previews.length < 9 && (
-              <label className={`flex w-full aspect-square items-center justify-center border-2 border-dashed rounded ${
-                isPending 
-                  ? 'border-gray-200 cursor-not-allowed opacity-50' 
-                  : 'border-gray-300 cursor-pointer hover:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500'
-              }`}>
+              <label 
+                tabIndex={isPending ? -1 : 0}
+                className={`flex w-full aspect-square items-center justify-center border-2 border-dashed rounded transition-colors ${
+                  isPending 
+                    ? 'border-muted cursor-not-allowed opacity-50' 
+                    : 'border-input cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2'
+                }`}
+                onKeyDown={(e) => {
+                  if (!isPending && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault()
+                    const input = e.currentTarget.querySelector('input[type="file"]') as HTMLInputElement
+                    input?.click()
+                  }
+                }}
+                aria-label="사진 추가"
+                role="button"
+              >
                 <input
                   type="file"
                   accept="image/*"
@@ -117,11 +120,11 @@ export default function NewExperimentPage() {
                   className="hidden"
                   aria-label="사진 추가"
                 />
-                <span className="text-2xl text-gray-400" aria-hidden="true">+</span>
+                <span className="text-2xl text-muted-foreground" aria-hidden="true">+</span>
               </label>
             )}
           </div>
-          <p className="text-xs text-gray-500">최대 9장까지 업로드 가능합니다.</p>
+          <p className="text-xs text-muted-foreground">최대 9장까지 업로드 가능합니다.</p>
         </fieldset>
 
         <Textarea
@@ -137,24 +140,21 @@ export default function NewExperimentPage() {
 
 
         {state?.error && (
-          <p role="alert" aria-live="assertive" className="text-red-600 text-sm">
+          <p role="alert" aria-live="assertive" className="text-error text-sm">
             {state.error}
           </p>
         )}
 
         <div className="flex gap-3 pt-4">
-          <Link
+          <LinkButton
             href={`/recipes/${recipeId}`}
-            className={`flex-1 px-6 py-3 bg-gray-200 text-gray-900 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-gray-500 ${
-              isPending 
-                ? 'opacity-50 cursor-not-allowed pointer-events-none' 
-                : 'hover:bg-gray-300'
-            }`}
+            variant="secondary"
+            className="flex-1"
             aria-label="취소"
             aria-disabled={isPending}
           >
             취소
-          </Link>
+          </LinkButton>
           <Button
             type="submit"
             disabled={isPending}

@@ -4,7 +4,7 @@ import { getRecipes, type SortOption } from '@/app/recipes/actions'
 import RecipeListHeader from '@/app/recipes/components/RecipeListHeader'
 import RecipeListContent from '@/app/recipes/components/RecipeListContent'
 import EmptyState from '@/components/shared/EmptyState'
-import Link from 'next/link'
+import LinkButton from '@/components/ui/LinkButton'
 
 interface RecipesPageProps {
   searchParams: Promise<{
@@ -22,16 +22,15 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
     return (
       // TODO: 별도의 컴포넌트로 분리하기
       <main className="flex flex-col items-center justify-center min-h-screen p-4">
-        <p className="text-gray-600 mb-4 text-center">
+        <p className="text-muted-foreground mb-4 text-center">
           조리법을 저장하고 관리하려면 로그인이 필요합니다.
         </p>
-        <Link
+        <LinkButton
           href="/login"
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-label="로그인하기"
         >
           로그인하기
-        </Link>
+        </LinkButton>
       </main>
     )
   }
@@ -53,7 +52,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
       {/* TODO: Suspense로 감쌀 필요가 있는지 검증하기 */}
       <Suspense
         fallback={
-          <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
+          <header className="sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
             <div className="flex items-center justify-between mb-3">
               <h1 className="text-2xl font-bold">조리법 목록</h1>
             </div>

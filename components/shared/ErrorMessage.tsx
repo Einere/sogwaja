@@ -1,5 +1,7 @@
 'use client'
 
+import Button from '@/components/ui/Button'
+
 interface ErrorMessageProps {
   message: string
   onRetry?: () => void
@@ -17,7 +19,7 @@ export default function ErrorMessage({
       role="alert"
       aria-live="assertive"
     >
-      <div className="text-red-600 mb-4" aria-hidden="true">
+      <div className="text-error mb-4" aria-hidden="true">
         <svg
           className="w-12 h-12"
           fill="none"
@@ -32,16 +34,15 @@ export default function ErrorMessage({
           />
         </svg>
       </div>
-      <h2 className="text-xl font-bold text-red-600 mb-2">오류 발생</h2>
-      <p className="text-gray-700 mb-4 text-center max-w-md">{message}</p>
+      <h2 className="text-xl font-bold text-error mb-2">오류 발생</h2>
+      <p className="text-foreground mb-4 text-center max-w-md">{message}</p>
       {onRetry && (
-        <button
+        <Button
           onClick={onRetry}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           aria-label={retryLabel}
         >
           {retryLabel}
-        </button>
+        </Button>
       )}
     </div>
   )

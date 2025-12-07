@@ -1,10 +1,7 @@
 import React from 'react'
+import { IconProps } from './AppleIcon'
 
-interface IconProps {
-  className?: string
-  'aria-hidden'?: boolean
-}
-
+// GoogleIcon은 브랜드 컬러를 유지하되, 스타일을 통일합니다
 export default function GoogleIcon({ className = 'w-5 h-5', 'aria-hidden': ariaHidden = true }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden={ariaHidden}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Button from '@/components/ui/Button'
 
 interface ConfirmDialogProps {
   isOpen: boolean
@@ -10,7 +11,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string
   onConfirm: () => void
   onCancel: () => void
-  variant?: 'danger' | 'default'
+  variant?: 'error' | 'default'
 }
 
 export default function ConfirmDialog({
@@ -57,29 +58,25 @@ export default function ConfirmDialog({
       <h2 id="dialog-title" className="text-xl font-bold mb-4">
         {title}
       </h2>
-      <p id="dialog-description" className="text-gray-700 mb-6">
+      <p id="dialog-description" className="text-foreground mb-6">
         {message}
       </p>
       <div className="flex gap-3 justify-end">
-        <button
+        <Button
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300"
+          variant="secondary"
           aria-label={cancelLabel}
         >
           {cancelLabel}
-        </button>
-        <button
+        </Button>
+        <Button
           ref={confirmButtonRef}
           onClick={onConfirm}
-          className={`px-4 py-2 rounded-lg text-white ${
-            variant === 'danger'
-              ? 'bg-red-600 hover:bg-red-700'
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
+          variant={variant === 'error' ? 'error' : 'primary'}
           aria-label={confirmLabel}
         >
           {confirmLabel}
-        </button>
+        </Button>
       </div>
     </dialog>
   )

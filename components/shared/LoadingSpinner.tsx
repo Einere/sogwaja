@@ -23,10 +23,10 @@ export default function LoadingSpinner({
       aria-label={message}
     >
       <div
-        className={`${sizeClasses[size]} border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin`}
+        className={`${sizeClasses[size]} border-4 border-muted border-t-primary rounded-full animate-spin`}
         aria-hidden="true"
       />
-      <p className="mt-4 text-gray-500">{message}</p>
+      <p className="mt-4 text-muted-foreground">{message}</p>
     </div>
   )
 }

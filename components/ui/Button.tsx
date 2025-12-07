@@ -1,39 +1,63 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react'
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode
-  variant?: 'primary' | 'secondary' | 'danger'
-  size?: 'sm' | 'md' | 'lg'
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+        // 우리 디자인 시스템 variant들
+        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+        warning: "bg-warning text-warning-foreground hover:bg-warning/90",
+        info: "bg-info text-info-foreground hover:bg-info/90",
+        error: "bg-error text-error-foreground hover:bg-error/90",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-lg px-3",
+        md: "h-10 px-4 py-2",
+        lg: "h-11 rounded-lg px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "primary",
+      size: "md",
+    },
+  }
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
 }
 
-export default function Button({
-  children,
-  variant = 'primary',
-  size = 'md',
-  className = '',
-  ...props
-}: ButtonProps) {
-  const baseStyles = 'font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-  
-  const variantStyles = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
   }
-  
-  const sizeStyles = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
-  }
+)
+Button.displayName = "Button"
 
-  return (
-    <button
-      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  )
-}
-
+export { Button, buttonVariants }
+export default Button
