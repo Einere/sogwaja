@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/hooks/useAuth'
 import { getExperiments, deleteExperiment } from '@/app/recipes/[id]/experiments/actions'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import ErrorMessage from '@/components/shared/ErrorMessage'
@@ -23,7 +22,6 @@ export default function ExperimentsPage() {
   const params = useParams()
   const router = useRouter()
   const recipeId = params.id as string
-  const { user, loading: authLoading } = useAuth()
   const [experiments, setExperiments] = useState<ExperimentWithPhotos[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -47,13 +45,9 @@ export default function ExperimentsPage() {
   }
 
   useEffect(() => {
-    if (!user) {
-      router.push('/login')
-      return
-    }
     loadExperiments()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, recipeId])
+  }, [recipeId])
 
   const handleDelete = async (id: string) => {
     try {
@@ -68,7 +62,7 @@ export default function ExperimentsPage() {
     }
   }
 
-  if (authLoading || loading) {
+  if (loading) {
     return <LoadingSpinner message="로딩 중..." />
   }
 
@@ -95,13 +89,7 @@ export default function ExperimentsPage() {
               ← 돌아가기
             </Link>
             <h1 className="text-xl font-bold">실험 목록</h1>
-            <Link
-              href={`/recipes/${recipeId}/experiments/new`}
-              className="text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-              aria-label="새 실험 만들기"
-            >
-              + 새 실험
-            </Link>
+            <div className="w-12" aria-hidden="true" />
           </div>
         </header>
 

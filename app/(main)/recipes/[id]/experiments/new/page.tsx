@@ -1,7 +1,6 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/hooks/useAuth'
 import { useExperimentForm } from '@/app/recipes/[id]/experiments/hooks/useExperimentForm'
 import Textarea from '@/components/ui/Textarea'
 import Button from '@/components/ui/Button'
@@ -12,7 +11,6 @@ export default function NewExperimentPage() {
   const params = useParams()
   const router = useRouter()
   const recipeId = params.id as string
-  const { user, loading: authLoading } = useAuth()
   const {
     memo,
     photos,
@@ -36,26 +34,12 @@ export default function NewExperimentPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) {
-      router.push('/login')
-      return
-    }
-
     const result = await handleSubmit(recipeId)
     if (result.success) {
       router.push(`/recipes/${recipeId}/experiments`)
     } else if (result.error) {
       alert(result.error)
     }
-  }
-
-  if (authLoading) {
-    return <LoadingSpinner message="로딩 중..." />
-  }
-
-  if (!user) {
-    router.push('/login')
-    return null
   }
 
   return (

@@ -31,7 +31,7 @@ export default function RecipeEditorPage() {
     handleOutputQuantityChange,
   } = useRecipeEditor(recipeId)
 
-  if (authLoading || loading) {
+  if (loading) {
     return <LoadingSpinner message="로딩 중..." />
   }
 

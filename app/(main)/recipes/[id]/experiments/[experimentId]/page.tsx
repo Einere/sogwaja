@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/hooks/useAuth'
 import { getExperiment, deleteExperiment } from '@/app/recipes/[id]/experiments/actions'
 import { getRecipeData } from '@/app/recipes/[id]/actions'
 import EquipmentEditor from '@/app/recipes/components/RecipeFormFields/EquipmentEditor'
@@ -34,7 +33,6 @@ export default function ExperimentDetailPage() {
   const router = useRouter()
   const recipeId = params.id as string
   const experimentId = params.experimentId as string
-  const { user, loading: authLoading } = useAuth()
   const [experiment, setExperiment] = useState<ExperimentWithPhotos | null>(null)
   const [recipe, setRecipe] = useState<Recipe | null>(null)
   const [equipment, setEquipment] = useState<Equipment[]>([])
@@ -83,13 +81,9 @@ export default function ExperimentDetailPage() {
   }
 
   useEffect(() => {
-    if (!user) {
-      router.push('/login')
-      return
-    }
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, recipeId, experimentId])
+  }, [recipeId, experimentId])
 
   const handleDelete = async () => {
     try {
@@ -103,7 +97,7 @@ export default function ExperimentDetailPage() {
     }
   }
 
-  if (authLoading || loading) {
+  if (loading) {
     return <LoadingSpinner message="로딩 중..." />
   }
 
