@@ -41,6 +41,7 @@ Supabase 대시보드의 **SQL Editor**에서 다음 단계를 따르세요:
 ### 3-3. 문제 해결
 
 **에러 코드 PGRST205**가 발생하는 경우:
+
 - 테이블이 생성되지 않았습니다
 - `supabase/schema.sql` 파일을 다시 실행하세요
 - 실행 후 Supabase 대시보드를 새로고침하세요
@@ -77,26 +78,32 @@ Supabase 대시보드에서 Storage를 활성화하고 다음 버킷을 생성�
 4. 각 정책을 하나씩 추가합니다:
 
 **정책 1: 사진 조회 (SELECT)**
+
 - Policy name: `Users can view photos`
 - Allowed operation: `SELECT`
 - Policy definition: 다음 SQL 사용
+
 ```sql
 bucket_id = 'experiment-photos'
 ```
 
 **정책 2: 사진 업로드 (INSERT)**
+
 - Policy name: `Users can upload their own photos`
 - Allowed operation: `INSERT`
 - Policy definition: 다음 SQL 사용
+
 ```sql
 bucket_id = 'experiment-photos' AND
 auth.uid()::text = (string_to_array(name, '/'))[1]
 ```
 
 **정책 3: 사진 삭제 (DELETE)**
+
 - Policy name: `Users can delete their own photos`
 - Allowed operation: `DELETE`
 - Policy definition: 다음 SQL 사용
+
 ```sql
 bucket_id = 'experiment-photos' AND
 auth.uid()::text = (string_to_array(name, '/'))[1]
@@ -258,6 +265,7 @@ https://{your-project-ref}.supabase.co/auth/v1/callback
 프로젝트 참조 ID는 Supabase 대시보드의 **Settings > API > Project URL**에서 확인할 수 있습니다.
 
 예시:
+
 - Project URL: `https://abcdefghijklmnop.supabase.co`
 - 리디렉션 URL: `https://abcdefghijklmnop.supabase.co/auth/v1/callback`
 
@@ -269,8 +277,8 @@ https://{your-project-ref}.supabase.co/auth/v1/callback
 2. 해당 프로바이더의 로그인 화면으로 리디렉션되는지 확인
 3. 로그인 성공 후 앱으로 돌아오는지 확인
 
-> **참고**: 
+> **참고**:
+>
 > - 각 프로바이더의 설정은 변경 사항이 반영되는 데 몇 분이 걸릴 수 있습니다.
 > - 개발 환경에서는 localhost를 사용할 수 없으므로, 실제 도메인 또는 Supabase 프로젝트 URL을 사용해야 합니다.
 > - Kakao와 Naver는 Custom OAuth로 설정해야 하며, Supabase의 기본 제공 프로바이더가 아닙니다.
-

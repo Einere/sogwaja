@@ -3,6 +3,41 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Primary Color - RGB 255 170 170 */
+  /* --primary: rgb(255, 170, 170); */
+  --primary: rgb(145, 200, 255);
+  --primary-foreground: rgb(255, 255, 255);
+
+  /* Secondary Color */
+  --secondary: rgb(245, 245, 245);
+  --secondary-foreground: rgb(23, 23, 23);
+
+  /* Warning Color */
+  --warning: rgb(251, 191, 36);
+  --warning-foreground: rgb(23, 23, 23);
+
+  /* Info Color */
+  --info: rgb(59, 130, 246);
+  --info-foreground: rgb(255, 255, 255);
+
+  /* Error Color */
+  --error: rgb(239, 68, 68);
+  --error-foreground: rgb(255, 255, 255);
+
+  /* Destructive (shadcn/ui 호환) */
+  --destructive: rgb(239, 68, 68);
+  --destructive-foreground: rgb(255, 255, 255);
+
+  /* Neutral Colors */
+  --muted: rgb(245, 245, 245);
+  --muted-foreground: rgb(115, 115, 115);
+  --accent: rgb(245, 245, 245);
+  --accent-foreground: rgb(23, 23, 23);
+  /* Border colors based on primary color with low opacity */
+  --border: color-mix(in srgb, var(--primary) 20%, var(--background) 80%);
+  --input: color-mix(in srgb, var(--primary) 20%, var(--background) 80%);
+  --ring: var(--primary);
 }
 
 @theme inline {
@@ -10,19 +45,46 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Primary - RGB 255 170 170 */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* Secondary */
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  /* Warning */
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
+  /* Info */
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* Error */
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+
+  /* Destructive (shadcn/ui 호환) */
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  /* Neutral */
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 }
 
 /* 모바일 최적화 */
@@ -34,13 +96,16 @@ body {
   }
 
   /* 터치 영역 최소 크기 보장 */
-  button, a {
+  button,
+  a {
     min-height: 44px;
     min-width: 44px;
   }
 
   /* 입력 필드 최적화 */
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     font-size: 16px; /* iOS 줌 방지 */
   }
 }

@@ -1,52 +1,47 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import type { SortOption } from '../actions'
+import { useSearchParams } from "next/navigation";
+import type { SortOption } from "../actions";
+import LinkButton from "@/components/ui/LinkButton";
+import { PlusIcon } from "@/components/icons";
 
 export default function RecipeListHeader() {
-  const searchParams = useSearchParams()
-  const sortBy: SortOption =
-    (searchParams.get('sort') as SortOption) || 'updated'
+  const searchParams = useSearchParams();
+  const sortBy: SortOption = (searchParams.get("sort") as SortOption) || "updated";
 
   return (
-    <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
+    <header className="sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
       <div className="flex items-center justify-between mb-3">
         <h1 className="text-2xl font-bold">조리법 목록</h1>
-        <Link
+        <LinkButton
           href="/recipes/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          size="sm"
+          className="flex items-center gap-1"
           aria-label="새 조리법 만들기"
         >
-          + 새 조리법
-        </Link>
+          <PlusIcon className="w-4 h-4" />새 조리법
+        </LinkButton>
       </div>
       <div className="flex gap-2" role="group" aria-label="정렬 옵션">
-        <Link
+        <LinkButton
           href="/recipes?sort=name"
-          className={`px-3 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            sortBy === 'name'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
-          aria-pressed={sortBy === 'name'}
+          variant={sortBy === "name" ? "primary" : "secondary"}
+          size="sm"
+          aria-pressed={sortBy === "name"}
           aria-label="가나다순으로 정렬"
         >
           가나다순
-        </Link>
-        <Link
+        </LinkButton>
+        <LinkButton
           href="/recipes?sort=updated"
-          className={`px-3 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            sortBy === 'updated'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
-          aria-pressed={sortBy === 'updated'}
+          variant={sortBy === "updated" ? "primary" : "secondary"}
+          size="sm"
+          aria-pressed={sortBy === "updated"}
           aria-label="최근 수정순으로 정렬"
         >
           최근 수정순
-        </Link>
+        </LinkButton>
       </div>
     </header>
-  )
+  );
 }

@@ -1,67 +1,71 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { deleteExperiment } from '@/app/recipes/[id]/experiments/actions'
-import EmptyState from '@/components/shared/EmptyState'
-import Link from 'next/link'
-import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import type { Database } from '@/types/database'
+import { useState } from "react";
+import { deleteExperiment } from "@/app/recipes/[id]/experiments/actions";
+import EmptyState from "@/components/shared/EmptyState";
+import TextLink from "@/components/ui/TextLink";
+import { ArrowLeftIcon } from "@/components/icons";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import Link from "next/link";
+import type { Database } from "@/types/database";
 
-type Experiment = Database['public']['Tables']['recipe_experiments']['Row']
-type Photo = Database['public']['Tables']['experiment_photos']['Row']
+type Experiment = Database["public"]["Tables"]["recipe_experiments"]["Row"];
+type Photo = Database["public"]["Tables"]["experiment_photos"]["Row"];
 
 export interface ExperimentWithPhotos extends Experiment {
-  photos: Photo[]
-  thumbnail?: string
+  photos: Photo[];
+  thumbnail?: string;
 }
 
 interface ExperimentsClientProps {
-  experiments: ExperimentWithPhotos[]
-  recipeId: string
+  experiments: ExperimentWithPhotos[];
+  recipeId: string;
 }
 
 export default function ExperimentsClient({ experiments, recipeId }: ExperimentsClientProps) {
   // TODO: experimentsList 를 지역 상태로 관리할 필요가 있는지 검증하기
-  const [experimentsList, setExperimentsList] = useState(experiments)
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null)
+  const [experimentsList, setExperimentsList] = useState(experiments);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteExperiment(id)
+      await deleteExperiment(id);
       // Remove deleted experiment from list
-      setExperimentsList(experimentsList.filter((exp) => exp.id !== id))
-      setDeleteConfirm(null)
+      setExperimentsList(experimentsList.filter(exp => exp.id !== id));
+      setDeleteConfirm(null);
     } catch {
-      alert('삭제 중 오류가 발생했습니다.')
+      alert("삭제 중 오류가 발생했습니다.");
     }
-  }
+  };
 
   return (
     <>
       <div className="min-h-screen pb-20">
         {/* TODO: 헤더를 별도의 컴포넌트로 분리하기 */}
-        <header className="grid grid-cols-3 items-center sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
-            <Link
-              href={`/recipes/${recipeId}`}
-              className="w-fit text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-              aria-label="조리법으로 돌아가기"
-            >
-              ← 돌아가기
-            </Link>
-            <h1 className="text-xl font-bold text-center">실험 목록</h1>
+        <header className="grid grid-cols-3 items-center sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
+          <TextLink
+            href={`/recipes/${recipeId}`}
+            size="sm"
+            className="w-fit flex items-center gap-1"
+            aria-label="조리법으로 돌아가기"
+          >
+            <ArrowLeftIcon className="w-4 h-4" />
+            돌아가기
+          </TextLink>
+          <h1 className="text-xl font-bold text-center">실험 목록</h1>
         </header>
 
         <div className="px-4 py-4">
           {experimentsList.length === 0 ? (
-            <EmptyState
-              title="아직 실험 결과가 없습니다."
-            />
+            <EmptyState title="아직 실험 결과가 없습니다." />
           ) : (
             <div className="space-y-4" role="list" aria-label="실험 목록">
-              {experimentsList.map((experiment) => (
-                <article
+              {experimentsList.map(experiment => (
+                <Card
                   key={experiment.id}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                  className="overflow-hidden"
                   aria-labelledby={`experiment-${experiment.id}`}
                 >
                   <Link href={`/recipes/${recipeId}/experiments/${experiment.id}`}>
@@ -76,37 +80,37 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
                       )}
                       <div className="flex-1">
                         <time
-                          className="text-sm text-gray-500 mb-1 block"
+                          className="text-sm text-muted-foreground mb-1 block"
                           dateTime={experiment.created_at}
                         >
-                          {new Date(experiment.created_at).toLocaleDateString('ko-KR', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
+                          {new Date(experiment.created_at).toLocaleDateString("ko-KR", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
                         </time>
                         {experiment.memo ? (
-                          <p className="text-sm text-gray-700 line-clamp-2">
-                            {experiment.memo}
-                          </p>
+                          <p className="text-sm text-foreground line-clamp-2">{experiment.memo}</p>
                         ) : (
-                          <p className="text-sm text-gray-400">메모 없음</p>
+                          <p className="text-sm text-muted-foreground">메모 없음</p>
                         )}
                       </div>
                     </div>
                   </Link>
                   <div className="px-4 pb-4">
-                    <button
-                      onClick={() => setDeleteConfirm({ id: experiment.id, name: '실험' })}
-                      className="text-sm text-red-600 hover:underline focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+                    <Button
+                      onClick={() => setDeleteConfirm({ id: experiment.id, name: "실험" })}
+                      variant="ghost"
+                      size="sm"
+                      className="text-error hover:text-error"
                       aria-label="실험 삭제"
                     >
                       삭제
-                    </button>
+                    </Button>
                   </div>
-                </article>
+                </Card>
               ))}
             </div>
           )}
@@ -118,11 +122,10 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
         message="정말 삭제하시겠습니까?"
         confirmLabel="삭제"
         cancelLabel="취소"
-        variant="danger"
+        variant="error"
         onConfirm={() => deleteConfirm && handleDelete(deleteConfirm.id)}
         onCancel={() => setDeleteConfirm(null)}
       />
     </>
-  )
+  );
 }
-

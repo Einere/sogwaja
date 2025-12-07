@@ -1,7 +1,7 @@
-import { createRecipe } from '@/app/recipes/actions'
-import { redirect } from 'next/navigation'
+import { createRecipe } from "@/app/recipes/actions";
 
 export default async function NewRecipePage() {
-  const recipe = await createRecipe()
-  redirect(`/recipes/${recipe.id}`)
+  await createRecipe();
+  // createRecipe 내부에서 redirect가 처리되므로 여기 도달하지 않음
+  return null;
 }

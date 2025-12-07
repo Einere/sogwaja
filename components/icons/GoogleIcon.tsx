@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
+import { IconProps } from "./AppleIcon";
 
-interface IconProps {
-  className?: string
-  'aria-hidden'?: boolean
-}
-
-export default function GoogleIcon({ className = 'w-5 h-5', 'aria-hidden': ariaHidden = true }: IconProps) {
+// GoogleIcon은 브랜드 컬러를 유지하되, 스타일을 통일합니다
+export default function GoogleIcon({
+  className = "w-5 h-5",
+  "aria-hidden": ariaHidden = true,
+}: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden={ariaHidden}>
       <path
@@ -25,6 +25,5 @@ export default function GoogleIcon({ className = 'w-5 h-5', 'aria-hidden': ariaH
         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
       />
     </svg>
-  )
+  );
 }
-

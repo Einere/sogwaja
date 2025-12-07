@@ -3,8 +3,8 @@
  */
 
 export interface Quantity {
-  value: number
-  unit: string
+  value: number;
+  unit: string;
 }
 
 /**
@@ -23,18 +23,18 @@ export function calculateProportionalQuantity(
   if (originalOutput.unit !== newOutput.unit) {
     // 단위 변환이 필요한 경우, 일단 같은 단위로 가정하고 비율만 계산
     // 실제로는 단위 변환 로직이 필요할 수 있음
-    const ratio = newOutput.value / originalOutput.value
+    const ratio = newOutput.value / originalOutput.value;
     return {
-      value: Math.round((originalQuantity.value * ratio) * 100) / 100,
+      value: Math.round(originalQuantity.value * ratio * 100) / 100,
       unit: originalQuantity.unit,
-    }
+    };
   }
 
-  const ratio = newOutput.value / originalOutput.value
+  const ratio = newOutput.value / originalOutput.value;
   return {
-    value: Math.round((originalQuantity.value * ratio) * 100) / 100,
+    value: Math.round(originalQuantity.value * ratio * 100) / 100,
     unit: originalQuantity.unit,
-  }
+  };
 }
 
 /**
@@ -45,17 +45,17 @@ export function calculateIngredients(
   originalOutput: Quantity,
   newOutput: Quantity
 ): Array<{ amount: number; unit: string }> {
-  return ingredients.map((ingredient) => {
+  return ingredients.map(ingredient => {
     const calculated = calculateProportionalQuantity(
       { value: ingredient.amount, unit: ingredient.unit },
       originalOutput,
       newOutput
-    )
+    );
     return {
       amount: calculated.value,
       unit: calculated.unit,
-    }
-  })
+    };
+  });
 }
 
 /**
@@ -66,16 +66,15 @@ export function calculateEquipment(
   originalOutput: Quantity,
   newOutput: Quantity
 ): Array<{ quantity: number; unit: string }> {
-  return equipment.map((eq) => {
+  return equipment.map(eq => {
     const calculated = calculateProportionalQuantity(
       { value: eq.quantity, unit: eq.unit },
       originalOutput,
       newOutput
-    )
+    );
     return {
       quantity: calculated.value,
       unit: calculated.unit,
-    }
-  })
+    };
+  });
 }
-

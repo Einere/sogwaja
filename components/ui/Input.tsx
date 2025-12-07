@@ -1,36 +1,69 @@
-import { InputHTMLAttributes } from 'react'
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string
-  error?: string
+const inputVariants = cva(
+  "flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+  {
+    variants: {
+      variant: {
+        default: "",
+        error: "border-error focus-visible:ring-error",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement>, VariantProps<typeof inputVariants> {
+  label?: string;
+  error?: string;
 }
 
-export default function Input({ label, error, className = '', id, ...props }: InputProps) {
-  const inputId = id || (label ? `input-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined)
-  const errorId = error ? `${inputId}-error` : undefined
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, className, id, variant, ...props }, ref) => {
+    const inputId = id || (label ? `input-${label.replace(/\s+/g, "-").toLowerCase()}` : undefined);
+    const errorId = error ? `${inputId}-error` : undefined;
+    const inputVariant = error ? "error" : variant;
 
-  return (
-    <div className="w-full">
-      {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
-        </label>
-      )}
+    if (label || error) {
+      return (
+        <div className="w-full">
+          {label && (
+            <label htmlFor={inputId} className="block text-sm font-medium text-foreground mb-1">
+              {label}
+            </label>
+          )}
+          <input
+            id={inputId}
+            ref={ref}
+            className={cn(inputVariants({ variant: inputVariant, className }))}
+            aria-invalid={error ? "true" : undefined}
+            aria-describedby={errorId}
+            {...props}
+          />
+          {error && (
+            <p id={errorId} className="mt-1 text-sm text-error" role="alert">
+              {error}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    return (
       <input
-        id={inputId}
-        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        } ${className}`}
-        aria-invalid={error ? 'true' : undefined}
-        aria-describedby={errorId}
+        ref={ref}
+        className={cn(inputVariants({ variant: inputVariant, className }))}
         {...props}
       />
-      {error && (
-        <p id={errorId} className="mt-1 text-sm text-red-600" role="alert">
-          {error}
-        </p>
-      )}
-    </div>
-  )
-}
+    );
+  }
+);
+Input.displayName = "Input";
 
+export { Input, inputVariants };
+export default Input;

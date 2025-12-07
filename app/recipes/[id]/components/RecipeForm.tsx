@@ -1,29 +1,29 @@
-'use client'
+"use client";
 
-import EquipmentEditor from '../../components/RecipeFormFields/EquipmentEditor'
-import IngredientEditor from '../../components/RecipeFormFields/IngredientEditor'
-import OutputEditor from '../../components/RecipeFormFields/OutputEditor'
-import StepEditor from '../../components/RecipeFormFields/StepEditor'
-import type { Database } from '@/types/database'
-import type { Json } from '@/types/database'
-import type { Descendant } from 'slate'
+import EquipmentEditor from "../../components/RecipeFormFields/EquipmentEditor";
+import IngredientEditor from "../../components/RecipeFormFields/IngredientEditor";
+import OutputEditor from "../../components/RecipeFormFields/OutputEditor";
+import StepEditor from "../../components/RecipeFormFields/StepEditor";
+import type { Database } from "@/types/database";
+import type { Json } from "@/types/database";
+import type { Descendant } from "slate";
 
-type Equipment = Database['public']['Tables']['recipe_equipment']['Row']
-type Ingredient = Database['public']['Tables']['recipe_ingredients']['Row']
-type Output = Database['public']['Tables']['recipe_outputs']['Row']
+type Equipment = Database["public"]["Tables"]["recipe_equipment"]["Row"];
+type Ingredient = Database["public"]["Tables"]["recipe_ingredients"]["Row"];
+type Output = Database["public"]["Tables"]["recipe_outputs"]["Row"];
 
 interface RecipeFormProps {
-  recipeId: string
-  equipment: Equipment[]
-  ingredients: Ingredient[]
-  outputs: Output[]
-  steps: Json | null
-  onEquipmentChange: (equipment: Equipment[]) => void
-  onIngredientsChange: (ingredients: Ingredient[]) => void
-  onOutputsChange: (outputs: Output[]) => void
-  onStepsChange: (steps: { children: Descendant[] }) => void
-  onOutputQuantityChange: (quantity: number, unit: string) => void
-  user: { id: string } | null
+  recipeId: string;
+  equipment: Equipment[];
+  ingredients: Ingredient[];
+  outputs: Output[];
+  steps: Json | null;
+  onEquipmentChange: (equipment: Equipment[]) => void;
+  onIngredientsChange: (ingredients: Ingredient[]) => void;
+  onOutputsChange: (outputs: Output[]) => void;
+  onStepsChange: (steps: { children: Descendant[] }) => void;
+  onOutputQuantityChange: (quantity: number, unit: string) => void;
+  user: { id: string } | null;
 }
 
 export default function RecipeForm({
@@ -37,11 +37,12 @@ export default function RecipeForm({
   onStepsChange,
   onOutputQuantityChange,
 }: RecipeFormProps) {
-  const initialSteps: { children: Descendant[] } = steps && typeof steps === 'object' && 'children' in steps
-    ? (steps as unknown as { children: Descendant[] })
-    : {
-        children: [{ type: 'paragraph', children: [{ text: '' }] }] as unknown as Descendant[],
-      }
+  const initialSteps: { children: Descendant[] } =
+    steps && typeof steps === "object" && "children" in steps
+      ? (steps as unknown as { children: Descendant[] })
+      : {
+          children: [{ type: "paragraph", children: [{ text: "" }] }] as unknown as Descendant[],
+        };
 
   return (
     <main className="px-4 py-6 space-y-6">
@@ -77,6 +78,5 @@ export default function RecipeForm({
         />
       </section>
     </main>
-  )
+  );
 }
-
