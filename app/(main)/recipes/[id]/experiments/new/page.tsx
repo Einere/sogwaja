@@ -72,25 +72,38 @@ export default function NewExperimentPage() {
           </legend>
           <div className="grid grid-cols-3 gap-2 mb-2">
             {previews.map((preview, index) => (
-              <div key={index} className="relative">
+              <div key={index} className="relative aspect-square">
                 <img
                   src={preview}
                   alt={`미리보기 ${index + 1}`}
-                  className="w-full h-24 object-cover rounded"
+                  className="w-full aspect-square object-cover rounded"
+                  loading="lazy"
                 />
                 <button
                   type="button"
                   onClick={() => removePhoto(index)}
                   disabled={isPending}
-                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="absolute top-1 right-1 bg-gray-500/50 backdrop-blur-sm rounded-full w-7 h-7 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-500/70 transition-colors"
                   aria-label={`사진 ${index + 1} 삭제`}
                 >
-                  ×
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-4 h-4 text-red-500"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
                 </button>
               </div>
             ))}
             {previews.length < 9 && (
-              <label className={`flex items-center justify-center border-2 border-dashed rounded ${
+              <label className={`flex w-full aspect-square items-center justify-center border-2 border-dashed rounded ${
                 isPending 
                   ? 'border-gray-200 cursor-not-allowed opacity-50' 
                   : 'border-gray-300 cursor-pointer hover:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500'
