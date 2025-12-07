@@ -26,13 +26,8 @@ export function useRecipeList(): UseRecipeListResult {
     setLoading(true)
     setError(null)
     try {
-      const result = await getRecipes(sortBy)
-      if (result.error) {
-        setError(result.error)
-        setRecipes([])
-      } else {
-        setRecipes(result.data || [])
-      }
+      const recipesData = await getRecipes(sortBy)
+      setRecipes(recipesData)
     } catch {
       setError('조리법 목록을 불러오는 중 오류가 발생했습니다.')
       setRecipes([])
@@ -46,10 +41,7 @@ export function useRecipeList(): UseRecipeListResult {
   }, [loadRecipes])
 
   const handleDelete = useCallback(async (id: string) => {
-    const result = await deleteRecipe(id)
-    if (result.error) {
-      throw new Error(result.error)
-    }
+    await deleteRecipe(id)
     await loadRecipes()
   }, [loadRecipes])
 

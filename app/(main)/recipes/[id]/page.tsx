@@ -1,74 +1,27 @@
-'use client'
+import { getRecipeData } from '@/app/recipes/[id]/actions'
+import { notFound } from 'next/navigation'
+import { getServerUser } from '@/lib/supabase/auth'
+import RecipeEditorClient from './RecipeEditorClient'
 
-import { useParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/hooks/useAuth'
-import { useRecipeEditor } from '@/app/recipes/[id]/hooks/useRecipeEditor'
-import RecipeHeader from '@/app/recipes/[id]/components/RecipeHeader'
-import RecipeForm from '@/app/recipes/[id]/components/RecipeForm'
-import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import ErrorMessage from '@/components/shared/ErrorMessage'
+interface RecipeEditorPageProps {
+  params: Promise<{ id: string }>
+}
 
-export default function RecipeEditorPage() {
-  const params = useParams()
-  const router = useRouter()
-  const recipeId = params.id as string
-  const { user, loading: authLoading } = useAuth()
-  const {
-    recipe,
-    equipment,
-    ingredients,
-    outputs,
-    steps,
-    title,
-    loading,
-    error,
-    saving,
-    setTitle,
-    setEquipment,
-    setIngredients,
-    setOutputs,
-    setSteps,
-    handleOutputQuantityChange,
-  } = useRecipeEditor(recipeId)
-
-  if (loading) {
-    return <LoadingSpinner message="로딩 중..." />
+export default async function RecipeEditorPage({ params }: RecipeEditorPageProps) {
+  const { id: recipeId } = await params
+  
+  const user = await getServerUser()
+  if (!user) {
+    notFound()
   }
 
-  if (error) {
-    return (
-      <ErrorMessage
-        message={error}
-        onRetry={() => router.push('/recipes')}
-        retryLabel="목록으로 돌아가기"
-      />
-    )
-  }
-
-  if (!recipe) {
-    return null
-  }
+  const recipeData = await getRecipeData(recipeId)
 
   return (
-    <div className="min-h-screen pb-20">
-      <RecipeHeader
-        title={title}
-        onTitleChange={setTitle}
-        saving={saving}
-      />
-      <RecipeForm
-        recipeId={recipeId}
-        equipment={equipment}
-        ingredients={ingredients}
-        outputs={outputs}
-        steps={steps}
-        onEquipmentChange={setEquipment}
-        onIngredientsChange={setIngredients}
-        onOutputsChange={setOutputs}
-        onStepsChange={setSteps}
-        onOutputQuantityChange={handleOutputQuantityChange}
-        user={user}
-      />
-    </div>
+    <RecipeEditorClient
+      initialData={recipeData}
+      recipeId={recipeId}
+      user={user}
+    />
   )
 }

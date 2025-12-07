@@ -47,14 +47,10 @@ export function useExperimentForm(): UseExperimentFormResult {
     setError(null)
 
     try {
-      const result = await createExperiment(recipeId, memo || null, photos)
-      if (result.error) {
-        setError(result.error)
-        return { success: false, error: result.error }
-      }
+      await createExperiment(recipeId, memo || null, photos)
       return { success: true }
-    } catch {
-      const errorMessage = '실험 결과 저장 중 오류가 발생했습니다.'
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '실험 결과 저장 중 오류가 발생했습니다.'
       setError(errorMessage)
       return { success: false, error: errorMessage }
     } finally {

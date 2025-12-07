@@ -18,7 +18,7 @@ export default function RecipeHeader({
       <div className="flex items-center justify-between mb-2">
         <Link
           href="/recipes"
-          className="text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+          className="w-fit text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
           aria-label="조리법 목록으로 돌아가기"
         >
           ← 목록으로

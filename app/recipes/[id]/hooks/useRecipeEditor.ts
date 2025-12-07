@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { getRecipeData, updateEquipment, updateIngredients, updateOutputs, updateSteps } from '../actions'
+import { getRecipeData, updateEquipment, updateIngredients, updateOutputs, updateSteps, type RecipeData } from '../actions'
 import { updateRecipeTitle } from '../../actions'
 import { calculateIngredients, calculateEquipment } from '@/lib/utils/calculations'
 import type { Database } from '@/types/database'
@@ -32,14 +32,18 @@ interface UseRecipeEditorResult {
   refresh: () => Promise<void>
 }
 
-export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
-  const [recipe, setRecipe] = useState<Recipe | null>(null)
-  const [equipment, setEquipment] = useState<Equipment[]>([])
-  const [ingredients, setIngredients] = useState<Ingredient[]>([])
-  const [outputs, setOutputs] = useState<Output[]>([])
-  const [steps, setSteps] = useState<Json | null>(null)
-  const [title, setTitle] = useState('')
-  const [loading, setLoading] = useState(true)
+// TOOD: react-hook-form 으로 리팩토링?
+export function useRecipeEditor(
+  recipeId: string,
+  initialData?: RecipeData
+): UseRecipeEditorResult {
+  const [recipe, setRecipe] = useState<Recipe | null>(initialData?.recipe || null)
+  const [equipment, setEquipment] = useState<Equipment[]>(initialData?.equipment || [])
+  const [ingredients, setIngredients] = useState<Ingredient[]>(initialData?.ingredients || [])
+  const [outputs, setOutputs] = useState<Output[]>(initialData?.outputs || [])
+  const [steps, setSteps] = useState<Json | null>(initialData?.steps || null)
+  const [title, setTitle] = useState(initialData?.recipe.title || '')
+  const [loading, setLoading] = useState(!initialData)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -47,20 +51,13 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
     setLoading(true)
     setError(null)
     try {
-      const result = await getRecipeData(recipeId)
-      if (result.error) {
-        setError(result.error)
-        return
-      }
-
-      if (result.data) {
-        setRecipe(result.data.recipe)
-        setTitle(result.data.recipe.title)
-        setEquipment(result.data.equipment)
-        setIngredients(result.data.ingredients)
-        setOutputs(result.data.outputs)
-        setSteps(result.data.steps)
-      }
+      const recipeData = await getRecipeData(recipeId)
+      setRecipe(recipeData.recipe)
+      setTitle(recipeData.recipe.title)
+      setEquipment(recipeData.equipment)
+      setIngredients(recipeData.ingredients)
+      setOutputs(recipeData.outputs)
+      setSteps(recipeData.steps)
     } catch (err) {
       setError('조리법을 불러오는 중 오류가 발생했습니다.')
     } finally {
@@ -69,8 +66,11 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
   }, [recipeId])
 
   useEffect(() => {
-    loadRecipe()
-  }, [loadRecipe])
+    // Only load if initialData is not provided
+    if (!initialData) {
+      loadRecipe()
+    }
+  }, [loadRecipe, initialData])
 
   // Save title
   const saveTitle = useCallback(async (newTitle: string) => {
@@ -78,14 +78,8 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
 
     setSaving(true)
     try {
-      const result = await updateRecipeTitle(recipeId, newTitle)
-      if (result.error) {
-        console.error('Error saving title:', result.error)
-        return
-      }
-      if (result.data) {
-        setRecipe(result.data)
-      }
+      const updatedRecipe = await updateRecipeTitle(recipeId, newTitle)
+      setRecipe(updatedRecipe)
     } catch (err) {
       console.error('Error saving title:', err)
     } finally {
@@ -108,14 +102,8 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
     setSaving(true)
     try {
       const equipmentToSave = newEquipment.map(({ created_at: _created_at, recipe_id: _recipe_id, id: _id, ...eq }) => eq)
-      const result = await updateEquipment(recipeId, equipmentToSave)
-      if (result.error) {
-        console.error('Error saving equipment:', result.error)
-        return
-      }
-      if (result.data) {
-        setEquipment(result.data)
-      }
+      const updatedEquipment = await updateEquipment(recipeId, equipmentToSave)
+      setEquipment(updatedEquipment)
     } catch (err) {
       console.error('Error saving equipment:', err)
     } finally {
@@ -129,14 +117,8 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
     setSaving(true)
     try {
       const ingredientsToSave = newIngredients.map(({ created_at: _created_at, recipe_id: _recipe_id, id: _id, ...ing }) => ing)
-      const result = await updateIngredients(recipeId, ingredientsToSave)
-      if (result.error) {
-        console.error('Error saving ingredients:', result.error)
-        return
-      }
-      if (result.data) {
-        setIngredients(result.data)
-      }
+      const updatedIngredients = await updateIngredients(recipeId, ingredientsToSave)
+      setIngredients(updatedIngredients)
     } catch (err) {
       console.error('Error saving ingredients:', err)
     } finally {
@@ -150,14 +132,8 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
     setSaving(true)
     try {
       const outputsToSave = newOutputs.map(({ created_at: _created_at, recipe_id: _recipe_id, ...out }) => out)
-      const result = await updateOutputs(recipeId, outputsToSave)
-      if (result.error) {
-        console.error('Error saving outputs:', result.error)
-        return
-      }
-      if (result.data) {
-        setOutputs(result.data)
-      }
+      const updatedOutputs = await updateOutputs(recipeId, outputsToSave)
+      setOutputs(updatedOutputs)
     } catch (err) {
       console.error('Error saving outputs:', err)
     } finally {
@@ -170,11 +146,7 @@ export function useRecipeEditor(recipeId: string): UseRecipeEditorResult {
     if (!recipe) return
     setSaving(true)
     try {
-      const result = await updateSteps(recipeId, newSteps)
-      if (result.error) {
-        console.error('Error saving steps:', result.error)
-        return
-      }
+      await updateSteps(recipeId, newSteps)
       setSteps(newSteps)
     } catch (err) {
       console.error('Error saving steps:', err)

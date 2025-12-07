@@ -5,7 +5,6 @@ import { useExperimentForm } from '@/app/recipes/[id]/experiments/hooks/useExper
 import Textarea from '@/components/ui/Textarea'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
-import LoadingSpinner from '@/components/shared/LoadingSpinner'
 
 export default function NewExperimentPage() {
   const params = useParams()
@@ -44,20 +43,18 @@ export default function NewExperimentPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
-        <div className="flex items-center justify-between">
+      <header className="grid grid-cols-3 items-center sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
           <Link
             href={`/recipes/${recipeId}`}
-            className="text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+            className="w-fit text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
             aria-label="조리법으로 돌아가기"
           >
             ← 돌아가기
           </Link>
-          <h1 className="text-xl font-bold">실험 결과 저장</h1>
-          <div className="w-12" aria-hidden="true" />
-        </div>
+          <h1 className="text-center text-xl font-bold">실험 결과 저장</h1>
       </header>
 
+      {/* TODO: 폼 액션을 활용하도록 수정. e.g. useActionState */}
       <form onSubmit={onSubmit} className="px-4 py-6 space-y-6" aria-label="실험 결과 저장 폼">
         <fieldset>
           <legend className="block text-sm font-medium text-gray-700 mb-2">

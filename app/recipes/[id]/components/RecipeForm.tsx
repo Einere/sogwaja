@@ -76,35 +76,6 @@ export default function RecipeForm({
           ingredients={ingredients}
         />
       </section>
-
-      {/* <div className="flex gap-3 pt-4">
-        {user ? (
-          <>
-            <Link
-              href={`/recipes/${recipeId}/experiments/new`}
-              className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg text-center hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-              aria-label="실험 저장"
-            >
-              실험 저장
-            </Link>
-            <Link
-              href={`/recipes/${recipeId}/experiments`}
-              className="flex-1 px-6 py-3 bg-gray-200 text-gray-900 rounded-lg text-center hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              aria-label="실험 목록 보기"
-            >
-              실험 목록
-            </Link>
-          </>
-        ) : (
-          <Link 
-            href="/login"
-            className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg text-center hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-            aria-label="로그인하여 실험 저장"
-          >
-            로그인하여 실험 저장
-          </Link>
-        )}
-      </div> */}
     </main>
   )
 }

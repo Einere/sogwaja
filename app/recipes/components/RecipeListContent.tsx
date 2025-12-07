@@ -21,11 +21,7 @@ export default function RecipeListContent({ recipes }: RecipeListContentProps) {
 
     setDeletingId(id)
     try {
-      const result = await deleteRecipe(id)
-      if (result.error) {
-        alert('삭제 중 오류가 발생했습니다: ' + result.error)
-        return
-      }
+      await deleteRecipe(id)
       // Refresh the page to show updated list
       router.refresh()
     } catch (error) {
