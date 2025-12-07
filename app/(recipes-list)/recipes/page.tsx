@@ -1,22 +1,24 @@
-import { Suspense } from 'react'
-import { getServerUser } from '@/lib/supabase/auth'
-import { getRecipes, type SortOption } from '@/app/recipes/actions'
-import RecipeListHeader from '@/app/recipes/components/RecipeListHeader'
-import RecipeListContent from '@/app/recipes/components/RecipeListContent'
-import EmptyState from '@/components/shared/EmptyState'
-import LinkButton from '@/components/ui/LinkButton'
+import { Suspense } from "react";
+import { getServerUser } from "@/lib/supabase/auth";
+import { getRecipes, type SortOption } from "@/app/recipes/actions";
+import RecipeListHeader from "@/app/recipes/components/RecipeListHeader";
+import RecipeListContent from "@/app/recipes/components/RecipeListContent";
+import EmptyState from "@/components/shared/EmptyState";
+import LinkButton from "@/components/ui/LinkButton";
 
 interface RecipesPageProps {
-  searchParams: Promise<{
-    sort?: string
-  }> | {
-    sort?: string
-  }
+  searchParams:
+    | Promise<{
+        sort?: string;
+      }>
+    | {
+        sort?: string;
+      };
 }
 
 export default async function RecipesPage({ searchParams }: RecipesPageProps) {
   // TODO: auth guard 로직은 분리해야 함.
-  const user = await getServerUser()
+  const user = await getServerUser();
 
   if (!user) {
     return (
@@ -25,27 +27,22 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
         <p className="text-muted-foreground mb-4 text-center">
           조리법을 저장하고 관리하려면 로그인이 필요합니다.
         </p>
-        <LinkButton
-          href="/login"
-          aria-label="로그인하기"
-        >
+        <LinkButton href="/login" aria-label="로그인하기">
           로그인하기
         </LinkButton>
       </main>
-    )
+    );
   }
 
   // Handle searchParams - it might be a Promise in Next.js 16
-  const params = searchParams instanceof Promise ? await searchParams : searchParams
+  const params = searchParams instanceof Promise ? await searchParams : searchParams;
 
   // Validate and set sort option
   const sortBy: SortOption =
-    params.sort === 'name' || params.sort === 'updated'
-      ? params.sort
-      : 'updated'
-  
+    params.sort === "name" || params.sort === "updated" ? params.sort : "updated";
+
   // Fetch recipes from server
-  const recipes = await getRecipes(sortBy)
+  const recipes = await getRecipes(sortBy);
 
   return (
     <div className="min-h-screen">
@@ -66,8 +63,8 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
           <EmptyState
             title="아직 조리법이 없습니다."
             action={{
-              label: '첫 조리법 만들기',
-              href: '/recipes/new',
+              label: "첫 조리법 만들기",
+              href: "/recipes/new",
             }}
           />
         ) : (
@@ -75,6 +72,5 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
         )}
       </div>
     </div>
-  )
+  );
 }
-

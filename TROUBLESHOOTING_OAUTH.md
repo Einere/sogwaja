@@ -1,6 +1,7 @@
 # OAuth 500 에러 해결 가이드
 
 ## 문제
+
 Supabase `/auth/v1/authorize` 엔드포인트에서 500 에러가 발생합니다.
 
 ## 해결 방법
@@ -8,6 +9,7 @@ Supabase `/auth/v1/authorize` 엔드포인트에서 500 에러가 발생합니�
 ### 1. Supabase 대시보드 설정 확인
 
 #### Site URL 설정
+
 1. Supabase 대시보드 접속
 2. **Settings > Authentication > URL Configuration**으로 이동
 3. **Site URL**에 다음 중 하나를 설정:
@@ -21,6 +23,7 @@ Supabase `/auth/v1/authorize` 엔드포인트에서 500 에러가 발생합니�
 5. **Save** 클릭
 
 #### Google OAuth 설정 확인
+
 1. **Authentication > Providers > Google**로 이동
 2. **Enable Google provider** 토글 활성화 확인
 3. **Client ID**와 **Client Secret**이 올바르게 입력되어 있는지 확인
@@ -60,4 +63,3 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 - 브라우저 콘솔에서 더 자세한 에러 메시지 확인
 - Supabase 대시보드의 **Logs > Auth Logs**에서 에러 로그 확인
 - 네트워크 탭에서 실제 요청/응답 확인
-

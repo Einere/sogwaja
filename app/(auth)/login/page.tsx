@@ -1,21 +1,21 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { GoogleIcon, AppleIcon } from '@/components/icons'
-import Button from '@/components/ui/Button'
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { GoogleIcon, AppleIcon } from "@/components/icons";
+import Button from "@/components/ui/Button";
 
 export default function LoginPage() {
-  const [loading, setLoading] = useState(false)
-  const supabase = createClient()
+  const [loading, setLoading] = useState(false);
+  const supabase = createClient();
 
-  const handleSocialLogin = async (provider: 'google' | 'apple') => {
+  const handleSocialLogin = async (provider: "google" | "apple") => {
     try {
-      setLoading(true)
-      
+      setLoading(true);
+
       // Check if Supabase URL is configured
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        throw new Error('Supabase URL이 설정되지 않았습니다. 환경 변수를 확인해주세요.')
+        throw new Error("Supabase URL이 설정되지 않았습니다. 환경 변수를 확인해주세요.");
       }
 
       const { error } = await supabase.auth.signInWithOAuth({
@@ -23,23 +23,24 @@ export default function LoginPage() {
         options: {
           redirectTo: `${window.location.origin}/api/auth/callback`,
         },
-      })
-      
+      });
+
       if (error) {
-        console.error('OAuth error:', error)
-        throw error
+        console.error("OAuth error:", error);
+        throw error;
       }
-      
+
       // OAuth는 리디렉션을 수행하므로 여기서는 성공으로 간주
       // 실제 인증은 콜백 URL에서 처리됩니다
     } catch (error) {
-      console.error('Error signing in:', error)
-      const errorMessage = error instanceof Error ? error.message : '로그인 중 오류가 발생했습니다.'
-      alert(errorMessage)
+      console.error("Error signing in:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "로그인 중 오류가 발생했습니다.";
+      alert(errorMessage);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -52,7 +53,7 @@ export default function LoginPage() {
 
           <div className="space-y-4">
             <Button
-              onClick={() => handleSocialLogin('google')}
+              onClick={() => handleSocialLogin("google")}
               disabled={loading}
               variant="outline"
               className="w-full flex items-center justify-center gap-3"
@@ -62,7 +63,7 @@ export default function LoginPage() {
             </Button>
 
             <Button
-              onClick={() => handleSocialLogin('apple')}
+              onClick={() => handleSocialLogin("apple")}
               disabled={loading}
               variant="primary"
               className="w-full flex items-center justify-center gap-3 bg-black hover:bg-black/90"
@@ -78,6 +79,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

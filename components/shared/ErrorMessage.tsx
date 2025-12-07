@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import Button from '@/components/ui/Button'
+import Button from "@/components/ui/Button";
 
 interface ErrorMessageProps {
-  message: string
-  onRetry?: () => void
-  retryLabel?: string
+  message: string;
+  onRetry?: () => void;
+  retryLabel?: string;
 }
 
 export default function ErrorMessage({
   message,
   onRetry,
-  retryLabel = '다시 시도',
+  retryLabel = "다시 시도",
 }: ErrorMessageProps) {
   return (
     <div
@@ -20,12 +20,7 @@ export default function ErrorMessage({
       aria-live="assertive"
     >
       <div className="text-error mb-4" aria-hidden="true">
-        <svg
-          className="w-12 h-12"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -37,14 +32,10 @@ export default function ErrorMessage({
       <h2 className="text-xl font-bold text-error mb-2">오류 발생</h2>
       <p className="text-foreground mb-4 text-center max-w-md">{message}</p>
       {onRetry && (
-        <Button
-          onClick={onRetry}
-          aria-label={retryLabel}
-        >
+        <Button onClick={onRetry} aria-label={retryLabel}>
           {retryLabel}
         </Button>
       )}
     </div>
-  )
+  );
 }
-

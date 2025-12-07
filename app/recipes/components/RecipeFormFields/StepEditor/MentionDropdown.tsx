@@ -1,12 +1,13 @@
-'use client'
+"use client";
 
-import type { MentionItem, DropdownPosition } from './types'
+import type { MentionItem, DropdownPosition } from "./types";
+import Badge from "@/components/ui/Badge";
 
 interface MentionDropdownProps {
-  items: MentionItem[]
-  selectedIndex: number
-  position: DropdownPosition
-  onSelect: (item: MentionItem) => void
+  items: MentionItem[];
+  selectedIndex: number;
+  position: DropdownPosition;
+  onSelect: (item: MentionItem) => void;
 }
 
 export default function MentionDropdown({
@@ -21,7 +22,7 @@ export default function MentionDropdown({
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
-        minWidth: '200px',
+        minWidth: "200px",
       }}
       role="listbox"
       aria-label="멘션 목록"
@@ -33,35 +34,32 @@ export default function MentionDropdown({
           tabIndex={0}
           className={`px-3 py-2 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
             i === selectedIndex
-              ? item.type === 'equipment'
-                ? 'bg-info/20 text-info-foreground'
-                : 'bg-warning/20 text-warning-foreground'
-              : 'hover:bg-accent'
+              ? item.type === "equipment"
+                ? "bg-info/20 text-foreground"
+                : "bg-warning/20 text-warning-foreground"
+              : "hover:bg-accent"
           }`}
           onClick={() => onSelect(item)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              onSelect(item)
+          onKeyDown={e => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onSelect(item);
             }
           }}
           role="option"
           aria-selected={i === selectedIndex}
-          aria-label={`${item.type === 'equipment' ? '장비' : '재료'}: ${item.displayName}`}
+          aria-label={`${item.type === "equipment" ? "장비" : "재료"}: ${item.displayName}`}
         >
-          <span
-            className={`inline-block px-2 py-0.5 rounded text-xs mr-2 ${
-              item.type === 'equipment'
-                ? 'bg-info/30 text-info-foreground'
-                : 'bg-warning/30 text-warning-foreground'
-            }`}
+          <Badge
+            variant={item.type === "equipment" ? "equipment" : "ingredient"}
+            size="sm"
+            className="mr-2"
           >
-            {item.type === 'equipment' ? '장비' : '재료'}
-          </span>
-          {item.displayName.replace(/\s+/g, '_')}
+            {item.type === "equipment" ? "장비" : "재료"}
+          </Badge>
+          {item.displayName.replace(/\s+/g, "_")}
         </div>
       ))}
     </div>
-  )
+  );
 }
-

@@ -1,37 +1,40 @@
-import type { MentionElement } from './types'
-import type { RenderElementProps as SlateRenderElementProps, RenderLeafProps as SlateRenderLeafProps } from 'slate-react'
+import type { MentionElement } from "./types";
+import type {
+  RenderElementProps as SlateRenderElementProps,
+  RenderLeafProps as SlateRenderLeafProps,
+} from "slate-react";
+import Badge from "@/components/ui/Badge";
 
 interface RenderElementProps extends SlateRenderElementProps {
-  element: SlateRenderElementProps['element'] | MentionElement
+  element: SlateRenderElementProps["element"] | MentionElement;
 }
 
-type RenderLeafProps = SlateRenderLeafProps
+type RenderLeafProps = SlateRenderLeafProps;
 
 export function MentionElement({ attributes, children, element }: RenderElementProps) {
-  const mentionElement = element as MentionElement
-  const isEquipment = mentionElement.mentionType === 'equipment'
+  const mentionElement = element as MentionElement;
+  const isEquipment = mentionElement.mentionType === "equipment";
 
   return (
-    <span
+    <Badge
       {...attributes}
+      variant={isEquipment ? "equipment" : "ingredient"}
+      size="sm"
+      className="text-base md:text-sm"
       contentEditable={false}
-      className={`inline px-1 rounded ${
-        isEquipment ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
-      }`}
-      style={{ userSelect: 'none' }}
+      style={{ userSelect: "none" }}
       role="textbox"
-      aria-label={`${isEquipment ? '장비' : '재료'} 멘션: ${mentionElement.name}`}
+      aria-label={`${isEquipment ? "장비" : "재료"} 멘션: ${mentionElement.name}`}
     >
       {children}
-    </span>
-  )
+    </Badge>
+  );
 }
 
 export function DefaultElement({ attributes, children }: RenderElementProps) {
-  return <p {...attributes}>{children}</p>
+  return <p {...attributes}>{children}</p>;
 }
 
 export function Leaf({ attributes, children }: RenderLeafProps) {
-  return <span {...attributes}>{children}</span>
+  return <span {...attributes}>{children}</span>;
 }
-

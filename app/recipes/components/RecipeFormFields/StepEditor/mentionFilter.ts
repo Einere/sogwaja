@@ -1,4 +1,4 @@
-import type { MentionItem, Equipment, Ingredient } from './types'
+import type { MentionItem, Equipment, Ingredient } from "./types";
 
 /**
  * equipment와 ingredients를 통합 태그 목록으로 변환합니다.
@@ -7,27 +7,27 @@ export function createMentionItems(
   equipment: Equipment[],
   ingredients: Ingredient[]
 ): MentionItem[] {
-  const items: MentionItem[] = []
+  const items: MentionItem[] = [];
 
-  equipment.forEach((eq) => {
+  equipment.forEach(eq => {
     items.push({
       id: eq.id,
-      name: eq.name.replace(/\s+/g, '_'),
+      name: eq.name.replace(/\s+/g, "_"),
       displayName: eq.name,
-      type: 'equipment',
-    })
-  })
+      type: "equipment",
+    });
+  });
 
-  ingredients.forEach((ing) => {
+  ingredients.forEach(ing => {
     items.push({
       id: ing.id,
-      name: ing.name.replace(/\s+/g, '_'),
+      name: ing.name.replace(/\s+/g, "_"),
       displayName: ing.name,
-      type: 'ingredient',
-    })
-  })
+      type: "ingredient",
+    });
+  });
 
-  return items
+  return items;
 }
 
 /**
@@ -43,16 +43,15 @@ export function filterMentionItems(
   maxResults: number = 10
 ): MentionItem[] {
   if (!searchText) {
-    return items.slice(0, maxResults)
+    return items.slice(0, maxResults);
   }
 
-  const lowerSearch = searchText.toLowerCase()
+  const lowerSearch = searchText.toLowerCase();
   return items
-    .filter((item) => {
-      const nameMatch = item.name.toLowerCase().includes(lowerSearch)
-      const displayMatch = item.displayName.toLowerCase().includes(lowerSearch)
-      return nameMatch || displayMatch
+    .filter(item => {
+      const nameMatch = item.name.toLowerCase().includes(lowerSearch);
+      const displayMatch = item.displayName.toLowerCase().includes(lowerSearch);
+      return nameMatch || displayMatch;
     })
-    .slice(0, maxResults)
+    .slice(0, maxResults);
 }
-

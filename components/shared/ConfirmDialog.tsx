@@ -1,51 +1,51 @@
-'use client'
+"use client";
 
-import { useEffect, useRef } from 'react'
-import Button from '@/components/ui/Button'
+import { useEffect, useRef } from "react";
+import Button from "@/components/ui/Button";
 
 interface ConfirmDialogProps {
-  isOpen: boolean
-  title: string
-  message: string
-  confirmLabel?: string
-  cancelLabel?: string
-  onConfirm: () => void
-  onCancel: () => void
-  variant?: 'error' | 'default'
+  isOpen: boolean;
+  title: string;
+  message: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  variant?: "error" | "default";
 }
 
 export default function ConfirmDialog({
   isOpen,
   title,
   message,
-  confirmLabel = '확인',
-  cancelLabel = '취소',
+  confirmLabel = "확인",
+  cancelLabel = "취소",
   onConfirm,
   onCancel,
-  variant = 'default',
+  variant = "default",
 }: ConfirmDialogProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null)
-  const confirmButtonRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      dialogRef.current?.showModal()
+      dialogRef.current?.showModal();
       // Focus confirm button after a short delay to ensure dialog is rendered
       setTimeout(() => {
-        confirmButtonRef.current?.focus()
-      }, 100)
+        confirmButtonRef.current?.focus();
+      }, 100);
     } else {
-      dialogRef.current?.close()
+      dialogRef.current?.close();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onCancel()
+    if (e.key === "Escape") {
+      onCancel();
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <dialog
@@ -62,23 +62,18 @@ export default function ConfirmDialog({
         {message}
       </p>
       <div className="flex gap-3 justify-end">
-        <Button
-          onClick={onCancel}
-          variant="secondary"
-          aria-label={cancelLabel}
-        >
+        <Button onClick={onCancel} variant="secondary" aria-label={cancelLabel}>
           {cancelLabel}
         </Button>
         <Button
           ref={confirmButtonRef}
           onClick={onConfirm}
-          variant={variant === 'error' ? 'error' : 'primary'}
+          variant={variant === "error" ? "error" : "primary"}
           aria-label={confirmLabel}
         >
           {confirmLabel}
         </Button>
       </div>
     </dialog>
-  )
+  );
 }
-
