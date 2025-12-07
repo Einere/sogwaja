@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { requireServerUser } from '@/lib/supabase/auth'
 import { AuthorizationError } from '@/lib/errors'
 import { revalidatePath } from 'next/cache'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import type { Database } from '@/types/database'
 
 type Experiment = Database['public']['Tables']['recipe_experiments']['Row']
@@ -144,6 +144,7 @@ export async function createExperiment(
     .single()
 
   if (experimentError) {
+    // TODO: supabase 에러가 직접적으로 노출되지 않도록 수정하기
     throw new Error(experimentError.message)
   }
 
@@ -198,6 +199,36 @@ export async function createExperiment(
 
   revalidatePath(`/recipes/${recipeId}/experiments`)
   return experiment
+}
+
+export async function createExperimentAction(
+  prevState: { error?: string } | null,
+  formData: FormData
+): Promise<{ error?: string }> {
+
+
+  const recipeId = formData.get('recipeId') as string
+    const memo = formData.get('memo') as string | null
+    const photoFiles = formData.getAll('photos') as File[]
+
+    if (!recipeId) {
+      return { error: '레시피 ID가 필요합니다.' }
+    }
+    // Filter out empty files
+    const photos = photoFiles.filter((file) => file.size > 0)
+
+    if (photos.length > 9) {
+      return { error: '최대 9장까지 업로드 가능합니다.' }
+    }
+
+  try {
+    await createExperiment(recipeId, memo || null, photos)
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : '실험 결과 저장 중 오류가 발생했습니다.'
+    return { error: errorMessage }
+  }
+
+  return redirect(`/recipes/${recipeId}/experiments`)
 }
 
 export async function deleteExperiment(
@@ -259,4 +290,3 @@ export async function deleteExperiment(
 
   revalidatePath(`/recipes/${experiment.recipe_id}/experiments`)
 }
-

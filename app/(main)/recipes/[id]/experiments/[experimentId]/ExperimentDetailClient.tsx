@@ -13,6 +13,7 @@ import type { Database } from '@/types/database'
 import type { Json } from '@/types/database'
 import type { Descendant } from 'slate'
 import type { ExperimentWithPhotos } from '../ExperimentsClient'
+import Image from 'next/image'
 
 type Recipe = Database['public']['Tables']['recipes']['Row']
 type Equipment = Database['public']['Tables']['recipe_equipment']['Row']
@@ -143,13 +144,20 @@ export default function ExperimentDetailClient({
               <h3 id="photos-heading" className="text-lg font-semibold">
                 사진
               </h3>
-              <div className="grid grid-cols-2 gap-2" role="list" aria-label="실험 사진">
+              <div 
+                className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4"
+                role="list" 
+                aria-label="실험 사진"
+              >
                 {experiment.photos.map((photo: Photo) => (
-                  <img
+                  <Image
                     key={photo.id}
                     src={photo.url}
+                    width={192} 
+                    height={192}
                     alt="실험 사진"
-                    className="w-full h-48 object-cover rounded"
+                    className="flex-shrink-0 w-48 h-48 object-cover rounded"
+                    loading="lazy"
                   />
                 ))}
               </div>
