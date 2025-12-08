@@ -1,17 +1,26 @@
+import { cache } from "react";
 import { createClient } from "./server";
 import { AuthenticationError } from "@/lib/errors";
 import type { User } from "@supabase/supabase-js";
 
 /**
- * 서버에서 현재 사용자 정보를 가져옵니다.
- * @returns 사용자 정보 또는 null
+ * 캐시된 내부 함수: 같은 요청 내에서 호출되면 캐시된 결과 반환
  */
-export async function getServerUser(): Promise<User | null> {
+const getCachedServerUser = cache(async (): Promise<User | null> => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   return user;
+});
+
+/**
+ * 서버에서 현재 사용자 정보를 가져옵니다.
+ * 같은 요청 내에서 여러 번 호출되어도 한 번만 DB 쿼리를 수행합니다.
+ * @returns 사용자 정보 또는 null
+ */
+export async function getServerUser(): Promise<User | null> {
+  return getCachedServerUser();
 }
 
 /**

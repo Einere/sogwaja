@@ -5,20 +5,21 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "./Button";
 
 export interface TextLinkProps
-  extends
-    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
+  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
     VariantProps<typeof buttonVariants> {
   href: string;
   children: ReactNode;
+  prefetch?: boolean;
 }
 
 const TextLink = forwardRef<HTMLAnchorElement, TextLinkProps>(
-  ({ href, children, variant = "link", size, className, ...props }, ref) => {
+  ({ href, children, variant = "link", size, className, prefetch, ...props }, ref) => {
     return (
       <Link
         href={href}
         ref={ref}
         className={cn(buttonVariants({ variant, size, className }))}
+        prefetch={prefetch}
         {...props}
       >
         {children}

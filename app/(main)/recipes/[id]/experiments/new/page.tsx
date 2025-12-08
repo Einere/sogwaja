@@ -1,18 +1,18 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useActionState, startTransition } from "react";
 import { createExperimentAction } from "@/app/recipes/[id]/experiments/actions";
 import { useExperimentForm } from "@/app/recipes/[id]/experiments/hooks/useExperimentForm";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
-import LinkButton from "@/components/ui/LinkButton";
 import TextLink from "@/components/ui/TextLink";
 import { XIcon, ArrowLeftIcon, PlusIcon } from "@/components/icons";
 
 // TODO: 해당 화면에서는 레이아웃의 하단 버튼들이 보이지 않아야 함. (실험 저장, 실험 목록)
 export default function NewExperimentPage() {
   const params = useParams();
+  const router = useRouter();
   const recipeId = params.id as string;
   const { memo, photos, previews, setMemo, handlePhotoChange, removePhoto } = useExperimentForm();
 
@@ -46,6 +46,11 @@ export default function NewExperimentPage() {
     });
   };
 
+  const handleCancel = () => {
+    if (isPending) return;
+    router.back();
+  };
+
   return (
     <div className="min-h-screen pb-20">
       {/* TODO: 헤더를 별도의 컴포넌트로 분리하기 */}
@@ -55,6 +60,7 @@ export default function NewExperimentPage() {
           size="sm"
           className="w-fit flex items-center gap-1"
           aria-label="조리법으로 돌아가기"
+          prefetch={true}
         >
           <ArrowLeftIcon className="w-4 h-4" />
           돌아가기
@@ -139,18 +145,18 @@ export default function NewExperimentPage() {
         )}
 
         <div className="flex gap-3 pt-4">
-          <LinkButton
-            href={`/recipes/${recipeId}`}
+          <Button
+            onClick={handleCancel}
             variant="secondary"
             className="flex-1"
+            disabled={isPending}
             aria-label="취소"
-            aria-disabled={isPending}
           >
             취소
-          </LinkButton>
+          </Button>
           <Button
             type="submit"
-            disabled={isPending}
+            loading={isPending}
             className="flex-1"
             aria-label={isPending ? "저장 중" : "저장"}
           >
