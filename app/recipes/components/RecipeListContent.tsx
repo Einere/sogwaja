@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { deleteRecipe } from "../actions";
 import RecipeList from "./RecipeList";
 import type { Database } from "@/types/database";
@@ -14,11 +14,9 @@ interface RecipeListContentProps {
 }
 
 export default function RecipeListContent({ recipes }: RecipeListContentProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [localRecipes, setLocalRecipes] = useState<Recipe[]>(recipes);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // 서버에서 받은 recipes가 변경되면 로컬 state 업데이트
   useEffect(() => {
@@ -53,7 +51,6 @@ export default function RecipeListContent({ recipes }: RecipeListContentProps) {
     // 2. 즉시 UI에서 제거 (낙관적)
     setLocalRecipes(prev => prev.filter(recipe => recipe.id !== id));
     setDeletingId(id);
-    setDeleteError(null);
 
     try {
       // 3. 백그라운드에서 서버 요청
@@ -62,7 +59,6 @@ export default function RecipeListContent({ recipes }: RecipeListContentProps) {
       // 5. 실패 시 롤백
       setLocalRecipes(previousRecipes);
       const errorMessage = err instanceof Error ? err.message : "삭제 중 오류가 발생했습니다.";
-      setDeleteError(errorMessage);
       alert(errorMessage);
     } finally {
       setDeletingId(null);
