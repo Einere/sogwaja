@@ -31,10 +31,15 @@ export async function getExperiments(recipeId: string): Promise<ExperimentWithPh
     throw new AuthorizationError();
   }
 
-  // Load experiments
+  // Load experiments with photos in a single query using JOIN
   const { data: experimentsData, error: experimentsError } = await supabase
     .from("recipe_experiments")
-    .select("*")
+    .select(
+      `
+      *,
+      experiment_photos (*)
+    `
+    )
     .eq("recipe_id", recipeId)
     .order("created_at", { ascending: false });
 
@@ -42,25 +47,24 @@ export async function getExperiments(recipeId: string): Promise<ExperimentWithPh
     throw new Error(experimentsError.message);
   }
 
-  // Load photos for each experiment
-  const experimentsWithPhotos = await Promise.all(
-    (experimentsData || []).map(async experiment => {
-      const { data: photosData } = await supabase
-        .from("experiment_photos")
-        .select("*")
-        .eq("experiment_id", experiment.id)
-        .order("order", { ascending: true });
+  // Transform the data to match the expected format
+  const experimentsWithPhotos = (experimentsData || []).map(experiment => {
+    const photos = (experiment.experiment_photos as Photo[] | null) || [];
+    // Sort photos by order
+    photos.sort((a, b) => a.order - b.order);
+    const thumbnail = photos[0]?.url;
 
-      const photos = photosData || [];
-      const thumbnail = photos[0]?.url;
+    // Remove the nested experiment_photos from the experiment object
+    const { experiment_photos: _, ...experimentWithoutPhotos } = experiment as Experiment & {
+      experiment_photos: Photo[] | null;
+    };
 
-      return {
-        ...experiment,
-        photos,
-        thumbnail,
-      };
-    })
-  );
+    return {
+      ...experimentWithoutPhotos,
+      photos,
+      thumbnail,
+    };
+  });
 
   return experimentsWithPhotos;
 }
@@ -69,41 +73,41 @@ export async function getExperiment(experimentId: string): Promise<ExperimentWit
   const user = await requireServerUser();
   const supabase = await createClient();
 
-  // Load experiment
+  // Load experiment with photos and verify recipe ownership in a single query
   const { data: experimentData, error: experimentError } = await supabase
     .from("recipe_experiments")
-    .select("*")
+    .select(
+      `
+      *,
+      experiment_photos (*),
+      recipes!inner(id, user_id)
+    `
+    )
     .eq("id", experimentId)
+    .eq("recipes.user_id", user.id)
     .single();
 
   if (experimentError) {
     notFound();
   }
 
-  // Verify recipe ownership
-  const { data: recipe, error: recipeError } = await supabase
-    .from("recipes")
-    .select("id")
-    .eq("id", experimentData.recipe_id)
-    .eq("user_id", user.id)
-    .single();
-
-  if (recipeError || !recipe) {
-    notFound();
-  }
-
-  // Load photos
-  const { data: photosData } = await supabase
-    .from("experiment_photos")
-    .select("*")
-    .eq("experiment_id", experimentId)
-    .order("order", { ascending: true });
-
-  const photos = photosData || [];
+  const photos = (experimentData.experiment_photos as Photo[] | null) || [];
+  // Sort photos by order
+  photos.sort((a, b) => a.order - b.order);
   const thumbnail = photos[0]?.url;
 
+  // Remove nested objects from the experiment object
+  const {
+    experiment_photos: _,
+    recipes: __,
+    ...experimentWithoutNested
+  } = experimentData as Experiment & {
+    experiment_photos: Photo[] | null;
+    recipes: { id: string; user_id: string };
+  };
+
   return {
-    ...experimentData,
+    ...experimentWithoutNested,
     photos,
     thumbnail,
   };

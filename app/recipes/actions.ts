@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { requireServerUser } from "@/lib/supabase/auth";
 import { AuthorizationError } from "@/lib/errors";
@@ -90,23 +91,23 @@ export async function deleteRecipe(id: string): Promise<void> {
   revalidatePath("/recipes");
 }
 
-export async function getRecipes(sortBy: SortOption = "updated"): Promise<Recipe[]> {
-  const user = await requireServerUser();
+// 캐시된 내부 함수: 같은 요청 내에서 동일한 인자로 호출되면 캐시된 결과 반환
+// 클라이언트 사이드 정렬을 위해 서버에서는 정렬 없이 모든 조리법 가져오기
+const getCachedRecipes = cache(async (userId: string): Promise<Recipe[]> => {
   const supabase = await createClient();
 
-  let query = supabase.from("recipes").select("*").eq("user_id", user.id);
-
-  if (sortBy === "name") {
-    query = query.order("title", { ascending: true });
-  } else {
-    query = query.order("updated_at", { ascending: false });
-  }
-
-  const { data, error } = await query;
+  // 정렬 없이 모든 조리법 가져오기 (정렬은 클라이언트에서 수행)
+  const { data, error } = await supabase.from("recipes").select("*").eq("user_id", userId);
 
   if (error) {
     throw new Error(error.message);
   }
 
   return data || [];
+});
+
+export async function getRecipes(): Promise<Recipe[]> {
+  const user = await requireServerUser();
+  // 같은 요청 내에서 동일한 사용자 ID로 호출되면 캐시된 결과 반환
+  return getCachedRecipes(user.id);
 }

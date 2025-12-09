@@ -1,22 +1,12 @@
 import { Suspense } from "react";
 import { getServerUser } from "@/lib/supabase/auth";
-import { getRecipes, type SortOption } from "@/app/recipes/actions";
+import { getRecipes } from "@/app/recipes/actions";
 import RecipeListHeader from "@/app/recipes/components/RecipeListHeader";
 import RecipeListContent from "@/app/recipes/components/RecipeListContent";
 import EmptyState from "@/components/shared/EmptyState";
 import LinkButton from "@/components/ui/LinkButton";
 
-interface RecipesPageProps {
-  searchParams:
-    | Promise<{
-        sort?: string;
-      }>
-    | {
-        sort?: string;
-      };
-}
-
-export default async function RecipesPage({ searchParams }: RecipesPageProps) {
+export default async function RecipesPage() {
   // TODO: auth guard 로직은 분리해야 함.
   const user = await getServerUser();
 
@@ -34,15 +24,9 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
     );
   }
 
-  // Handle searchParams - it might be a Promise in Next.js 16
-  const params = searchParams instanceof Promise ? await searchParams : searchParams;
-
-  // Validate and set sort option
-  const sortBy: SortOption =
-    params.sort === "name" || params.sort === "updated" ? params.sort : "updated";
-
-  // Fetch recipes from server
-  const recipes = await getRecipes(sortBy);
+  // 클라이언트 사이드 정렬을 위해 서버에서는 정렬 없이 모든 조리법 가져오기
+  // 정렬은 클라이언트에서 수행됨
+  const recipes = await getRecipes();
 
   return (
     <div className="min-h-screen">

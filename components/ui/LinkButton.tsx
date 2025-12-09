@@ -12,11 +12,22 @@ export interface LinkButtonProps
     VariantProps<typeof buttonVariants> {
   href: string;
   children: ReactNode;
+  prefetch?: boolean;
 }
 
 const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
   (
-    { href, children, variant, size, className, "aria-disabled": ariaDisabled, tabIndex, ...props },
+    {
+      href,
+      children,
+      variant,
+      size,
+      className,
+      "aria-disabled": ariaDisabled,
+      tabIndex,
+      prefetch,
+      ...props
+    },
     ref
   ) => {
     const isDisabled = ariaDisabled === true || ariaDisabled === "true";
@@ -28,6 +39,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
         className={cn(buttonVariants({ variant, size, className }))}
         aria-disabled={ariaDisabled}
         tabIndex={isDisabled ? -1 : tabIndex}
+        prefetch={isDisabled ? false : prefetch}
         {...props}
       >
         {children}

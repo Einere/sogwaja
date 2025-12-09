@@ -25,13 +25,25 @@ export async function getRecipeData(id: string): Promise<RecipeData> {
   const user = await requireServerUser();
   const supabase = await createClient();
 
-  // Load recipe
-  const { data: recipeData, error: recipeError } = await supabase
-    .from("recipes")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", user.id)
-    .single();
+  // 모든 쿼리를 병렬로 실행하여 성능 최적화
+  const [
+    { data: recipeData, error: recipeError },
+    { data: equipmentData },
+    { data: ingredientsData },
+    { data: outputsData },
+    { data: stepsData },
+  ] = await Promise.all([
+    // Load recipe
+    supabase.from("recipes").select("*").eq("id", id).eq("user_id", user.id).single(),
+    // Load equipment
+    supabase.from("recipe_equipment").select("*").eq("recipe_id", id).order("created_at"),
+    // Load ingredients
+    supabase.from("recipe_ingredients").select("*").eq("recipe_id", id).order("created_at"),
+    // Load outputs
+    supabase.from("recipe_outputs").select("*").eq("recipe_id", id).order("created_at"),
+    // Load steps
+    supabase.from("recipe_steps").select("*").eq("recipe_id", id).maybeSingle(),
+  ]);
 
   if (recipeError) {
     throw new Error(recipeError.message);
@@ -40,34 +52,6 @@ export async function getRecipeData(id: string): Promise<RecipeData> {
   if (!recipeData) {
     notFound();
   }
-
-  // Load equipment
-  const { data: equipmentData } = await supabase
-    .from("recipe_equipment")
-    .select("*")
-    .eq("recipe_id", id)
-    .order("created_at");
-
-  // Load ingredients
-  const { data: ingredientsData } = await supabase
-    .from("recipe_ingredients")
-    .select("*")
-    .eq("recipe_id", id)
-    .order("created_at");
-
-  // Load outputs
-  const { data: outputsData } = await supabase
-    .from("recipe_outputs")
-    .select("*")
-    .eq("recipe_id", id)
-    .order("created_at");
-
-  // Load steps
-  const { data: stepsData } = await supabase
-    .from("recipe_steps")
-    .select("*")
-    .eq("recipe_id", id)
-    .maybeSingle();
 
   return {
     recipe: recipeData,

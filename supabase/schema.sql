@@ -343,6 +343,8 @@ CREATE POLICY "Users can delete photos for their experiments"
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_recipes_user_id ON recipes(user_id);
+-- Composite index for RLS policies that check both id and user_id
+CREATE INDEX IF NOT EXISTS idx_recipes_id_user_id ON recipes(id, user_id);
 CREATE INDEX IF NOT EXISTS idx_recipe_equipment_recipe_id ON recipe_equipment(recipe_id);
 CREATE INDEX IF NOT EXISTS idx_recipe_ingredients_recipe_id ON recipe_ingredients(recipe_id);
 CREATE INDEX IF NOT EXISTS idx_recipe_outputs_recipe_id ON recipe_outputs(recipe_id);
@@ -350,4 +352,6 @@ CREATE INDEX IF NOT EXISTS idx_recipe_steps_recipe_id ON recipe_steps(recipe_id)
 CREATE INDEX IF NOT EXISTS idx_recipe_experiments_recipe_id ON recipe_experiments(recipe_id);
 CREATE INDEX IF NOT EXISTS idx_recipe_experiments_created_at ON recipe_experiments(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_experiment_photos_experiment_id ON experiment_photos(experiment_id);
+-- Composite index for experiment_photos to optimize queries filtering by experiment_id and ordering by order
+CREATE INDEX IF NOT EXISTS idx_experiment_photos_experiment_id_order ON experiment_photos(experiment_id, "order");
 

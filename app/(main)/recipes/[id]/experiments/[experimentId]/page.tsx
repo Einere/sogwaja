@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { getServerUser } from "@/lib/supabase/auth";
 import { getExperiment } from "@/app/recipes/[id]/experiments/actions";
 import { getRecipeData } from "@/app/recipes/[id]/actions";
 import ExperimentDetailClient from "./ExperimentDetailClient";
@@ -7,6 +9,11 @@ interface ExperimentDetailPageProps {
 }
 
 export default async function ExperimentDetailPage({ params }: ExperimentDetailPageProps) {
+  const user = await getServerUser();
+  if (!user) {
+    redirect("/login");
+  }
+
   const { id: recipeId, experimentId } = await params;
 
   const [experiment, recipeData] = await Promise.all([

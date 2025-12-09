@@ -5,3 +5,4 @@ export { default as AppleIcon } from "./AppleIcon";
 export { default as XIcon } from "./XIcon";
 export { default as ArrowLeftIcon } from "./ArrowLeftIcon";
 export { default as PlusIcon } from "./PlusIcon";
+export { default as LoadingSpinnerIcon } from "./LoadingSpinnerIcon";

@@ -46,10 +46,71 @@ Supabase 대시보드의 **SQL Editor**에서 다음 단계를 따르세요:
 - `supabase/schema.sql` 파일을 다시 실행하세요
 - 실행 후 Supabase 대시보드를 새로고침하세요
 
-또는 Supabase CLI를 사용하는 경우:
+### 3-4. 마이그레이션 사용 (권장)
+
+**마이그레이션 도구를 사용하는 것이 더 안전합니다:**
+
+#### 장점
+
+- ✅ 변경 이력 관리: 모든 스키마 변경이 파일로 기록됨
+- ✅ 롤백 가능: 문제 발생 시 이전 상태로 되돌리기 쉬움
+- ✅ 안전성: 이미 적용된 마이그레이션은 재실행되지 않음
+- ✅ 환경 일관성: 개발/스테이징/프로덕션 환경 동기화 용이
+
+#### Supabase CLI 설치
 
 ```bash
+# macOS
+brew install supabase/tap/supabase
+
+# 또는 npm으로 설치
+npm install -g supabase
+```
+
+#### Supabase 프로젝트 연결
+
+```bash
+# Supabase CLI 로그인
+supabase login
+
+# 프로젝트 연결 (프로젝트 참조 ID 필요)
+supabase link --project-ref your-project-ref
+```
+
+프로젝트 참조 ID는 Supabase 대시보드의 **Settings > General > Reference ID**에서 확인할 수 있습니다.
+
+#### 마이그레이션 적용
+
+```bash
+# 모든 마이그레이션 적용
 supabase db push
+
+# 또는 특정 마이그레이션만 확인
+supabase migration list
+```
+
+#### 새 마이그레이션 생성
+
+스키마 변경이 필요할 때:
+
+```bash
+# 새 마이그레이션 파일 생성
+supabase migration new your_migration_name
+
+# 생성된 파일에 SQL 작성 후
+supabase db push
+```
+
+#### 현재 최적화 마이그레이션 적용
+
+성능 최적화를 위한 인덱스 추가:
+
+```bash
+# 마이그레이션 적용
+supabase db push
+
+# 또는 SQL Editor에서 직접 실행
+# supabase/migrations/20250104000000_add_performance_indexes.sql 파일 내용 실행
 ```
 
 ## 4. Storage 설정 (이미지 업로드용)
@@ -154,6 +215,7 @@ Supabase 대시보드의 **Authentication > Providers**에서 소셜 로그인�
 ### 5-1. Google 로그인 설정
 
 1. **Google Cloud Console**에서 설정:
+
    - [Google Cloud Console](https://console.cloud.google.com/) 접속
    - 새 프로젝트 생성 또는 기존 프로젝트 선택
    - **API 및 서비스 > 사용자 인증 정보**로 이동
@@ -176,6 +238,7 @@ Supabase 대시보드의 **Authentication > Providers**에서 소셜 로그인�
 ### 5-2. Apple 로그인 설정
 
 1. **Apple Developer**에서 설정:
+
    - [Apple Developer](https://developer.apple.com/) 접속
    - Certificates, Identifiers & Profiles로 이동
    - **Identifiers**에서 **Services IDs** 생성
@@ -204,6 +267,7 @@ Supabase 대시보드의 **Authentication > Providers**에서 소셜 로그인�
 ### 5-3. Kakao 로그인 설정 (Custom OAuth)
 
 1. **Kakao Developers**에서 설정:
+
    - [Kakao Developers](https://developers.kakao.com/) 접속
    - 내 애플리케이션 > 애플리케이션 추가하기
    - 앱 이름, 사업자명 입력 후 생성
@@ -231,6 +295,7 @@ Supabase 대시보드의 **Authentication > Providers**에서 소셜 로그인�
 ### 5-4. Naver 로그인 설정 (Custom OAuth)
 
 1. **Naver Developers**에서 설정:
+
    - [Naver Developers](https://developers.naver.com/) 접속
    - **Application > 애플리케이션 등록**
    - 애플리케이션 이름, 사용 API 선택 (네이버 로그인)
