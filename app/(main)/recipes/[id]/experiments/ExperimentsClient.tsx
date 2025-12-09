@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { deleteExperiment } from "@/app/recipes/[id]/experiments/actions";
 import EmptyState from "@/components/shared/EmptyState";
 import TextLink from "@/components/ui/TextLink";
@@ -25,18 +26,30 @@ interface ExperimentsClientProps {
 }
 
 export default function ExperimentsClient({ experiments, recipeId }: ExperimentsClientProps) {
-  // TODO: experimentsList 를 지역 상태로 관리할 필요가 있는지 검증하기
   const [experimentsList, setExperimentsList] = useState(experiments);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
+  // 서버에서 받은 experiments가 변경되면 로컬 state 업데이트
+  useEffect(() => {
+    setExperimentsList(experiments);
+  }, [experiments]);
+
   const handleDelete = async (id: string) => {
+    // 1. 이전 상태 저장 (롤백용)
+    const previousExperiments = experimentsList;
+
+    // 2. 즉시 목록에서 제거 (낙관적)
+    setExperimentsList(prev => prev.filter(exp => exp.id !== id));
+    setDeleteConfirm(null);
+
     try {
+      // 3. 백그라운드에서 서버 요청
       await deleteExperiment(id);
-      // Remove deleted experiment from list
-      setExperimentsList(experimentsList.filter(exp => exp.id !== id));
-      setDeleteConfirm(null);
-    } catch {
-      alert("삭제 중 오류가 발생했습니다.");
+    } catch (err) {
+      // 5. 실패 시 롤백
+      setExperimentsList(previousExperiments);
+      const errorMessage = err instanceof Error ? err.message : "삭제 중 오류가 발생했습니다.";
+      alert(errorMessage);
     }
   };
 

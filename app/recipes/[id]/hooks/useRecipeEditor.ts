@@ -66,7 +66,7 @@ export function useRecipeEditor(recipeId: string, initialData?: RecipeData): Use
       setIngredients(recipeData.ingredients);
       setOutputs(recipeData.outputs);
       setSteps(recipeData.steps);
-    } catch (err) {
+    } catch {
       setError("조리법을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -80,16 +80,27 @@ export function useRecipeEditor(recipeId: string, initialData?: RecipeData): Use
     }
   }, [loadRecipe, initialData]);
 
-  // Save title
+  // Save title with optimistic update
   const saveTitle = useCallback(
     async (newTitle: string) => {
       if (!recipe || newTitle === recipe.title) return;
 
+      // 1. 이전 상태 저장 (롤백용)
+      const previousRecipe = recipe;
+
+      // 2. 즉시 UI 업데이트 (낙관적)
+      setRecipe({ ...recipe, title: newTitle });
       setSaving(true);
+
       try {
+        // 3. 백그라운드에서 서버 요청
         const updatedRecipe = await updateRecipeTitle(recipeId, newTitle);
+
+        // 4. 성공 시 서버 응답으로 최종 동기화
         setRecipe(updatedRecipe);
       } catch (err) {
+        // 5. 실패 시 롤백
+        setRecipe(previousRecipe);
         console.error("Error saving title:", err);
       } finally {
         setSaving(false);
@@ -111,81 +122,135 @@ export function useRecipeEditor(recipeId: string, initialData?: RecipeData): Use
     debouncedSaveTitle(title);
   }, [title, recipe, debouncedSaveTitle]);
 
-  // Save equipment
+  // Save equipment with optimistic update
   const saveEquipment = useCallback(
     async (newEquipment: Equipment[]) => {
       if (!recipe) return;
+
+      // 1. 이전 상태 저장 (롤백용)
+      const previousEquipment = equipment;
+
+      // 2. 즉시 UI 업데이트 (낙관적)
+      setEquipment(newEquipment);
       setSaving(true);
+
       try {
+        // 3. 백그라운드에서 서버 요청
+        // 임시 ID를 가진 항목도 포함하되, ID 필드는 제거하여 서버로 전송
         const equipmentToSave = newEquipment.map(
           ({ created_at: _created_at, recipe_id: _recipe_id, id: _id, ...eq }) => eq
         );
         const updatedEquipment = await updateEquipment(recipeId, equipmentToSave);
+
+        // 4. 성공 시 서버 응답으로 최종 동기화
+        // 서버에서 받은 실제 ID를 사용하여 최종 동기화
         setEquipment(updatedEquipment);
       } catch (err) {
+        // 5. 실패 시 롤백
+        setEquipment(previousEquipment);
         console.error("Error saving equipment:", err);
       } finally {
         setSaving(false);
       }
     },
-    [recipe, recipeId]
+    [recipe, recipeId, equipment]
   );
 
-  // Save ingredients
+  // Save ingredients with optimistic update
   const saveIngredients = useCallback(
     async (newIngredients: Ingredient[]) => {
       if (!recipe) return;
+
+      // 1. 이전 상태 저장 (롤백용)
+      const previousIngredients = ingredients;
+
+      // 2. 즉시 UI 업데이트 (낙관적)
+      setIngredients(newIngredients);
       setSaving(true);
+
       try {
+        // 3. 백그라운드에서 서버 요청
+        // 임시 ID를 가진 항목도 포함하되, ID 필드는 제거하여 서버로 전송
         const ingredientsToSave = newIngredients.map(
           ({ created_at: _created_at, recipe_id: _recipe_id, id: _id, ...ing }) => ing
         );
         const updatedIngredients = await updateIngredients(recipeId, ingredientsToSave);
+
+        // 4. 성공 시 서버 응답으로 최종 동기화
+        // 서버에서 받은 실제 ID를 사용하여 최종 동기화
         setIngredients(updatedIngredients);
       } catch (err) {
+        // 5. 실패 시 롤백
+        setIngredients(previousIngredients);
         console.error("Error saving ingredients:", err);
       } finally {
         setSaving(false);
       }
     },
-    [recipe, recipeId]
+    [recipe, recipeId, ingredients]
   );
 
-  // Save outputs
+  // Save outputs with optimistic update
   const saveOutputs = useCallback(
     async (newOutputs: Output[]) => {
       if (!recipe) return;
+
+      // 1. 이전 상태 저장 (롤백용)
+      const previousOutputs = outputs;
+
+      // 2. 즉시 UI 업데이트 (낙관적)
+      setOutputs(newOutputs);
       setSaving(true);
+
       try {
+        // 3. 백그라운드에서 서버 요청
+        // 임시 ID를 가진 항목도 포함하되, ID 필드는 제거하여 서버로 전송
         const outputsToSave = newOutputs.map(
-          ({ created_at: _created_at, recipe_id: _recipe_id, ...out }) => out
+          ({ created_at: _created_at, recipe_id: _recipe_id, id: _id, ...out }) => out
         );
         const updatedOutputs = await updateOutputs(recipeId, outputsToSave);
+
+        // 4. 성공 시 서버 응답으로 최종 동기화
+        // 서버에서 받은 실제 ID를 사용하여 최종 동기화
         setOutputs(updatedOutputs);
       } catch (err) {
+        // 5. 실패 시 롤백
+        setOutputs(previousOutputs);
         console.error("Error saving outputs:", err);
       } finally {
         setSaving(false);
       }
     },
-    [recipe, recipeId]
+    [recipe, recipeId, outputs]
   );
 
-  // Save steps
+  // Save steps with optimistic update
   const saveSteps = useCallback(
     async (newSteps: Json) => {
       if (!recipe) return;
+
+      // 1. 이전 상태 저장 (롤백용)
+      const previousSteps = steps;
+
+      // 2. 즉시 UI 업데이트 (낙관적)
+      setSteps(newSteps);
       setSaving(true);
+
       try {
+        // 3. 백그라운드에서 서버 요청
         await updateSteps(recipeId, newSteps);
-        setSteps(newSteps);
+
+        // 4. 성공 시 서버 응답으로 최종 동기화 (steps는 서버에서 반환하지 않으므로 그대로 유지)
+        // setSteps는 이미 낙관적 업데이트로 설정됨
       } catch (err) {
+        // 5. 실패 시 롤백
+        setSteps(previousSteps);
         console.error("Error saving steps:", err);
       } finally {
         setSaving(false);
       }
     },
-    [recipe, recipeId]
+    [recipe, recipeId, steps]
   );
 
   // Debounced save functions
