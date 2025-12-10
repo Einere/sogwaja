@@ -11,7 +11,7 @@ import {
   type RecipeData,
 } from "../actions";
 import { updateRecipeTitle } from "../../actions";
-import { calculateIngredients, calculateEquipment } from "@/lib/utils/calculations";
+import { calculateIngredients, calculateEquipment, isValidNumber } from "@/lib/utils/calculations";
 import type { Database } from "@/types/database";
 import type { Json } from "@/types/database";
 import type { Descendant } from "slate";
@@ -318,6 +318,16 @@ export function useRecipeEditor(recipeId: string, initialData?: RecipeData): Use
 
       const mainOutput = outputs[0];
       if (!mainOutput) return;
+
+      // 입력값 검증: quantity가 유효한 number가 아니면 조기 반환
+      if (!isValidNumber(quantity)) {
+        return;
+      }
+
+      // originalOutput.value도 검증
+      if (!isValidNumber(mainOutput.quantity)) {
+        return;
+      }
 
       const originalOutput = {
         value: mainOutput.quantity,
