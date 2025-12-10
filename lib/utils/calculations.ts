@@ -8,6 +8,15 @@ export interface Quantity {
 }
 
 /**
+ * 값이 유효한 number인지 확인
+ * @param value 검증할 값
+ * @returns 유효한 number인지 여부
+ */
+export function isValidNumber(value: unknown): value is number {
+  return typeof value === "number" && !isNaN(value) && isFinite(value);
+}
+
+/**
  * 비율을 계산하여 새로운 양을 반환
  * @param originalQuantity 원래 양
  * @param originalOutput 원래 결과물 양
@@ -19,6 +28,41 @@ export function calculateProportionalQuantity(
   originalOutput: Quantity,
   newOutput: Quantity
 ): Quantity {
+  // 타입 및 유효성 검증
+  if (!isValidNumber(originalQuantity.value)) {
+    // 원래 수량이 유효하지 않으면 원래 수량 유지
+    return originalQuantity;
+  }
+
+  if (!isValidNumber(originalOutput.value)) {
+    // 원래 결과물 수량이 유효하지 않으면 원래 수량 유지
+    return originalQuantity;
+  }
+
+  if (!isValidNumber(newOutput.value)) {
+    // 새로운 결과물 수량이 유효하지 않으면 원래 수량 유지
+    return originalQuantity;
+  }
+
+  // 0 값 처리
+  if (originalOutput.value === 0) {
+    // 원래 결과물 수량이 0인 경우
+    if (newOutput.value === 0) {
+      // 새로운 결과물 수량도 0이면 원래 수량 유지
+      return originalQuantity;
+    }
+    // 새로운 결과물 수량이 0보다 크면 비율 계산 불가 → 원래 수량 유지
+    return originalQuantity;
+  }
+
+  if (newOutput.value === 0) {
+    // 새로운 결과물 수량이 0이면 수량을 0으로 설정
+    return {
+      value: 0,
+      unit: originalQuantity.unit,
+    };
+  }
+
   // 단위가 같아야 비율 계산이 가능
   if (originalOutput.unit !== newOutput.unit) {
     // 단위 변환이 필요한 경우, 일단 같은 단위로 가정하고 비율만 계산
@@ -30,6 +74,7 @@ export function calculateProportionalQuantity(
     };
   }
 
+  // 정상 케이스: 비율 계산
   const ratio = newOutput.value / originalOutput.value;
   return {
     value: Math.round(originalQuantity.value * ratio * 100) / 100,
@@ -51,8 +96,10 @@ export function calculateIngredients(
       originalOutput,
       newOutput
     );
+    // 방어적 프로그래밍: 계산된 값이 유효하지 않으면 원래 값 유지
+    const amount = isValidNumber(calculated.value) ? calculated.value : ingredient.amount;
     return {
-      amount: calculated.value,
+      amount,
       unit: calculated.unit,
     };
   });
@@ -72,8 +119,10 @@ export function calculateEquipment(
       originalOutput,
       newOutput
     );
+    // 방어적 프로그래밍: 계산된 값이 유효하지 않으면 원래 값 유지
+    const quantity = isValidNumber(calculated.value) ? calculated.value : eq.quantity;
     return {
-      quantity: calculated.value,
+      quantity,
       unit: calculated.unit,
     };
   });
