@@ -114,3 +114,16 @@ body {
 * {
   -webkit-overflow-scrolling: touch;
 }
+
+/* 접근성: 모션 감소 설정 존중 */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* 브라우저 지원 확인 - 폴백 처리 */
+@supports not (view-transition-name: none) {
+  /* 미지원 브라우저에서는 애니메이션이 적용되지 않지만 기능은 정상 작동 */
+}
