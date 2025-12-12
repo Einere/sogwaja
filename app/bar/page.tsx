@@ -1,15 +1,15 @@
-import { SsgoiTransition } from "@ssgoi/react";
 import Link from "next/link";
+import { ViewTransition } from "react";
 
 export default function BarPage() {
   return (
-    <SsgoiTransition id="bar">
+    <ViewTransition enter="slide-left" exit="slide-right">
       <div>
         BarPage
         <div>
-          <Link href="/foo">Foo</Link>
+          <Link href="/foo">⬅️</Link>
         </div>
       </div>
-    </SsgoiTransition>
+    </ViewTransition>
   );
 }

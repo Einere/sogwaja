@@ -3,7 +3,12 @@
 import { Ssgoi } from "@ssgoi/react";
 import { drill, slide } from "@ssgoi/react/view-transitions";
 
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const nullConfig = {
+  defaultTransition: null,
+};
 const config = {
+  defaultTransition: null,
   transitions: [
     {
       from: "recipes",
@@ -87,7 +92,7 @@ const config = {
  */
 export default function SsgoiProvider({ children }: { children: React.ReactNode }) {
   return (
-    <Ssgoi config={config}>
+    <Ssgoi config={reducedMotion ? nullConfig : config}>
       <div style={{ position: "relative", minHeight: "100vh" }}>{children}</div>
     </Ssgoi>
   );

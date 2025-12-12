@@ -7,6 +7,8 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { ViewTransition } from "react";
 
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 type Recipe = Database["public"]["Tables"]["recipes"]["Row"];
 
 interface RecipeCardProps {
@@ -23,7 +25,7 @@ export default function RecipeCard({ recipe, onDelete, isDeleting = false }: Rec
   };
 
   return (
-    <ViewTransition name={`recipe-card-${recipe.id}`} default="slide">
+    <ViewTransition name={`recipe-card-${recipe.id}`} default={reducedMotion ? "none" : "auto"}>
       <Card
         className="p-4 hover:shadow-md transition-shadow"
         aria-labelledby={`recipe-title-${recipe.id}`}
