@@ -3,6 +3,7 @@ import { getServerUser } from "@/lib/supabase/auth";
 import { getExperiment } from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
 import { getRecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
 import ExperimentDetailClient from "./ExperimentDetailClient";
+import { SsgoiTransition } from "@ssgoi/react";
 
 interface ExperimentDetailPageProps {
   params: Promise<{ recipeId: string; experimentId: string }>;
@@ -34,4 +35,3 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
     />
   );
 }
-

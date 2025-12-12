@@ -18,4 +18,3 @@ export default async function ExperimentsPage({ params }: ExperimentsPageProps) 
 
   return <ExperimentsClient experiments={experiments} recipeId={recipeId} />;
 }
-

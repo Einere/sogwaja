@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import SsgoiProvider from "@/components/layout/SsgoiProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +26,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased `}>
+        <SsgoiProvider>
+          <div className="min-h-screen bg-muted">
+            <div className="max-w-md mx-auto bg-background min-h-screen">{children}</div>
+          </div>
+        </SsgoiProvider>
+      </body>
     </html>
   );
 }

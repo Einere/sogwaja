@@ -1,15 +1,16 @@
 import Navigation from "@/components/layout/Navigation";
+import { SsgoiTransition } from "@ssgoi/react";
 
 export default function RecipeEditorLayout({ children }: { children: React.ReactNode }) {
-  // 인증 체크는 각 페이지에서 수행 (레이아웃의 책임이 아님)
   return (
-    <div className="min-h-screen bg-muted">
-      <div className="max-w-md mx-auto bg-background min-h-screen">
-        {children}
+    <SsgoiTransition id="recipe-editor">
+      <div className="min-h-screen">
+        <div className="max-w-md mx-auto bg-background min-h-screen">
+          {children}
 
-        <Navigation />
+          <Navigation />
+        </div>
       </div>
-    </div>
+    </SsgoiTransition>
   );
 }
-

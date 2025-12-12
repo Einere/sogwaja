@@ -14,7 +14,7 @@ import Button from "@/components/ui/Button";
 import type { Database } from "@/types/database";
 import type { Json } from "@/types/database";
 import type { Descendant } from "slate";
-import type { ExperimentWithPhotos } from "../ExperimentsClient";
+import type { ExperimentWithPhotos } from "../../../../../(experiments)/recipes/[recipeId]/experiments/ExperimentsClient";
 import Image from "next/image";
 
 type Recipe = Database["public"]["Tables"]["recipes"]["Row"];
