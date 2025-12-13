@@ -2,13 +2,10 @@
 
 import { Ssgoi } from "@ssgoi/react";
 import { drill, slide } from "@ssgoi/react/view-transitions";
+import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const nullConfig = {
-  defaultTransition: null,
-};
+const nullConfig = {};
 const config = {
-  defaultTransition: null,
   transitions: [
     {
       from: "recipes",
@@ -91,8 +88,10 @@ const config = {
  * 모바일 앱 스타일의 페이지 전환 애니메이션을 제공합니다.
  */
 export default function SsgoiProvider({ children }: { children: React.ReactNode }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   return (
-    <Ssgoi config={reducedMotion ? nullConfig : config}>
+    <Ssgoi config={prefersReducedMotion ? nullConfig : config}>
       <div style={{ position: "relative", minHeight: "100vh" }}>{children}</div>
     </Ssgoi>
   );
