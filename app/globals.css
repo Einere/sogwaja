@@ -114,3 +114,81 @@ body {
 * {
   -webkit-overflow-scrolling: touch;
 }
+
+/* 브라우저 지원 확인 - 폴백 처리 */
+@supports not (view-transition-name: none) {
+  /* 미지원 브라우저에서는 애니메이션이 적용되지 않지만 기능은 정상 작동 */
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+::view-transition-group(.slide-left) {
+  border: 1px solid red;
+}
+::view-transition-old(.slide-left) {
+  animation: slide-out-left 0.3s ease-in-out;
+}
+::view-transition-new(.slide-left) {
+  animation: slide-in-left 0.3s ease-in-out;
+}
+
+::view-transition-group(.slide-right) {
+  border: 1px solid blue;
+}
+::view-transition-old(.slide-right) {
+  animation: slide-out-right 0.3s ease-in-out;
+}
+::view-transition-new(.slide-right) {
+  animation: slide-in-right 0.3s ease-in-out;
+}
+
+/* 접근성: 모션 감소 설정 존중 */
+/* MacOS: 설정/손쉬운 사용/디스플레이/동작 줄이기 */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

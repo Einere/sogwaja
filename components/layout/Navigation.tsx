@@ -8,7 +8,12 @@ import { cn } from "@/lib/utils";
 export default function Navigation() {
   const pathname = usePathname();
   const params = useParams();
-  const recipeId = params.id as string | undefined;
+  const recipeId = (params.recipeId || params.id) as string | undefined;
+
+  // recipeId가 없으면 Navigation을 렌더링하지 않음
+  if (!recipeId) {
+    return null;
+  }
 
   return (
     <nav
@@ -16,40 +21,34 @@ export default function Navigation() {
       aria-label="주요 네비게이션"
     >
       <div className="flex items-center justify-around h-16" role="list">
-        {recipeId && (
-          <>
-            <Link
-              href={`/recipes/${recipeId}/experiments/new`}
-              className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors",
-                pathname === `/recipes/${recipeId}/experiments/new`
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              aria-label="실험 저장"
-              aria-current={
-                pathname === `/recipes/${recipeId}/experiments/new` ? "page" : undefined
-              }
-            >
-              <PencilIcon className="w-6 h-6 mb-1" />
-              <span className="text-xs">실험 저장</span>
-            </Link>
-            <Link
-              href={`/recipes/${recipeId}/experiments`}
-              className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors",
-                pathname === `/recipes/${recipeId}/experiments`
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              aria-label="실험 목록"
-              aria-current={pathname === `/recipes/${recipeId}/experiments` ? "page" : undefined}
-            >
-              <ClipboardIcon className="w-6 h-6 mb-1" />
-              <span className="text-xs">실험 목록</span>
-            </Link>
-          </>
-        )}
+        <Link
+          href={`/recipes/${recipeId}/experiments/new`}
+          className={cn(
+            "flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors",
+            pathname === `/recipes/${recipeId}/experiments/new`
+              ? "text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+          aria-label="실험 저장"
+          aria-current={pathname === `/recipes/${recipeId}/experiments/new` ? "page" : undefined}
+        >
+          <PencilIcon className="w-6 h-6 mb-1" />
+          <span className="text-xs">실험 저장</span>
+        </Link>
+        <Link
+          href={`/recipes/${recipeId}/experiments`}
+          className={cn(
+            "flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors",
+            pathname === `/recipes/${recipeId}/experiments`
+              ? "text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+          aria-label="실험 목록"
+          aria-current={pathname === `/recipes/${recipeId}/experiments` ? "page" : undefined}
+        >
+          <ClipboardIcon className="w-6 h-6 mb-1" />
+          <span className="text-xs">실험 목록</span>
+        </Link>
       </div>
     </nav>
   );

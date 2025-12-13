@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
       if (error) {
         console.error("Error exchanging code for session:", error);
-        return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(error.message)}`);
+        return NextResponse.redirect(`${origin}/auth?error=${encodeURIComponent(error.message)}`);
       }
     }
 
@@ -23,6 +23,6 @@ export async function GET(request: Request) {
     console.error("Unexpected error in auth callback:", error);
     const requestUrl = new URL(request.url);
     const origin = requestUrl.origin;
-    return NextResponse.redirect(`${origin}/login?error=authentication_failed`);
+    return NextResponse.redirect(`${origin}/auth?error=authentication_failed`);
   }
 }

@@ -34,9 +34,9 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  // Allow access to login and auth callback pages without authentication
+  // Allow access to auth and auth callback pages without authentication
   if (
-    request.nextUrl.pathname.startsWith("/login") ||
+    request.nextUrl.pathname.startsWith("/auth") ||
     request.nextUrl.pathname.startsWith("/api/auth/callback")
   ) {
     return supabaseResponse;
