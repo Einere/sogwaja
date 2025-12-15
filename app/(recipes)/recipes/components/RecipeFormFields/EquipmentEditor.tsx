@@ -26,6 +26,12 @@ export default function EquipmentEditor({
   const [newQuantity, setNewQuantity] = useState("");
   const [newUnit, setNewUnit] = useState("개");
 
+  const UNIT_OPTIONS = [
+    { value: "개", label: "개" },
+    { value: "g", label: "g" },
+    { value: "ml", label: "ml" },
+  ];
+
   const handleAdd = () => {
     if (!newName.trim() || !newQuantity) return;
 
@@ -77,6 +83,8 @@ export default function EquipmentEditor({
             namePlaceholder="장비 이름"
             valuePlaceholder="개수"
             unitPlaceholder="단위"
+            unitType="select"
+            unitOptions={UNIT_OPTIONS}
             ariaLabel={`장비: ${eq.name}, ${eq.quantity} ${eq.unit}`}
           />
         ))}
@@ -93,6 +101,8 @@ export default function EquipmentEditor({
           namePlaceholder="장비 이름"
           valuePlaceholder="개수"
           unitPlaceholder="단위"
+          unitType="select"
+          unitOptions={UNIT_OPTIONS}
           submitLabel="추가"
           ariaLabel="새 장비 추가"
         />

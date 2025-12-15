@@ -38,7 +38,7 @@ export default function EditorForm({
   namePlaceholder = "이름",
   valuePlaceholder = "값",
   unitPlaceholder = "단위",
-  unitType = "input",
+  unitType = "select",
   unitOptions,
   submitLabel = "추가",
   ariaLabel,

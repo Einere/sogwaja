@@ -41,8 +41,12 @@ export default function EditorItem({
   namePlaceholder = "이름",
   valuePlaceholder = "값",
   unitPlaceholder = "단위",
-  unitType = "input",
-  unitOptions,
+  unitType = "select",
+  unitOptions = [
+    { value: "개", label: "개" },
+    { value: "g", label: "g" },
+    { value: "ml", label: "ml" },
+  ],
   ariaLabel,
 }: EditorItemProps) {
   const itemId = `editor-item-${id}`;

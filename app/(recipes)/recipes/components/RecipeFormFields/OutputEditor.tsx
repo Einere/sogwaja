@@ -17,9 +17,7 @@ interface OutputEditorProps {
 const UNIT_OPTIONS = [
   { value: "개", label: "개" },
   { value: "g", label: "g" },
-  { value: "kg", label: "kg" },
   { value: "ml", label: "ml" },
-  { value: "L", label: "L" },
 ];
 
 export default function OutputEditor({

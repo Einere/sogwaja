@@ -26,6 +26,12 @@ export default function IngredientEditor({
   const [newAmount, setNewAmount] = useState("");
   const [newUnit, setNewUnit] = useState("g");
 
+  const UNIT_OPTIONS = [
+    { value: "개", label: "개" },
+    { value: "g", label: "g" },
+    { value: "ml", label: "ml" },
+  ];
+
   const handleAdd = () => {
     if (!newName.trim() || !newAmount) return;
 
@@ -89,6 +95,8 @@ export default function IngredientEditor({
           namePlaceholder="재료 이름"
           valuePlaceholder="양"
           unitPlaceholder="단위"
+          unitType="select"
+          unitOptions={UNIT_OPTIONS}
           submitLabel="추가"
           ariaLabel="새 재료 추가"
         />
