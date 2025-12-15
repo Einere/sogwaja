@@ -20,9 +20,7 @@ interface EditorFormProps {
   onSubmit: () => void;
   namePlaceholder?: string;
   valuePlaceholder?: string;
-  unitPlaceholder?: string;
-  unitType?: "input" | "select";
-  unitOptions?: { value: string; label: string }[];
+  unitOptions: { value: string; label: string }[];
   submitLabel?: string;
   ariaLabel?: string;
 }
@@ -37,8 +35,6 @@ export default function EditorForm({
   onSubmit,
   namePlaceholder = "이름",
   valuePlaceholder = "값",
-  unitPlaceholder = "단위",
-  unitType = "select",
   unitOptions,
   submitLabel = "추가",
   ariaLabel,
@@ -62,6 +58,7 @@ export default function EditorForm({
       />
       <Input
         type="number"
+        inputMode="numeric"
         value={value}
         onChange={e => onValueChange(e.target.value)}
         onKeyPress={handleKeyPress}
@@ -69,30 +66,18 @@ export default function EditorForm({
         placeholder={valuePlaceholder}
         aria-label={`${valuePlaceholder} 입력`}
       />
-      {unitType === "select" && unitOptions ? (
-        <Select value={unit} onValueChange={onUnitChange}>
-          <SelectTrigger className="w-20 text-sm" aria-label="단위 선택">
-            <SelectValue placeholder="단위" />
-          </SelectTrigger>
-          <SelectContent>
-            {unitOptions.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      ) : (
-        <Input
-          type="text"
-          value={unit}
-          onChange={e => onUnitChange(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="w-16 text-sm"
-          placeholder={unitPlaceholder}
-          aria-label={`${unitPlaceholder} 입력`}
-        />
-      )}
+      <Select value={unit} onValueChange={onUnitChange}>
+        <SelectTrigger className="w-20 text-sm" aria-label="단위 선택">
+          <SelectValue placeholder="단위" />
+        </SelectTrigger>
+        <SelectContent>
+          {unitOptions.map(option => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <Button onClick={onSubmit} size="sm" className="text-sm" aria-label={submitLabel}>
         {submitLabel}
       </Button>

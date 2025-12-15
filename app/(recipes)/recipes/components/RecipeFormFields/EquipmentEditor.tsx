@@ -18,8 +18,6 @@ interface EquipmentEditorProps {
 export default function EquipmentEditor({
   equipment,
   onUpdate,
-  outputQuantity = 1,
-  outputUnit = "개",
   readOnly = false,
 }: EquipmentEditorProps) {
   const [newName, setNewName] = useState("");
@@ -100,8 +98,6 @@ export default function EquipmentEditor({
           onSubmit={handleAdd}
           namePlaceholder="장비 이름"
           valuePlaceholder="개수"
-          unitPlaceholder="단위"
-          unitType="select"
           unitOptions={UNIT_OPTIONS}
           submitLabel="추가"
           ariaLabel="새 장비 추가"

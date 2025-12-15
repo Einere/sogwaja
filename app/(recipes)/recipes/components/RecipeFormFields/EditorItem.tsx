@@ -69,6 +69,7 @@ export default function EditorItem({
       />
       <Input
         type="number"
+        inputMode="numeric"
         id={`${itemId}-value`}
         value={value}
         onChange={e => onValueChange(parseFloat(e.target.value) || 0)}

@@ -105,7 +105,6 @@ export default function OutputEditor({
           onSubmit={handleAdd}
           namePlaceholder="결과물 이름"
           valuePlaceholder="양"
-          unitType="select"
           unitOptions={UNIT_OPTIONS}
           submitLabel="추가"
           ariaLabel="새 결과물 추가"
