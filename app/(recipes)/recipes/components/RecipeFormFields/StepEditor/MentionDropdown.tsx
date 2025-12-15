@@ -1,7 +1,7 @@
 "use client";
 
 import type { MentionItem, DropdownPosition } from "./types";
-import Badge from "@/components/ui/Badge";
+import { Badge } from "@/components/ui";
 
 interface MentionDropdownProps {
   items: MentionItem[];

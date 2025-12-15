@@ -1,16 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteExperiment } from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
 import EquipmentEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/EquipmentEditor";
 import IngredientEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/IngredientEditor";
 import OutputEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/OutputEditor";
 import StepEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/StepEditor";
-import ConfirmDialog from "@/components/shared/ConfirmDialog";
-import TextLink from "@/components/ui/TextLink";
+import { LinkButton, Button } from "@/components/ui";
 import { ArrowLeftIcon } from "@/components/icons";
-import Button from "@/components/ui/Button";
 import type { Database } from "@/types/database";
 import type { Json } from "@/types/database";
 import type { Descendant } from "slate";
@@ -45,9 +42,12 @@ export default function ExperimentDetailClient({
   experimentId,
 }: ExperimentDetailClientProps) {
   const router = useRouter();
-  const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   const handleDelete = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) {
+      return;
+    }
+
     try {
       await deleteExperiment(experimentId);
       router.push(`/recipes/${recipeId}/experiments`);
@@ -68,18 +68,19 @@ export default function ExperimentDetailClient({
       <div className="min-h-screen pb-20">
         {/* TODO: 헤더 컴포넌트를 서버 컴포넌트로 별도로 분리하고(layout 으로 만들어도 괜찮음), 삭제 버튼은 children 을 받는 방식으로 변경하여 서버 컴포넌트 영역을 최대한 넓히기  */}
         <header className="sticky top-0 bg-background border-b border-border z-10 px-4 py-3 grid grid-cols-3 items-center">
-          <TextLink
+          <LinkButton
             href={`/recipes/${recipeId}/experiments`}
+            variant="link"
             size="sm"
             className="w-fit flex items-center gap-1"
             aria-label="실험 목록으로 돌아가기"
           >
             <ArrowLeftIcon className="w-4 h-4" />
             목록으로
-          </TextLink>
+          </LinkButton>
           <h1 className="text-xl font-bold text-center">실험 결과</h1>
           <Button
-            onClick={() => setDeleteConfirm(true)}
+            onClick={handleDelete}
             variant="ghost"
             size="sm"
             className="justify-self-end w-fit text-end text-error hover:text-error justify-end"
@@ -176,16 +177,6 @@ export default function ExperimentDetailClient({
           )}
         </main>
       </div>
-      <ConfirmDialog
-        isOpen={deleteConfirm}
-        title="실험 삭제"
-        message="정말 삭제하시겠습니까?"
-        confirmLabel="삭제"
-        cancelLabel="취소"
-        variant="error"
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteConfirm(false)}
-      />
     </>
   );
 }

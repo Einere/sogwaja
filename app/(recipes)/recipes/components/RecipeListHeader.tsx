@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import type { SortOption } from "../actions";
-import LinkButton from "@/components/ui/LinkButton";
+import { LinkButton } from "@/components/ui";
 import { PlusIcon } from "@/components/icons";
 
 export default function RecipeListHeader() {

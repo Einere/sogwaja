@@ -8,6 +8,10 @@ const inputVariants = cva(
     variants: {
       variant: {
         default: "",
+        primary: "border-primary focus-visible:ring-primary",
+        secondary: "border-secondary focus-visible:ring-secondary",
+        info: "border-info focus-visible:ring-info",
+        warning: "border-warning focus-visible:ring-warning",
         error: "border-error focus-visible:ring-error",
       },
     },
@@ -18,52 +22,50 @@ const inputVariants = cva(
 );
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement>, VariantProps<typeof inputVariants> {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "variant">,
+    VariantProps<typeof inputVariants> {
   label?: string;
   error?: string;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className, id, variant, ...props }, ref) => {
-    const inputId = id || (label ? `input-${label.replace(/\s+/g, "-").toLowerCase()}` : undefined);
-    const errorId = error ? `${inputId}-error` : undefined;
-    const inputVariant = error ? "error" : variant;
+export function Input({ label, error, className, id, variant, ref, ...props }: InputProps) {
+  const inputId = id || (label ? `input-${label.replace(/\s+/g, "-").toLowerCase()}` : undefined);
+  const errorId = error ? `${inputId}-error` : undefined;
+  const inputVariant = error ? "error" : variant;
 
-    if (label || error) {
-      return (
-        <div className="w-full">
-          {label && (
-            <label htmlFor={inputId} className="block text-sm font-medium text-foreground mb-1">
-              {label}
-            </label>
-          )}
-          <input
-            id={inputId}
-            ref={ref}
-            className={cn(inputVariants({ variant: inputVariant, className }))}
-            aria-invalid={error ? "true" : undefined}
-            aria-describedby={errorId}
-            {...props}
-          />
-          {error && (
-            <p id={errorId} className="mt-1 text-sm text-error" role="alert">
-              {error}
-            </p>
-          )}
-        </div>
-      );
-    }
-
+  if (label || error) {
     return (
-      <input
-        ref={ref}
-        className={cn(inputVariants({ variant: inputVariant, className }))}
-        {...props}
-      />
+      <div className="w-full">
+        {label && (
+          <label htmlFor={inputId} className="block text-sm font-medium text-foreground mb-1">
+            {label}
+          </label>
+        )}
+        <input
+          id={inputId}
+          ref={ref}
+          className={cn(inputVariants({ variant: inputVariant, className }))}
+          aria-invalid={error ? "true" : undefined}
+          aria-describedby={errorId}
+          {...props}
+        />
+        {error && (
+          <p id={errorId} className="mt-1 text-sm text-error" role="alert">
+            {error}
+          </p>
+        )}
+      </div>
     );
   }
-);
-Input.displayName = "Input";
 
-export { Input, inputVariants };
-export default Input;
+  return (
+    <input
+      ref={ref}
+      className={cn(inputVariants({ variant: inputVariant, className }))}
+      {...props}
+    />
+  );
+}
+
+export { inputVariants };

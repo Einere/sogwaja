@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleIcon, AppleIcon } from "@/components/icons";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);

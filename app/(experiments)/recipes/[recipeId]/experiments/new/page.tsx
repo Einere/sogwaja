@@ -4,9 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useActionState, startTransition } from "react";
 import { createExperimentAction } from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
 import { useExperimentForm } from "@/app/(experiment)/recipes/[recipeId]/experiments/hooks/useExperimentForm";
-import Textarea from "@/components/ui/Textarea";
-import Button from "@/components/ui/Button";
-import TextLink from "@/components/ui/TextLink";
+import { Textarea, Button, LinkButton } from "@/components/ui";
 import { XIcon, ArrowLeftIcon, PlusIcon } from "@/components/icons";
 import { SsgoiTransition } from "@ssgoi/react";
 
@@ -55,8 +53,9 @@ export default function NewExperimentPage() {
     <div className="min-h-screen pb-20">
       {/* TODO: 헤더를 별도의 컴포넌트로 분리하기 */}
       <header className="grid grid-cols-3 items-center sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
-        <TextLink
+        <LinkButton
           href={`/recipes/${recipeId}`}
+          variant="link"
           size="sm"
           className="w-fit flex items-center gap-1"
           aria-label="조리법으로 돌아가기"
@@ -64,7 +63,7 @@ export default function NewExperimentPage() {
         >
           <ArrowLeftIcon className="w-4 h-4" />
           돌아가기
-        </TextLink>
+        </LinkButton>
         <h1 className="text-center text-xl font-bold">실험 결과 저장</h1>
       </header>
 

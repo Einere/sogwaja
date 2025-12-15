@@ -1,11 +1,12 @@
-import { HTMLAttributes, ReactNode, forwardRef } from "react";
+import { HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-const Card = forwardRef<HTMLDivElement, CardProps>(({ children, className, ...props }, ref) => {
+export function Card({ children, className, ref, ...props }: CardProps) {
   return (
     <div
       ref={ref}
@@ -15,8 +16,4 @@ const Card = forwardRef<HTMLDivElement, CardProps>(({ children, className, ...pr
       {children}
     </div>
   );
-});
-
-Card.displayName = "Card";
-
-export default Card;
+}

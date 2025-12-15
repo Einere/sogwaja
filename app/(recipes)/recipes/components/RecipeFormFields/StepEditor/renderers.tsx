@@ -3,7 +3,7 @@ import type {
   RenderElementProps as SlateRenderElementProps,
   RenderLeafProps as SlateRenderLeafProps,
 } from "slate-react";
-import Badge from "@/components/ui/Badge";
+import { Badge } from "@/components/ui";
 
 interface RenderElementProps extends SlateRenderElementProps {
   element: SlateRenderElementProps["element"] | MentionElement;

@@ -1,7 +1,14 @@
 "use client";
 
-import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import {
+  Input,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui";
 
 interface EditorFormProps {
   name: string;
@@ -63,18 +70,18 @@ export default function EditorForm({
         aria-label={`${valuePlaceholder} 입력`}
       />
       {unitType === "select" && unitOptions ? (
-        <select
-          value={unit}
-          onChange={e => onUnitChange(e.target.value)}
-          className="w-20 px-3 py-1.5 border border-input bg-background rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          aria-label="단위 선택"
-        >
-          {unitOptions.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <Select value={unit} onValueChange={onUnitChange}>
+          <SelectTrigger className="w-20 text-sm" aria-label="단위 선택">
+            <SelectValue placeholder="단위" />
+          </SelectTrigger>
+          <SelectContent>
+            {unitOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       ) : (
         <Input
           type="text"

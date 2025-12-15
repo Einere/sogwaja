@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import LinkButton from "@/components/ui/LinkButton";
+import { LinkButton } from "@/components/ui";
 
 interface EmptyStateProps {
   title: string;

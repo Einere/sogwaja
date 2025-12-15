@@ -4,7 +4,7 @@ import { getRecipes } from "@/app/(recipes)/recipes/actions";
 import RecipeListHeader from "@/app/(recipes)/recipes/components/RecipeListHeader";
 import RecipeListContent from "@/app/(recipes)/recipes/components/RecipeListContent";
 import EmptyState from "@/components/shared/EmptyState";
-import LinkButton from "@/components/ui/LinkButton";
+import { LinkButton } from "@/components/ui";
 
 export default async function RecipesPage() {
   // TODO: auth guard 로직은 분리해야 함.
@@ -58,4 +58,3 @@ export default async function RecipesPage() {
     </div>
   );
 }
-

@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import type { Database } from "@/types/database";
-import TextLink from "@/components/ui/TextLink";
-import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
+import { LinkButton, Button, Card } from "@/components/ui";
 import { ViewTransition } from "react";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 
@@ -43,13 +41,14 @@ export default function RecipeCard({ recipe, onDelete, isDeleting = false }: Rec
           </time>
         </Link>
         <div className="mt-3 flex gap-2">
-          <TextLink
+          <LinkButton
             href={`/recipes/${recipe.id}/experiments`}
+            variant="link"
             size="sm"
             aria-label={`${recipe.title}의 실험 목록 보기`}
           >
             실험 목록
-          </TextLink>
+          </LinkButton>
           <Button
             onClick={handleDelete}
             disabled={isDeleting}

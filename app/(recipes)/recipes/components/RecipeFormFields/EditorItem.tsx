@@ -1,7 +1,6 @@
 "use client";
 
-import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import { Input, Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui";
 
 interface EditorItemProps {
   id: string;
@@ -67,20 +66,18 @@ export default function EditorItem({
         aria-label={`${valuePlaceholder} 입력`}
       />
       {unitType === "select" && unitOptions ? (
-        <select
-          id={`${itemId}-unit`}
-          value={unit}
-          onChange={e => onUnitChange(e.target.value)}
-          disabled={readOnly}
-          className="w-20 px-3 py-1.5 border border-input bg-background rounded-lg text-sm disabled:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          aria-label="단위 선택"
-        >
+        <Select value={unit} onValueChange={onUnitChange} disabled={readOnly}>
+          <SelectTrigger id={`${itemId}-unit`} className="w-20 text-sm" aria-label="단위 선택">
+            <SelectValue placeholder="단위" />
+          </SelectTrigger>
+          <SelectContent>
           {unitOptions.map(option => (
-            <option key={option.value} value={option.value}>
+              <SelectItem key={option.value} value={option.value}>
               {option.label}
-            </option>
+              </SelectItem>
           ))}
-        </select>
+          </SelectContent>
+        </Select>
       ) : (
         <Input
           type="text"
