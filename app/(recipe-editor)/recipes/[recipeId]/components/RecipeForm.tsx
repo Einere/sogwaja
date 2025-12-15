@@ -45,7 +45,7 @@ export default function RecipeForm({
         };
 
   return (
-    <main className="px-4 py-6 space-y-6">
+    <main className="space-y-6 px-4 py-6">
       <EquipmentEditor
         equipment={equipment}
         onUpdate={onEquipmentChange}

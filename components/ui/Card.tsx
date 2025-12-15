@@ -10,7 +10,7 @@ export function Card({ children, className, ref, ...props }: CardProps) {
   return (
     <div
       ref={ref}
-      className={cn("bg-white border border-border rounded-lg overflow-hidden", className)}
+      className={cn("border-border overflow-hidden rounded-lg border bg-white", className)}
       {...props}
     >
       {children}

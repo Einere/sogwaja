@@ -18,7 +18,7 @@ export default function MentionDropdown({
 }: MentionDropdownProps) {
   return (
     <div
-      className="absolute z-50 bg-background border border-border rounded-lg shadow-lg max-h-60 overflow-auto"
+      className="bg-background border-border absolute z-50 max-h-60 overflow-auto rounded-lg border shadow-lg"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
@@ -32,7 +32,7 @@ export default function MentionDropdown({
         <div
           key={item.id}
           tabIndex={0}
-          className={`px-3 py-2 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+          className={`focus:ring-ring cursor-pointer px-3 py-2 transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none ${
             i === selectedIndex
               ? item.type === "equipment"
                 ? "bg-info/20 text-foreground"

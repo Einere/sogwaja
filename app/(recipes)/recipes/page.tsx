@@ -13,7 +13,7 @@ export default async function RecipesPage() {
   if (!user) {
     return (
       // TODO: 별도의 컴포넌트로 분리하기
-      <main className="flex flex-col items-center justify-center min-h-screen p-4">
+      <main className="flex min-h-screen flex-col items-center justify-center p-4">
         <p className="text-muted-foreground mb-4 text-center">
           조리법을 저장하고 관리하려면 로그인이 필요합니다.
         </p>
@@ -33,8 +33,8 @@ export default async function RecipesPage() {
       {/* TODO: Suspense로 감쌀 필요가 있는지 검증하기 */}
       <Suspense
         fallback={
-          <header className="sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
-            <div className="flex items-center justify-between mb-3">
+          <header className="bg-background border-border sticky top-0 z-10 border-b px-4 py-3">
+            <div className="mb-3 flex items-center justify-between">
               <h1 className="text-2xl font-bold">조리법 목록</h1>
             </div>
           </header>

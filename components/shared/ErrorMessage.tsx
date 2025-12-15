@@ -15,12 +15,12 @@ export default function ErrorMessage({
 }: ErrorMessageProps) {
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen p-4"
+      className="flex min-h-screen flex-col items-center justify-center p-4"
       role="alert"
       aria-live="assertive"
     >
       <div className="text-error mb-4" aria-hidden="true">
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -29,8 +29,8 @@ export default function ErrorMessage({
           />
         </svg>
       </div>
-      <h2 className="text-xl font-bold text-error mb-2">오류 발생</h2>
-      <p className="text-foreground mb-4 text-center max-w-md">{message}</p>
+      <h2 className="text-error mb-2 text-xl font-bold">오류 발생</h2>
+      <p className="text-foreground mb-4 max-w-md text-center">{message}</p>
       {onRetry && (
         <Button onClick={onRetry} aria-label={retryLabel}>
           {retryLabel}

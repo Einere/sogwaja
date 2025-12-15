@@ -4,7 +4,7 @@ export default function ExperimentsLayout({ children }: { children: React.ReactN
   return (
     <SsgoiTransition id="experiments">
       <div className="min-h-screen">
-        <div className="max-w-md mx-auto bg-background min-h-screen">{children}</div>
+        <div className="bg-background mx-auto min-h-screen max-w-md">{children}</div>
       </div>
     </SsgoiTransition>
   );

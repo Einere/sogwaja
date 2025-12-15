@@ -233,7 +233,7 @@ export default function StepEditor({
   return (
     <div
       ref={editorRef}
-      className="border border-input rounded-lg p-4 min-h-[200px] relative"
+      className="border-input relative min-h-[200px] rounded-lg border p-4"
       role="textbox"
       aria-label="조리법 흐름 입력"
       aria-multiline="true"
@@ -244,7 +244,7 @@ export default function StepEditor({
           renderLeaf={renderLeaf}
           placeholder={readOnly ? "" : "조리법 흐름을 입력하세요... @로 멘션할 수 있습니다"}
           readOnly={readOnly}
-          className="outline-none min-h-[150px]"
+          className="min-h-[150px] outline-none"
           onKeyDown={handleKeyDown}
           onSelect={handleSelect}
           onCompositionStart={() => {

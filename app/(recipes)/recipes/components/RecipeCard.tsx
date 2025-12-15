@@ -29,14 +29,14 @@ export default function RecipeCard({ recipe, onDelete, isDeleting = false }: Rec
       default={prefersReducedMotion ? "none" : "auto"}
     >
       <Card
-        className="p-4 hover:shadow-md transition-shadow"
+        className="p-4 transition-shadow hover:shadow-md"
         aria-labelledby={`recipe-title-${recipe.id}`}
       >
         <Link href={`/recipes/${recipe.id}`} className="block">
-          <h2 id={`recipe-title-${recipe.id}`} className="text-lg font-semibold mb-1">
+          <h2 id={`recipe-title-${recipe.id}`} className="mb-1 text-lg font-semibold">
             {recipe.title}
           </h2>
-          <time className="text-sm text-muted-foreground" dateTime={recipe.updated_at}>
+          <time className="text-muted-foreground text-sm" dateTime={recipe.updated_at}>
             {new Date(recipe.updated_at).toLocaleDateString("ko-KR")}
           </time>
         </Link>

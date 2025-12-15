@@ -1,6 +1,14 @@
 "use client";
 
-import { Input, Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui";
+import {
+  Input,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui";
 
 interface EditorItemProps {
   id: string;
@@ -41,7 +49,7 @@ export default function EditorItem({
 
   return (
     <div
-      className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+      className="bg-muted flex items-center gap-2 rounded-lg p-2"
       role="listitem"
       aria-label={ariaLabel || `${name}, ${value} ${unit}`}
     >
@@ -71,11 +79,11 @@ export default function EditorItem({
             <SelectValue placeholder="단위" />
           </SelectTrigger>
           <SelectContent>
-          {unitOptions.map(option => (
+            {unitOptions.map(option => (
               <SelectItem key={option.value} value={option.value}>
-              {option.label}
+                {option.label}
               </SelectItem>
-          ))}
+            ))}
           </SelectContent>
         </Select>
       ) : (
@@ -95,7 +103,7 @@ export default function EditorItem({
           onClick={onRemove}
           variant="ghost"
           size="sm"
-          className="text-error hover:text-error hover:bg-error/10 p-2 h-auto"
+          className="text-error hover:text-error hover:bg-error/10 h-auto p-2"
           aria-label="삭제"
         >
           삭제

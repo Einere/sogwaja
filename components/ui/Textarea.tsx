@@ -22,7 +22,8 @@ const textareaVariants = cva(
 );
 
 export interface TextareaProps
-  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "variant">,
+  extends
+    Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "variant">,
     VariantProps<typeof textareaVariants> {
   label?: string;
   error?: string;
@@ -38,7 +39,7 @@ export function Textarea({ label, error, className, id, variant, ref, ...props }
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={textareaId} className="block text-sm font-medium text-foreground mb-1">
+        <label htmlFor={textareaId} className="text-foreground mb-1 block text-sm font-medium">
           {label}
         </label>
       )}
@@ -51,7 +52,7 @@ export function Textarea({ label, error, className, id, variant, ref, ...props }
         {...props}
       />
       {error && (
-        <p id={errorId} className="mt-1 text-sm text-error" role="alert">
+        <p id={errorId} className="text-error mt-1 text-sm" role="alert">
           {error}
         </p>
       )}

@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "./Button";
 
 export interface LinkButtonProps
-  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
+  extends
+    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
     VariantProps<typeof buttonVariants> {
   href: string;
   children: ReactNode;

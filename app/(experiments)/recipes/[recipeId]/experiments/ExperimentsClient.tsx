@@ -55,18 +55,18 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
     <>
       <div className="min-h-screen pb-20">
         {/* TODO: 헤더를 별도의 컴포넌트로 분리하기 */}
-        <header className="grid grid-cols-3 items-center sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
+        <header className="bg-background border-border sticky top-0 z-10 grid grid-cols-3 items-center border-b px-4 py-3">
           <LinkButton
             href={`/recipes/${recipeId}`}
             variant="link"
             size="sm"
-            className="w-fit flex items-center gap-1"
+            className="flex w-fit items-center gap-1"
             aria-label="조리법으로 돌아가기"
           >
-            <ArrowLeftIcon className="w-4 h-4" />
+            <ArrowLeftIcon className="h-4 w-4" />
             돌아가기
           </LinkButton>
-          <h1 className="text-xl font-bold text-center">실험 목록</h1>
+          <h1 className="text-center text-xl font-bold">실험 목록</h1>
         </header>
 
         <div className="px-4 py-4">
@@ -87,12 +87,12 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
                         <img
                           src={experiment.thumbnail}
                           alt="실험 썸네일"
-                          className="w-20 h-20 object-cover rounded"
+                          className="h-20 w-20 rounded object-cover"
                         />
                       )}
                       <div className="flex-1">
                         <time
-                          className="text-sm text-muted-foreground mb-1 block"
+                          className="text-muted-foreground mb-1 block text-sm"
                           dateTime={experiment.created_at}
                         >
                           {new Date(experiment.created_at).toLocaleDateString("ko-KR", {
@@ -104,9 +104,9 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
                           })}
                         </time>
                         {experiment.memo ? (
-                          <p className="text-sm text-foreground line-clamp-2">{experiment.memo}</p>
+                          <p className="text-foreground line-clamp-2 text-sm">{experiment.memo}</p>
                         ) : (
-                          <p className="text-sm text-muted-foreground">메모 없음</p>
+                          <p className="text-muted-foreground text-sm">메모 없음</p>
                         )}
                       </div>
                     </div>

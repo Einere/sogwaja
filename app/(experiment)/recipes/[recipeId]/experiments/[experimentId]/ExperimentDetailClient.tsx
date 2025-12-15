@@ -67,33 +67,33 @@ export default function ExperimentDetailClient({
     <>
       <div className="min-h-screen pb-20">
         {/* TODO: 헤더 컴포넌트를 서버 컴포넌트로 별도로 분리하고(layout 으로 만들어도 괜찮음), 삭제 버튼은 children 을 받는 방식으로 변경하여 서버 컴포넌트 영역을 최대한 넓히기  */}
-        <header className="sticky top-0 bg-background border-b border-border z-10 px-4 py-3 grid grid-cols-3 items-center">
+        <header className="bg-background border-border sticky top-0 z-10 grid grid-cols-3 items-center border-b px-4 py-3">
           <LinkButton
             href={`/recipes/${recipeId}/experiments`}
             variant="link"
             size="sm"
-            className="w-fit flex items-center gap-1"
+            className="flex w-fit items-center gap-1"
             aria-label="실험 목록으로 돌아가기"
           >
-            <ArrowLeftIcon className="w-4 h-4" />
+            <ArrowLeftIcon className="h-4 w-4" />
             목록으로
           </LinkButton>
-          <h1 className="text-xl font-bold text-center">실험 결과</h1>
+          <h1 className="text-center text-xl font-bold">실험 결과</h1>
           <Button
             onClick={handleDelete}
             variant="ghost"
             size="sm"
-            className="justify-self-end w-fit text-end text-error hover:text-error justify-end"
+            className="text-error hover:text-error w-fit justify-end justify-self-end text-end"
             aria-label="실험 삭제"
           >
             삭제
           </Button>
         </header>
 
-        <main className="px-4 py-6 space-y-6">
+        <main className="space-y-6 px-4 py-6">
           <section>
-            <h2 className="text-2xl font-bold mb-2">{recipe.title}</h2>
-            <time className="text-sm text-muted-foreground" dateTime={experiment.created_at}>
+            <h2 className="mb-2 text-2xl font-bold">{recipe.title}</h2>
+            <time className="text-muted-foreground text-sm" dateTime={experiment.created_at}>
               {/* TODO: day.js 로 리팩토링하기 */}
               {new Date(experiment.created_at).toLocaleDateString("ko-KR", {
                 year: "numeric",
@@ -145,7 +145,7 @@ export default function ExperimentDetailClient({
                 사진
               </h3>
               <div
-                className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4"
+                className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2"
                 role="list"
                 aria-label="실험 사진"
               >
@@ -156,7 +156,7 @@ export default function ExperimentDetailClient({
                     width={192}
                     height={192}
                     alt="실험 사진"
-                    className="flex-shrink-0 w-48 h-48 object-cover rounded"
+                    className="h-48 w-48 flex-shrink-0 rounded object-cover"
                     loading="lazy"
                   />
                 ))}
@@ -170,7 +170,7 @@ export default function ExperimentDetailClient({
               <h3 id="memo-heading" className="text-lg font-semibold">
                 메모
               </h3>
-              <div className="p-4 bg-muted rounded-lg">
+              <div className="bg-muted rounded-lg p-4">
                 <p className="text-foreground whitespace-pre-wrap">{experiment.memo}</p>
               </div>
             </section>

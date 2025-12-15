@@ -43,11 +43,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="bg-background rounded-lg shadow-md p-8">
-          <h1 className="text-2xl font-bold text-center mb-8">구움과자 조리법</h1>
-          <p className="text-center text-muted-foreground mb-8">
+        <div className="bg-background rounded-lg p-8 shadow-md">
+          <h1 className="mb-8 text-center text-2xl font-bold">구움과자 조리법</h1>
+          <p className="text-muted-foreground mb-8 text-center">
             조리법을 저장하고 관리하려면 로그인이 필요합니다.
           </p>
 
@@ -56,7 +56,7 @@ export default function LoginPage() {
               onClick={() => handleSocialLogin("google")}
               disabled={loading}
               variant="outline"
-              className="w-full flex items-center justify-center gap-3"
+              className="flex w-full items-center justify-center gap-3"
             >
               <GoogleIcon />
               Google로 로그인
@@ -66,14 +66,14 @@ export default function LoginPage() {
               onClick={() => handleSocialLogin("apple")}
               disabled={loading}
               variant="primary"
-              className="w-full flex items-center justify-center gap-3 bg-black hover:bg-black/90"
+              className="flex w-full items-center justify-center gap-3 bg-black hover:bg-black/90"
             >
               <AppleIcon />
               Apple로 로그인
             </Button>
           </div>
 
-          <p className="text-xs text-center text-muted-foreground mt-6">
+          <p className="text-muted-foreground mt-6 text-center text-xs">
             로그인 시 조리법 저장 및 관리 기능을 사용할 수 있습니다.
           </p>
         </div>

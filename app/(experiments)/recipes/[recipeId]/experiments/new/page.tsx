@@ -52,51 +52,51 @@ export default function NewExperimentPage() {
   return (
     <div className="min-h-screen pb-20">
       {/* TODO: 헤더를 별도의 컴포넌트로 분리하기 */}
-      <header className="grid grid-cols-3 items-center sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
+      <header className="bg-background border-border sticky top-0 z-10 grid grid-cols-3 items-center border-b px-4 py-3">
         <LinkButton
           href={`/recipes/${recipeId}`}
           variant="link"
           size="sm"
-          className="w-fit flex items-center gap-1"
+          className="flex w-fit items-center gap-1"
           aria-label="조리법으로 돌아가기"
           prefetch={true}
         >
-          <ArrowLeftIcon className="w-4 h-4" />
+          <ArrowLeftIcon className="h-4 w-4" />
           돌아가기
         </LinkButton>
         <h1 className="text-center text-xl font-bold">실험 결과 저장</h1>
       </header>
 
-      <form onSubmit={handleSubmit} className="px-4 py-6 space-y-6" aria-label="실험 결과 저장 폼">
+      <form onSubmit={handleSubmit} className="space-y-6 px-4 py-6" aria-label="실험 결과 저장 폼">
         <fieldset disabled={isPending}>
-          <legend className="block text-sm font-medium text-foreground mb-2">사진</legend>
-          <div className="grid grid-cols-3 gap-2 mb-2">
+          <legend className="text-foreground mb-2 block text-sm font-medium">사진</legend>
+          <div className="mb-2 grid grid-cols-3 gap-2">
             {previews.map((preview, index) => (
               <div key={index} className="relative aspect-square">
                 <img
                   src={preview}
                   alt={`미리보기 ${index + 1}`}
-                  className="w-full aspect-square object-cover rounded"
+                  className="aspect-square w-full rounded object-cover"
                   loading="lazy"
                 />
                 <button
                   type="button"
                   onClick={() => removePhoto(index)}
                   disabled={isPending}
-                  className="absolute top-1 right-1 bg-muted-foreground/50 backdrop-blur-sm rounded-full w-7 h-7 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted-foreground/70 transition-colors"
+                  className="bg-muted-foreground/50 focus:ring-ring hover:bg-muted-foreground/70 absolute top-1 right-1 flex h-7 w-7 items-center justify-center rounded-full backdrop-blur-sm transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={`사진 ${index + 1} 삭제`}
                 >
-                  <XIcon className="w-4 h-4 text-error" />
+                  <XIcon className="text-error h-4 w-4" />
                 </button>
               </div>
             ))}
             {previews.length < 9 && (
               <label
                 tabIndex={isPending ? -1 : 0}
-                className={`flex w-full aspect-square items-center justify-center border-2 border-dashed rounded transition-colors ${
+                className={`flex aspect-square w-full items-center justify-center rounded border-2 border-dashed transition-colors ${
                   isPending
                     ? "border-muted cursor-not-allowed opacity-50"
-                    : "border-input cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+                    : "border-input hover:border-primary focus:ring-ring focus-within:ring-ring cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus:ring-2 focus:ring-offset-2 focus:outline-none"
                 }`}
                 onKeyDown={e => {
                   if (!isPending && (e.key === "Enter" || e.key === " ")) {
@@ -119,11 +119,11 @@ export default function NewExperimentPage() {
                   className="hidden"
                   aria-label="사진 추가"
                 />
-                <PlusIcon className="w-8 h-8 text-muted-foreground" />
+                <PlusIcon className="text-muted-foreground h-8 w-8" />
               </label>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">최대 9장까지 업로드 가능합니다.</p>
+          <p className="text-muted-foreground text-xs">최대 9장까지 업로드 가능합니다.</p>
         </fieldset>
 
         <Textarea

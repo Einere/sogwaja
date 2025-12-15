@@ -13,13 +13,7 @@ export default function ChevronUpIcon({
       viewBox="0 0 24 24"
       aria-hidden={ariaHidden}
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="m18 15-6-6-6 6"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m18 15-6-6-6 6" />
     </svg>
   );
 }
-

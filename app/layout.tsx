@@ -26,10 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased `}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SsgoiProvider>
-          <div className="min-h-screen bg-muted">
-            <div className="max-w-md mx-auto bg-background min-h-screen">{children}</div>
+          <div className="bg-muted min-h-screen">
+            <div className="bg-background mx-auto min-h-screen max-w-md">{children}</div>
           </div>
         </SsgoiProvider>
       </body>

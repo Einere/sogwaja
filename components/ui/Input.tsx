@@ -22,7 +22,8 @@ const inputVariants = cva(
 );
 
 export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "variant">,
+  extends
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, "variant">,
     VariantProps<typeof inputVariants> {
   label?: string;
   error?: string;
@@ -38,7 +39,7 @@ export function Input({ label, error, className, id, variant, ref, ...props }: I
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-foreground mb-1">
+          <label htmlFor={inputId} className="text-foreground mb-1 block text-sm font-medium">
             {label}
           </label>
         )}
@@ -51,7 +52,7 @@ export function Input({ label, error, className, id, variant, ref, ...props }: I
           {...props}
         />
         {error && (
-          <p id={errorId} className="mt-1 text-sm text-error" role="alert">
+          <p id={errorId} className="text-error mt-1 text-sm" role="alert">
             {error}
           </p>
         )}

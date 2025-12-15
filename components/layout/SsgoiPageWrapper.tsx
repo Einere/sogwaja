@@ -11,9 +11,8 @@ export default function SsgoiPageWrapper({ children }: { children: React.ReactNo
   const pathname = usePathname();
 
   return (
-    <SsgoiTransition id={pathname} className="w-full min-h-full">
+    <SsgoiTransition id={pathname} className="min-h-full w-full">
       {children}
     </SsgoiTransition>
   );
 }
-
