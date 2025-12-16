@@ -215,7 +215,6 @@ Supabase 대시보드의 **Authentication > Providers**에서 소셜 로그인�
 ### 5-1. Google 로그인 설정
 
 1. **Google Cloud Console**에서 설정:
-
    - [Google Cloud Console](https://console.cloud.google.com/) 접속
    - 새 프로젝트 생성 또는 기존 프로젝트 선택
    - **API 및 서비스 > 사용자 인증 정보**로 이동
@@ -238,7 +237,6 @@ Supabase 대시보드의 **Authentication > Providers**에서 소셜 로그인�
 ### 5-2. Apple 로그인 설정
 
 1. **Apple Developer**에서 설정:
-
    - [Apple Developer](https://developer.apple.com/) 접속
    - Certificates, Identifiers & Profiles로 이동
    - **Identifiers**에서 **Services IDs** 생성
@@ -267,7 +265,6 @@ Supabase 대시보드의 **Authentication > Providers**에서 소셜 로그인�
 ### 5-3. Kakao 로그인 설정 (Custom OAuth)
 
 1. **Kakao Developers**에서 설정:
-
    - [Kakao Developers](https://developers.kakao.com/) 접속
    - 내 애플리케이션 > 애플리케이션 추가하기
    - 앱 이름, 사업자명 입력 후 생성
@@ -295,7 +292,6 @@ Supabase 대시보드의 **Authentication > Providers**에서 소셜 로그인�
 ### 5-4. Naver 로그인 설정 (Custom OAuth)
 
 1. **Naver Developers**에서 설정:
-
    - [Naver Developers](https://developers.naver.com/) 접속
    - **Application > 애플리케이션 등록**
    - 애플리케이션 이름, 사용 API 선택 (네이버 로그인)

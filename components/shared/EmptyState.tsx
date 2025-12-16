@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import LinkButton from "@/components/ui/LinkButton";
+import { LinkButton } from "@/components/ui";
 
 interface EmptyStateProps {
   title: string;
@@ -16,13 +16,13 @@ interface EmptyStateProps {
 export default function EmptyState({ title, description, action, children }: EmptyStateProps) {
   return (
     <div
-      className="text-center py-12"
+      className="py-12 text-center"
       role="status"
       aria-live="polite"
       aria-label={`${title}. ${description || ""}`}
     >
       <p className="text-muted-foreground mb-4">{title}</p>
-      {description && <p className="text-sm text-muted-foreground/70 mb-4">{description}</p>}
+      {description && <p className="text-muted-foreground/70 mb-4 text-sm">{description}</p>}
       {action && (
         <LinkButton href={action.href} aria-label={action.label}>
           {action.label}

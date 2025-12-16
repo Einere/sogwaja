@@ -17,16 +17,16 @@ export default function LoadingSpinner({
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen"
+      className="flex min-h-screen flex-col items-center justify-center"
       role="status"
       aria-live="polite"
       aria-label={message}
     >
       <div
-        className={`${sizeClasses[size]} border-4 border-muted border-t-primary rounded-full animate-spin`}
+        className={`${sizeClasses[size]} border-muted border-t-primary animate-spin rounded-full border-4`}
         aria-hidden="true"
       />
-      <p className="mt-4 text-muted-foreground">{message}</p>
+      <p className="text-muted-foreground mt-4">{message}</p>
     </div>
   );
 }

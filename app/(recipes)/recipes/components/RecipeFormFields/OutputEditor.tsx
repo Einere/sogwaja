@@ -10,16 +10,19 @@ type Output = Database["public"]["Tables"]["recipe_outputs"]["Row"];
 interface OutputEditorProps {
   outputs: Output[];
   onUpdate: (outputs: Output[]) => void;
-  onQuantityChange?: (quantity: number, unit: string) => void;
+  onQuantityChange?: (
+    quantity: number,
+    unit: string,
+    originalQuantity?: number,
+    originalUnit?: string
+  ) => void;
   readOnly?: boolean;
 }
 
 const UNIT_OPTIONS = [
   { value: "개", label: "개" },
   { value: "g", label: "g" },
-  { value: "kg", label: "kg" },
   { value: "ml", label: "ml" },
-  { value: "L", label: "L" },
 ];
 
 export default function OutputEditor({
@@ -59,13 +62,22 @@ export default function OutputEditor({
     field: "name" | "quantity" | "unit",
     value: string | number
   ) => {
+    // Store original output before update for quantity change calculation
+    const originalOutput = outputs.find(out => out.id === id);
+
     const updated = outputs.map(out => (out.id === id ? { ...out, [field]: value } : out));
     onUpdate(updated);
 
     if (field === "quantity" || field === "unit") {
       const output = updated.find(out => out.id === id);
-      if (output && onQuantityChange) {
-        onQuantityChange(output.quantity, output.unit);
+      if (output && onQuantityChange && originalOutput) {
+        // Pass both original and new values for calculation
+        onQuantityChange(
+          output.quantity,
+          output.unit,
+          originalOutput.quantity,
+          originalOutput.unit
+        );
       }
     }
   };
@@ -107,7 +119,6 @@ export default function OutputEditor({
           onSubmit={handleAdd}
           namePlaceholder="결과물 이름"
           valuePlaceholder="양"
-          unitType="select"
           unitOptions={UNIT_OPTIONS}
           submitLabel="추가"
           ariaLabel="새 결과물 추가"

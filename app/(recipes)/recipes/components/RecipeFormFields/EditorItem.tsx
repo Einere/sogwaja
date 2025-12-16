@@ -1,7 +1,14 @@
 "use client";
 
-import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import {
+  Input,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui";
 
 interface EditorItemProps {
   id: string;
@@ -34,15 +41,19 @@ export default function EditorItem({
   namePlaceholder = "이름",
   valuePlaceholder = "값",
   unitPlaceholder = "단위",
-  unitType = "input",
-  unitOptions,
+  unitType = "select",
+  unitOptions = [
+    { value: "개", label: "개" },
+    { value: "g", label: "g" },
+    { value: "ml", label: "ml" },
+  ],
   ariaLabel,
 }: EditorItemProps) {
   const itemId = `editor-item-${id}`;
 
   return (
     <div
-      className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+      className="bg-muted flex items-center gap-2 rounded-lg p-2"
       role="listitem"
       aria-label={ariaLabel || `${name}, ${value} ${unit}`}
     >
@@ -58,6 +69,7 @@ export default function EditorItem({
       />
       <Input
         type="number"
+        inputMode="numeric"
         id={`${itemId}-value`}
         value={value}
         onChange={e => onValueChange(parseFloat(e.target.value) || 0)}
@@ -67,20 +79,18 @@ export default function EditorItem({
         aria-label={`${valuePlaceholder} 입력`}
       />
       {unitType === "select" && unitOptions ? (
-        <select
-          id={`${itemId}-unit`}
-          value={unit}
-          onChange={e => onUnitChange(e.target.value)}
-          disabled={readOnly}
-          className="w-20 px-3 py-1.5 border border-input bg-background rounded-lg text-sm disabled:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          aria-label="단위 선택"
-        >
-          {unitOptions.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <Select value={unit} onValueChange={onUnitChange} disabled={readOnly}>
+          <SelectTrigger id={`${itemId}-unit`} className="w-20 text-sm" aria-label="단위 선택">
+            <SelectValue placeholder="단위" />
+          </SelectTrigger>
+          <SelectContent>
+            {unitOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       ) : (
         <Input
           type="text"
@@ -98,7 +108,7 @@ export default function EditorItem({
           onClick={onRemove}
           variant="ghost"
           size="sm"
-          className="text-error hover:text-error hover:bg-error/10 p-2 h-auto"
+          className="text-error hover:text-error hover:bg-error/10 h-auto p-2"
           aria-label="삭제"
         >
           삭제

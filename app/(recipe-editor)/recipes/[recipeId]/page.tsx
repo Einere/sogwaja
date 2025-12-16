@@ -18,4 +18,3 @@ export default async function RecipeEditorPage({ params }: RecipeEditorPageProps
 
   return <RecipeEditorClient initialData={recipeData} recipeId={recipeId} user={user} />;
 }
-

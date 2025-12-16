@@ -1,4 +1,3 @@
-import { SsgoiTransition } from "@ssgoi/react";
 import Link from "next/link";
 import { ViewTransition } from "react";
 

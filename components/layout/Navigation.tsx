@@ -17,14 +17,14 @@ export default function Navigation() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-background border-t border-border max-w-md mx-auto"
+      className="bg-background border-border fixed right-0 bottom-0 left-0 mx-auto max-w-md border-t"
       aria-label="주요 네비게이션"
     >
-      <div className="flex items-center justify-around h-16" role="list">
+      <div className="flex h-16 items-center justify-around" role="list">
         <Link
           href={`/recipes/${recipeId}/experiments/new`}
           className={cn(
-            "flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors",
+            "focus:ring-ring flex h-full flex-1 flex-col items-center justify-center rounded transition-colors focus:ring-2 focus:outline-none",
             pathname === `/recipes/${recipeId}/experiments/new`
               ? "text-primary"
               : "text-muted-foreground hover:text-foreground"
@@ -32,13 +32,13 @@ export default function Navigation() {
           aria-label="실험 저장"
           aria-current={pathname === `/recipes/${recipeId}/experiments/new` ? "page" : undefined}
         >
-          <PencilIcon className="w-6 h-6 mb-1" />
+          <PencilIcon className="mb-1 h-6 w-6" />
           <span className="text-xs">실험 저장</span>
         </Link>
         <Link
           href={`/recipes/${recipeId}/experiments`}
           className={cn(
-            "flex flex-col items-center justify-center flex-1 h-full focus:outline-none focus:ring-2 focus:ring-ring rounded transition-colors",
+            "focus:ring-ring flex h-full flex-1 flex-col items-center justify-center rounded transition-colors focus:ring-2 focus:outline-none",
             pathname === `/recipes/${recipeId}/experiments`
               ? "text-primary"
               : "text-muted-foreground hover:text-foreground"
@@ -46,7 +46,7 @@ export default function Navigation() {
           aria-label="실험 목록"
           aria-current={pathname === `/recipes/${recipeId}/experiments` ? "page" : undefined}
         >
-          <ClipboardIcon className="w-6 h-6 mb-1" />
+          <ClipboardIcon className="mb-1 h-6 w-6" />
           <span className="text-xs">실험 목록</span>
         </Link>
       </div>

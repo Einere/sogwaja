@@ -1,7 +1,14 @@
 "use client";
 
-import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import {
+  Input,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui";
 
 interface EditorFormProps {
   name: string;
@@ -13,9 +20,7 @@ interface EditorFormProps {
   onSubmit: () => void;
   namePlaceholder?: string;
   valuePlaceholder?: string;
-  unitPlaceholder?: string;
-  unitType?: "input" | "select";
-  unitOptions?: { value: string; label: string }[];
+  unitOptions: { value: string; label: string }[];
   submitLabel?: string;
   ariaLabel?: string;
 }
@@ -30,8 +35,6 @@ export default function EditorForm({
   onSubmit,
   namePlaceholder = "이름",
   valuePlaceholder = "값",
-  unitPlaceholder = "단위",
-  unitType = "input",
   unitOptions,
   submitLabel = "추가",
   ariaLabel,
@@ -55,37 +58,27 @@ export default function EditorForm({
       />
       <Input
         type="number"
+        inputMode="numeric"
         value={value}
         onChange={e => onValueChange(e.target.value)}
+        // TODO: onKeyPress 대체하기(onKeyDown 사용)
         onKeyPress={handleKeyPress}
         className="w-24 text-sm"
         placeholder={valuePlaceholder}
         aria-label={`${valuePlaceholder} 입력`}
       />
-      {unitType === "select" && unitOptions ? (
-        <select
-          value={unit}
-          onChange={e => onUnitChange(e.target.value)}
-          className="w-20 px-3 py-1.5 border border-input bg-background rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          aria-label="단위 선택"
-        >
+      <Select value={unit} onValueChange={onUnitChange}>
+        <SelectTrigger className="w-20 text-sm" aria-label="단위 선택">
+          <SelectValue placeholder="단위" />
+        </SelectTrigger>
+        <SelectContent>
           {unitOptions.map(option => (
-            <option key={option.value} value={option.value}>
+            <SelectItem key={option.value} value={option.value}>
               {option.label}
-            </option>
+            </SelectItem>
           ))}
-        </select>
-      ) : (
-        <Input
-          type="text"
-          value={unit}
-          onChange={e => onUnitChange(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="w-16 text-sm"
-          placeholder={unitPlaceholder}
-          aria-label={`${unitPlaceholder} 입력`}
-        />
-      )}
+        </SelectContent>
+      </Select>
       <Button onClick={onSubmit} size="sm" className="text-sm" aria-label={submitLabel}>
         {submitLabel}
       </Button>

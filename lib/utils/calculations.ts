@@ -127,3 +127,49 @@ export function calculateEquipment(
     };
   });
 }
+
+/**
+ * 재료 목록에 비율을 적용하여 업데이트된 목록 반환
+ * 전체 객체를 유지하면서 amount와 unit만 업데이트
+ */
+export function applyProportionalToIngredients<T extends { amount: number; unit: string }>(
+  ingredients: T[],
+  originalOutput: Quantity,
+  newOutput: Quantity
+): T[] {
+  return ingredients.map(ingredient => {
+    const calculated = calculateProportionalQuantity(
+      { value: ingredient.amount, unit: ingredient.unit },
+      originalOutput,
+      newOutput
+    );
+    return {
+      ...ingredient,
+      amount: isValidNumber(calculated.value) ? calculated.value : ingredient.amount,
+      unit: calculated.unit,
+    };
+  });
+}
+
+/**
+ * 장비 목록에 비율을 적용하여 업데이트된 목록 반환
+ * 전체 객체를 유지하면서 quantity와 unit만 업데이트
+ */
+export function applyProportionalToEquipment<T extends { quantity: number; unit: string }>(
+  equipment: T[],
+  originalOutput: Quantity,
+  newOutput: Quantity
+): T[] {
+  return equipment.map(eq => {
+    const calculated = calculateProportionalQuantity(
+      { value: eq.quantity, unit: eq.unit },
+      originalOutput,
+      newOutput
+    );
+    return {
+      ...eq,
+      quantity: isValidNumber(calculated.value) ? calculated.value : eq.quantity,
+      unit: calculated.unit,
+    };
+  });
+}

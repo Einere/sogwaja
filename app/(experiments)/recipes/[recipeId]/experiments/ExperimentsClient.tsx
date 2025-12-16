@@ -1,14 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { deleteExperiment } from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
 import EmptyState from "@/components/shared/EmptyState";
-import TextLink from "@/components/ui/TextLink";
+import { LinkButton, Button, Card } from "@/components/ui";
 import { ArrowLeftIcon } from "@/components/icons";
-import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
-import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import Link from "next/link";
 import type { Database } from "@/types/database";
 
@@ -27,7 +23,6 @@ interface ExperimentsClientProps {
 
 export default function ExperimentsClient({ experiments, recipeId }: ExperimentsClientProps) {
   const [experimentsList, setExperimentsList] = useState(experiments);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
   // 서버에서 받은 experiments가 변경되면 로컬 state 업데이트
   useEffect(() => {
@@ -35,12 +30,15 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
   }, [experiments]);
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) {
+      return;
+    }
+
     // 1. 이전 상태 저장 (롤백용)
     const previousExperiments = experimentsList;
 
     // 2. 즉시 목록에서 제거 (낙관적)
     setExperimentsList(prev => prev.filter(exp => exp.id !== id));
-    setDeleteConfirm(null);
 
     try {
       // 3. 백그라운드에서 서버 요청
@@ -57,17 +55,18 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
     <>
       <div className="min-h-screen pb-20">
         {/* TODO: 헤더를 별도의 컴포넌트로 분리하기 */}
-        <header className="grid grid-cols-3 items-center sticky top-0 bg-background border-b border-border z-10 px-4 py-3">
-          <TextLink
+        <header className="bg-background border-border sticky top-0 z-10 grid grid-cols-3 items-center border-b px-4 py-3">
+          <LinkButton
             href={`/recipes/${recipeId}`}
+            variant="link"
             size="sm"
-            className="w-fit flex items-center gap-1"
+            className="flex w-fit items-center gap-1"
             aria-label="조리법으로 돌아가기"
           >
-            <ArrowLeftIcon className="w-4 h-4" />
+            <ArrowLeftIcon className="h-4 w-4" />
             돌아가기
-          </TextLink>
-          <h1 className="text-xl font-bold text-center">실험 목록</h1>
+          </LinkButton>
+          <h1 className="text-center text-xl font-bold">실험 목록</h1>
         </header>
 
         <div className="px-4 py-4">
@@ -88,12 +87,12 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
                         <img
                           src={experiment.thumbnail}
                           alt="실험 썸네일"
-                          className="w-20 h-20 object-cover rounded"
+                          className="h-20 w-20 rounded object-cover"
                         />
                       )}
                       <div className="flex-1">
                         <time
-                          className="text-sm text-muted-foreground mb-1 block"
+                          className="text-muted-foreground mb-1 block text-sm"
                           dateTime={experiment.created_at}
                         >
                           {new Date(experiment.created_at).toLocaleDateString("ko-KR", {
@@ -105,16 +104,16 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
                           })}
                         </time>
                         {experiment.memo ? (
-                          <p className="text-sm text-foreground line-clamp-2">{experiment.memo}</p>
+                          <p className="text-foreground line-clamp-2 text-sm">{experiment.memo}</p>
                         ) : (
-                          <p className="text-sm text-muted-foreground">메모 없음</p>
+                          <p className="text-muted-foreground text-sm">메모 없음</p>
                         )}
                       </div>
                     </div>
                   </Link>
                   <div className="px-4 pb-4">
                     <Button
-                      onClick={() => setDeleteConfirm({ id: experiment.id, name: "실험" })}
+                      onClick={() => handleDelete(experiment.id)}
                       variant="ghost"
                       size="sm"
                       className="text-error hover:text-error"
@@ -129,16 +128,6 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
           )}
         </div>
       </div>
-      <ConfirmDialog
-        isOpen={!!deleteConfirm}
-        title="실험 삭제"
-        message="정말 삭제하시겠습니까?"
-        confirmLabel="삭제"
-        cancelLabel="취소"
-        variant="error"
-        onConfirm={() => deleteConfirm && handleDelete(deleteConfirm.id)}
-        onCancel={() => setDeleteConfirm(null)}
-      />
     </>
   );
 }

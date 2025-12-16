@@ -18,13 +18,17 @@ interface IngredientEditorProps {
 export default function IngredientEditor({
   ingredients,
   onUpdate,
-  outputQuantity = 1,
-  outputUnit = "개",
   readOnly = false,
 }: IngredientEditorProps) {
   const [newName, setNewName] = useState("");
   const [newAmount, setNewAmount] = useState("");
   const [newUnit, setNewUnit] = useState("g");
+
+  const UNIT_OPTIONS = [
+    { value: "개", label: "개" },
+    { value: "g", label: "g" },
+    { value: "ml", label: "ml" },
+  ];
 
   const handleAdd = () => {
     if (!newName.trim() || !newAmount) return;
@@ -88,7 +92,7 @@ export default function IngredientEditor({
           onSubmit={handleAdd}
           namePlaceholder="재료 이름"
           valuePlaceholder="양"
-          unitPlaceholder="단위"
+          unitOptions={UNIT_OPTIONS}
           submitLabel="추가"
           ariaLabel="새 재료 추가"
         />

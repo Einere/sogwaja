@@ -233,10 +233,7 @@ export default function StepEditor({
   return (
     <div
       ref={editorRef}
-      className="border border-input rounded-lg p-4 min-h-[200px] relative"
-      role="textbox"
-      aria-label="조리법 흐름 입력"
-      aria-multiline="true"
+      className="border-input relative flex min-h-[200px] flex-1 cursor-text flex-col rounded-lg border"
     >
       <Slate editor={editor} initialValue={editorValue} onChange={handleChange}>
         <Editable
@@ -244,14 +241,16 @@ export default function StepEditor({
           renderLeaf={renderLeaf}
           placeholder={readOnly ? "" : "조리법 흐름을 입력하세요... @로 멘션할 수 있습니다"}
           readOnly={readOnly}
-          className="outline-none min-h-[150px]"
+          className="min-h-[150px] flex-1 p-4 outline-none"
           onKeyDown={handleKeyDown}
           onSelect={handleSelect}
           onCompositionStart={() => {
             isComposingRef.current = true;
           }}
           onCompositionEnd={handleCompositionEnd}
-          aria-label="조리법 흐름 에디터"
+          role="textbox"
+          aria-label="조리법 흐름 입력"
+          aria-multiline="true"
         />
         {target && filteredItems.length > 0 && dropdownPosition && (
           <MentionDropdown
