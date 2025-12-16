@@ -203,3 +203,8 @@ body {
     animation: none !important;
   }
 }
+
+/* 부드러운 모서리를 위한 corner-shape 유틸리티 */
+.rounded-smooth {
+  corner-shape: squircle;
+}

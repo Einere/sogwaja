@@ -19,7 +19,7 @@ const badgeVariantConfig = {
 export type BadgeVariant = keyof typeof badgeVariantConfig;
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+  "inline-flex items-center rounded-md rounded-smooth font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
   {
     variants: {
       variant: badgeVariantConfig,
