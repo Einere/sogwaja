@@ -2,17 +2,17 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useActionState, startTransition } from "react";
+import { Controller } from "react-hook-form";
 import { createExperimentAction } from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
 import { useExperimentForm } from "@/app/(experiment)/recipes/[recipeId]/experiments/hooks/useExperimentForm";
 import { Textarea, Button, LinkButton } from "@/components/ui";
 import { XIcon, ArrowLeftIcon, PlusIcon } from "@/components/icons";
-import { SsgoiTransition } from "@ssgoi/react";
 
 export default function NewExperimentPage() {
   const params = useParams();
   const router = useRouter();
   const recipeId = params.recipeId as string;
-  const { memo, photos, previews, setMemo, handlePhotoChange, removePhoto } = useExperimentForm();
+  const { form, previews, handlePhotoChange, removePhoto } = useExperimentForm();
 
   const [state, formAction, isPending] = useActionState(createExperimentAction, null);
 
@@ -20,22 +20,16 @@ export default function NewExperimentPage() {
     if (isPending) return;
 
     const files = Array.from(e.target.files || []);
-    if (files.length + photos.length > 9) {
-      alert("최대 9장까지 업로드 가능합니다.");
-      return;
-    }
     handlePhotoChange(files);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const onSubmit = (data: { memo?: string | null; photos: File[] }) => {
     const formData = new FormData();
     formData.append("recipeId", recipeId);
-    formData.append("memo", memo || "");
+    formData.append("memo", data.memo || "");
 
     // Add photos to FormData
-    photos.forEach(photo => {
+    data.photos.forEach(photo => {
       formData.append("photos", photo);
     });
 
@@ -67,7 +61,11 @@ export default function NewExperimentPage() {
         <h1 className="text-center text-xl font-bold">실험 결과 저장</h1>
       </header>
 
-      <form onSubmit={handleSubmit} className="space-y-6 px-4 py-6" aria-label="실험 결과 저장 폼">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 px-4 py-6"
+        aria-label="실험 결과 저장 폼"
+      >
         <fieldset disabled={isPending}>
           <legend className="text-foreground mb-2 block text-sm font-medium">사진</legend>
           <div className="mb-2 grid grid-cols-3 gap-2">
@@ -124,17 +122,31 @@ export default function NewExperimentPage() {
             )}
           </div>
           <p className="text-muted-foreground text-xs">최대 9장까지 업로드 가능합니다.</p>
+          {form.formState.errors.photos && (
+            // TODO: 모든 폼 인풋 경고 요소에 대해, 접근성 준수하기
+            <p role="alert" className="text-error mt-1 text-sm">
+              {form.formState.errors.photos.message}
+            </p>
+          )}
         </fieldset>
 
-        <Textarea
-          label="메모"
+        <Controller
           name="memo"
-          value={memo}
-          onChange={e => setMemo(e.target.value)}
-          disabled={isPending}
-          rows={6}
-          placeholder="실험 결과에 대한 메모를 입력하세요..."
-          aria-label="실험 메모"
+          control={form.control}
+          render={({ field }) => (
+            <Textarea
+              label="메모"
+              name={field.name}
+              value={field.value || ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              disabled={isPending}
+              rows={6}
+              placeholder="실험 결과에 대한 메모를 입력하세요..."
+              aria-label="실험 메모"
+              error={form.formState.errors.memo?.message}
+            />
+          )}
         />
 
         {state?.error && (

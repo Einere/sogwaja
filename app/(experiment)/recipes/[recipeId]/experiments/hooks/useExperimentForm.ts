@@ -1,57 +1,73 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useForm, UseFormReturn } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { ExperimentFormSchema, type ExperimentFormData } from "@/lib/validations/experiment";
 
 interface UseExperimentFormResult {
-  memo: string;
-  photos: File[];
+  form: UseFormReturn<ExperimentFormData>;
   previews: string[];
-  setMemo: (memo: string) => void;
   handlePhotoChange: (files: File[]) => void;
   removePhoto: (index: number) => void;
-  reset: () => void;
 }
 
 export function useExperimentForm(): UseExperimentFormResult {
-  const [memo, setMemo] = useState("");
-  const [photos, setPhotos] = useState<File[]>([]);
+  const form = useForm<ExperimentFormData>({
+    resolver: zodResolver(ExperimentFormSchema),
+    defaultValues: {
+      memo: "",
+      photos: [],
+    },
+  });
+
+  const watchedPhotos = form.watch("photos");
   const [previews, setPreviews] = useState<string[]>([]);
 
-  const handlePhotoChange = useCallback(
-    (files: File[]) => {
-      const newPhotos = [...photos, ...files];
-      setPhotos(newPhotos);
+  // Generate previews when photos change
+  useEffect(() => {
+    const newPreviews: string[] = [];
+    const previewPromises = watchedPhotos.map(
+      file =>
+        new Promise<string>(resolve => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+        })
+    );
 
-      // Create previews
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviews(prev => [...prev, reader.result as string]);
-        };
-        reader.readAsDataURL(file);
+    Promise.all(previewPromises).then(results => {
+      setPreviews(results);
+    });
+  }, [watchedPhotos]);
+
+  const handlePhotoChange = (files: File[]) => {
+    const currentPhotos = form.getValues("photos");
+    if (currentPhotos.length + files.length > 9) {
+      form.setError("photos", {
+        type: "manual",
+        message: "최대 9장까지 업로드 가능합니다",
       });
-    },
-    [photos]
-  );
+      return;
+    }
+    form.setValue("photos", [...currentPhotos, ...files], { shouldDirty: true });
+  };
 
-  const removePhoto = useCallback((index: number) => {
-    setPhotos(prev => prev.filter((_, i) => i !== index));
-    setPreviews(prev => prev.filter((_, i) => i !== index));
-  }, []);
-
-  const reset = useCallback(() => {
-    setMemo("");
-    setPhotos([]);
-    setPreviews([]);
-  }, []);
+  const removePhoto = (index: number) => {
+    const currentPhotos = form.getValues("photos");
+    form.setValue(
+      "photos",
+      currentPhotos.filter((_, i) => i !== index),
+      { shouldDirty: true }
+    );
+  };
 
   return {
-    memo,
-    photos,
+    form,
     previews,
-    setMemo,
     handlePhotoChange,
     removePhoto,
-    reset,
   };
 }

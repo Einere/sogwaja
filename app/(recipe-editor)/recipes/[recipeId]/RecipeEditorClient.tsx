@@ -1,11 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useRecipeEditor } from "@/app/(recipe-editor)/recipes/[recipeId]/hooks/useRecipeEditor";
 import type { RecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
 import RecipeHeader from "@/app/(recipe-editor)/recipes/[recipeId]/components/RecipeHeader";
 import RecipeForm from "@/app/(recipe-editor)/recipes/[recipeId]/components/RecipeForm";
-import ErrorMessage from "@/components/shared/ErrorMessage";
 
 interface RecipeEditorClientProps {
   initialData: RecipeData;
@@ -18,14 +16,12 @@ export default function RecipeEditorClient({
   recipeId,
   user,
 }: RecipeEditorClientProps) {
-  const router = useRouter();
   const {
     equipment,
     ingredients,
     outputs,
     steps,
     title,
-    error,
     saving,
     setTitle,
     setEquipment,
@@ -34,16 +30,6 @@ export default function RecipeEditorClient({
     setSteps,
     handleOutputQuantityChange,
   } = useRecipeEditor(recipeId, initialData);
-
-  if (error) {
-    return (
-      <ErrorMessage
-        message={error}
-        onRetry={() => router.push("/recipes")}
-        retryLabel="목록으로 돌아가기"
-      />
-    );
-  }
 
   return (
     <div className="min-h-screen pb-20">

@@ -61,6 +61,7 @@ export default function EditorForm({
         inputMode="numeric"
         value={value}
         onChange={e => onValueChange(e.target.value)}
+        // TODO: onKeyPress 대체하기(onKeyDown 사용)
         onKeyPress={handleKeyPress}
         className="w-24 text-sm"
         placeholder={valuePlaceholder}

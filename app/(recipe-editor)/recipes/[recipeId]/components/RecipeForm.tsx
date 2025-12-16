@@ -22,7 +22,12 @@ interface RecipeFormProps {
   onIngredientsChange: (ingredients: Ingredient[]) => void;
   onOutputsChange: (outputs: Output[]) => void;
   onStepsChange: (steps: { children: Descendant[] }) => void;
-  onOutputQuantityChange: (quantity: number, unit: string) => void;
+  onOutputQuantityChange: (
+    quantity: number,
+    unit: string,
+    originalQuantity?: number,
+    originalUnit?: string
+  ) => void;
   user: { id: string } | null;
 }
 
