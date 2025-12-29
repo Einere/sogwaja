@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { getServerUser } from "@/lib/supabase/auth";
-import { getExperiment } from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
-import { getRecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
+import {
+  getExperiment,
+  getExperimentData,
+} from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
 import ExperimentDetailClient from "./ExperimentDetailClient";
 import { SsgoiTransition } from "@ssgoi/react";
 
@@ -17,19 +19,19 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
 
   const { recipeId, experimentId } = await params;
 
-  const [experiment, recipeData] = await Promise.all([
+  const [experiment, experimentData] = await Promise.all([
     getExperiment(experimentId),
-    getRecipeData(recipeId),
+    getExperimentData(experimentId),
   ]);
 
   return (
     <ExperimentDetailClient
       experiment={experiment}
-      recipe={recipeData.recipe}
-      equipment={recipeData.equipment}
-      ingredients={recipeData.ingredients}
-      outputs={recipeData.outputs}
-      steps={recipeData.steps}
+      recipe={experimentData.recipe}
+      equipment={experimentData.equipment}
+      ingredients={experimentData.ingredients}
+      outputs={experimentData.outputs}
+      steps={experimentData.steps}
       recipeId={recipeId}
       experimentId={experimentId}
     />

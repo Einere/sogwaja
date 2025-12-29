@@ -170,6 +170,104 @@ export interface Database {
           created_at?: string;
         };
       };
+      experiment_equipment: {
+        Row: {
+          id: string;
+          experiment_id: string;
+          name: string;
+          quantity: number;
+          unit: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          experiment_id: string;
+          name: string;
+          quantity: number;
+          unit: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          experiment_id?: string;
+          name?: string;
+          quantity?: number;
+          unit?: string;
+          created_at?: string;
+        };
+      };
+      experiment_ingredients: {
+        Row: {
+          id: string;
+          experiment_id: string;
+          name: string;
+          amount: number;
+          unit: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          experiment_id: string;
+          name: string;
+          amount: number;
+          unit: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          experiment_id?: string;
+          name?: string;
+          amount?: number;
+          unit?: string;
+          created_at?: string;
+        };
+      };
+      experiment_outputs: {
+        Row: {
+          id: string;
+          experiment_id: string;
+          name: string;
+          quantity: number;
+          unit: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          experiment_id: string;
+          name: string;
+          quantity: number;
+          unit: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          experiment_id?: string;
+          name?: string;
+          quantity?: number;
+          unit?: string;
+          created_at?: string;
+        };
+      };
+      experiment_steps: {
+        Row: {
+          id: string;
+          experiment_id: string;
+          content: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          experiment_id: string;
+          content: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          experiment_id?: string;
+          content?: Json;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
