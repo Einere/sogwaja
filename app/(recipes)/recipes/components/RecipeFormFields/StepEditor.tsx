@@ -233,7 +233,9 @@ export default function StepEditor({
   return (
     <div
       ref={editorRef}
-      className="border-input relative flex min-h-[200px] flex-1 cursor-text flex-col rounded-lg border"
+      className={`border-input relative flex min-h-[200px] flex-1 flex-col rounded-lg border ${
+        readOnly ? "bg-muted cursor-not-allowed" : "bg-background cursor-text"
+      }`}
     >
       <Slate editor={editor} initialValue={editorValue} onChange={handleChange}>
         <Editable
@@ -241,7 +243,9 @@ export default function StepEditor({
           renderLeaf={renderLeaf}
           placeholder={readOnly ? "" : "조리법 흐름을 입력하세요... @로 멘션할 수 있습니다"}
           readOnly={readOnly}
-          className="min-h-[150px] flex-1 p-4 outline-none"
+          className={`min-h-[150px] flex-1 p-4 outline-none ${
+            readOnly ? "cursor-not-allowed opacity-50" : ""
+          }`}
           onKeyDown={handleKeyDown}
           onSelect={handleSelect}
           onCompositionStart={() => {
