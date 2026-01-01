@@ -21,6 +21,7 @@ import {
   handleMentionDeletion,
   getMentionAtCursor,
 } from "./StepEditor/mentionNavigation";
+import { findMentionAtSelection, isCursorAtMention } from "./StepEditor/mentionUtils";
 import { calculateDropdownPosition } from "./StepEditor/mentionDropdownPosition";
 import type { MentionItem } from "./StepEditor/types";
 import { withMentions } from "./StepEditor/editorPlugins";
@@ -124,6 +125,31 @@ export default function StepEditor({
       return;
     }
 
+    // 멘션이 선택되었거나 커서가 멘션 내부/경계에 있는지 확인
+    const mention = findMentionAtSelection(editor);
+    if (mention) {
+      const [start, end] = Range.edges(selection);
+      const [mentionStart, mentionEnd] = Range.edges(mention.range);
+
+      // 멘션 전체 선택
+      if (
+        !Range.isCollapsed(selection) &&
+        Point.equals(start, mentionStart) &&
+        Point.equals(end, mentionEnd)
+      ) {
+        setTarget(null);
+        setSelectedMentionPath(mention.path);
+        return;
+      }
+
+      // 커서가 멘션 내부/경계에 있음
+      if (isCursorAtMention(editor)) {
+        setTarget(null);
+        setSelectedMentionPath(null);
+        return;
+      }
+    }
+
     // @ 입력 감지 및 드롭다운 표시
     const mentionDetection = detectMention(editor);
     if (mentionDetection) {
@@ -132,25 +158,6 @@ export default function StepEditor({
       setIndex(0);
       setSelectedMentionPath(null);
       return;
-    }
-
-    // @ 입력이 감지되지 않았을 때 멘션 선택 상태만 업데이트
-    // (실제 선택은 handleSelect에서 처리)
-    if (target === null) {
-      const mention = getMentionAtCursor(editor);
-      if (mention && !Range.isCollapsed(selection)) {
-        // 멘션이 선택되었는지 확인 (전체 범위가 선택된 경우)
-        const [start, end] = Range.edges(selection);
-        const mentionStart = Editor.start(editor, mention.path);
-        const mentionEnd = Editor.end(editor, mention.path);
-        if (Point.equals(start, mentionStart) && Point.equals(end, mentionEnd)) {
-          setSelectedMentionPath(mention.path);
-        } else {
-          setSelectedMentionPath(null);
-        }
-      } else if (!mention) {
-        setSelectedMentionPath(null);
-      }
     }
 
     setTarget(null);
@@ -166,14 +173,13 @@ export default function StepEditor({
     }
 
     // 멘션 선택 상태 업데이트 및 자동 선택
-    const mention = getMentionAtCursor(editor);
+    const mention = findMentionAtSelection(editor);
     if (mention) {
-      const mentionStart = Editor.start(editor, mention.path);
-      const mentionEnd = Editor.end(editor, mention.path);
+      const [start, end] = Range.edges(selection);
+      const [mentionStart, mentionEnd] = Range.edges(mention.range);
 
       // 멘션이 선택되었는지 확인 (전체 범위가 선택된 경우)
       if (!Range.isCollapsed(selection)) {
-        const [start, end] = Range.edges(selection);
         if (Point.equals(start, mentionStart) && Point.equals(end, mentionEnd)) {
           setSelectedMentionPath(mention.path);
         } else {
@@ -181,7 +187,6 @@ export default function StepEditor({
         }
       } else {
         // 커서가 멘션 내부에 있으면 멘션 선택
-        const [start] = Range.edges(selection);
         const isInsideMention =
           Point.compare(start, mentionStart) > 0 && Point.compare(start, mentionEnd) < 0;
 

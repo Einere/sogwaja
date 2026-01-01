@@ -1,4 +1,5 @@
-import { Editor, Transforms, Range, Point, Element, Path } from "slate";
+import { Editor, Transforms, Range, Point, Path, Element } from "slate";
+import { findMentionAtSelection } from "./mentionUtils";
 
 /**
  * 커서 위치의 멘션을 찾습니다.
@@ -6,55 +7,13 @@ import { Editor, Transforms, Range, Point, Element, Path } from "slate";
  * @returns 멘션 경로와 노드, 또는 null
  */
 export function getMentionAtCursor(editor: Editor): { path: Path; node: Element } | null {
-  const { selection } = editor;
-  if (!selection) return null;
-
-  const [start, end] = Range.edges(selection);
-
-  // 현재 블록 찾기
-  const block = Editor.above(editor, {
-    match: n => Element.isElement(n) && Editor.isBlock(editor, n),
-  });
-
-  if (!block) return null;
-
-  const [, blockPath] = block;
-  const blockNode = Editor.node(editor, blockPath)[0];
-
-  if (!blockNode || typeof blockNode !== "object" || !("children" in blockNode)) {
-    return null;
-  }
-
-  // 블록의 모든 노드를 순회하며 멘션 찾기
-  for (let i = 0; i < blockNode.children.length; i++) {
-    const child = blockNode.children[i];
-    const childPath = [...blockPath, i];
-
-    if (typeof child === "object" && "type" in child && child.type === "mention") {
-      const mentionStart = Editor.start(editor, childPath);
-      const mentionEnd = Editor.end(editor, childPath);
-
-      // 선택 범위가 멘션과 겹치는지 확인
-      const startCompare = Point.compare(start, mentionStart);
-      const endCompare = Point.compare(end, mentionEnd);
-      const startEndCompare = Point.compare(start, mentionEnd);
-      const endStartCompare = Point.compare(end, mentionStart);
-
-      // 커서가 멘션 내부에 있는지 확인
-      const isStartInMention = startCompare >= 0 && startEndCompare < 0;
-      const isEndInMention = endStartCompare > 0 && endCompare <= 0;
-      // 선택 범위가 멘션을 포함하는지 확인
-      const isMentionInSelection = startCompare < 0 && endCompare > 0;
-      // 커서가 멘션 경계에 있는지 확인
-      const isAtMentionBoundary = Point.equals(start, mentionStart) || Point.equals(start, mentionEnd);
-
-      if (isStartInMention || isEndInMention || isMentionInSelection || isAtMentionBoundary) {
-        return { path: childPath, node: child as Element };
-      }
-    }
-  }
-
-  return null;
+  const mention = findMentionAtSelection(editor);
+  if (!mention) return null;
+  
+  return {
+    path: mention.path,
+    node: mention.node,
+  };
 }
 
 /**
@@ -83,10 +42,8 @@ export function selectMention(editor: Editor, mentionPath: Path): boolean {
  * @returns 멘션 내부 선택이 감지되어 선택했는지 여부
  */
 export function normalizeMentionSelection(editor: Editor): boolean {
-  const mention = getMentionAtCursor(editor);
+  const mention = findMentionAtSelection(editor);
   if (!mention) return false;
-
-  // 멘션을 선택
   return selectMention(editor, mention.path);
 }
 
@@ -106,58 +63,37 @@ export function handleMentionNavigation(
   const [start, end] = Range.edges(selection);
   const isCollapsed = Range.isCollapsed(selection);
 
-  // 현재 블록 찾기
-  const block = Editor.above(editor, {
-    match: n => Element.isElement(n) && Editor.isBlock(editor, n),
-  });
+  const mention = findMentionAtSelection(editor);
+  if (!mention) return false;
 
-  if (!block) return false;
+  const { path, range } = mention;
+  const [mentionStart, mentionEnd] = Range.edges(range);
+  const isMentionSelected = 
+    Point.equals(start, mentionStart) && Point.equals(end, mentionEnd);
 
-  const [, blockPath] = block;
-  const blockNode = Editor.node(editor, blockPath)[0];
-
-  if (!blockNode || typeof blockNode !== "object" || !("children" in blockNode)) {
-    return false;
-  }
-
-  // 블록의 모든 노드를 순회하며 멘션 찾기
-  for (let i = 0; i < blockNode.children.length; i++) {
-    const child = blockNode.children[i];
-    const childPath = [...blockPath, i];
-
-    if (typeof child === "object" && "type" in child && child.type === "mention") {
-      const mentionStart = Editor.start(editor, childPath);
-      const mentionEnd = Editor.end(editor, childPath);
-
-      // 현재 선택이 이 멘션 전체를 선택하고 있는지 확인
-      const isMentionSelected =
-        Point.equals(start, mentionStart) && Point.equals(end, mentionEnd);
-
-      if (direction === "ArrowRight") {
-        if (isMentionSelected) {
-          // 이미 선택된 멘션에서 오른쪽 방향키: 멘션 끝으로 통과
-          Transforms.setSelection(editor, {
-            anchor: mentionEnd,
-            focus: mentionEnd,
-          });
-          return true;
-        } else if (isCollapsed && Point.equals(start, mentionStart)) {
-          // 멘션 바로 앞에서 오른쪽 방향키: 멘션 선택
-          return selectMention(editor, childPath);
-        }
-      } else if (direction === "ArrowLeft") {
-        if (isMentionSelected) {
-          // 이미 선택된 멘션에서 왼쪽 방향키: 멘션 앞으로 통과
-          Transforms.setSelection(editor, {
-            anchor: mentionStart,
-            focus: mentionStart,
-          });
-          return true;
-        } else if (isCollapsed && Point.equals(start, mentionEnd)) {
-          // 멘션 바로 뒤에서 왼쪽 방향키: 멘션 선택
-          return selectMention(editor, childPath);
-        }
-      }
+  if (direction === "ArrowRight") {
+    if (isMentionSelected) {
+      // 이미 선택된 멘션에서 오른쪽 방향키: 멘션 끝으로 통과
+      Transforms.setSelection(editor, {
+        anchor: mentionEnd,
+        focus: mentionEnd,
+      });
+      return true;
+    } else if (isCollapsed && Point.equals(start, mentionStart)) {
+      // 멘션 바로 앞에서 오른쪽 방향키: 멘션 선택
+      return selectMention(editor, path);
+    }
+  } else if (direction === "ArrowLeft") {
+    if (isMentionSelected) {
+      // 이미 선택된 멘션에서 왼쪽 방향키: 멘션 앞으로 통과
+      Transforms.setSelection(editor, {
+        anchor: mentionStart,
+        focus: mentionStart,
+      });
+      return true;
+    } else if (isCollapsed && Point.equals(start, mentionEnd)) {
+      // 멘션 바로 뒤에서 왼쪽 방향키: 멘션 선택
+      return selectMention(editor, path);
     }
   }
 
@@ -173,43 +109,31 @@ export function handleMentionDeletion(editor: Editor): boolean {
   const { selection } = editor;
   if (!selection) return false;
 
-  // 선택된 멘션이 있는지 확인 (멘션 전체가 선택된 경우)
+  // 선택된 멘션 삭제
   if (!Range.isCollapsed(selection)) {
-    const [start, end] = Range.edges(selection);
-    const mention = getMentionAtCursor(editor);
+    const mention = findMentionAtSelection(editor);
     if (mention) {
-      const mentionStart = Editor.start(editor, mention.path);
-      const mentionEnd = Editor.end(editor, mention.path);
+      const [start, end] = Range.edges(selection);
+      const [mentionStart, mentionEnd] = Range.edges(mention.range);
+      
       // 선택 범위가 멘션 전체를 포함하는지 확인
       if (Point.equals(start, mentionStart) && Point.equals(end, mentionEnd)) {
-        // 선택된 멘션 삭제
         Transforms.removeNodes(editor, { at: mention.path });
         return true;
       }
     }
   }
 
-  // 커서가 접혀있는 경우 기존 로직 사용
+  // 커서 앞의 멘션 삭제
   const [start] = Range.edges(selection);
   const before = Editor.before(editor, start);
-
   if (!before) return false;
 
   const [node, path] = Editor.node(editor, before);
-
+  
   // 이전 노드가 멘션 요소인지 확인
   if (node && typeof node === "object" && "type" in node && node.type === "mention") {
-    // 멘션 요소 전체를 삭제
     Transforms.removeNodes(editor, { at: path });
-    return true;
-  }
-
-  // 멘션 요소 내부에 있는지 확인 (커서가 멘션 안에 있을 때)
-  const [parent] = Editor.parent(editor, path);
-  if (parent && typeof parent === "object" && "type" in parent && parent.type === "mention") {
-    // 부모 멘션 요소 전체를 삭제
-    const parentPath = Editor.path(editor, path.slice(0, -1));
-    Transforms.removeNodes(editor, { at: parentPath });
     return true;
   }
 
