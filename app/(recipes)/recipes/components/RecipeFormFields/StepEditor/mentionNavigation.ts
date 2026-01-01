@@ -1,13 +1,13 @@
-import { Editor, Transforms, Range, Point, Element } from "slate";
+import { Editor, Transforms, Range, Point, Element, Path } from "slate";
 
 /**
- * 멘션 내부 선택을 감지하고 커서를 멘션 앞으로 이동합니다.
+ * 커서 위치의 멘션을 찾습니다.
  * @param editor Slate 에디터 인스턴스
- * @returns 멘션 내부 선택이 감지되어 이동했는지 여부
+ * @returns 멘션 경로와 노드, 또는 null
  */
-export function normalizeMentionSelection(editor: Editor): boolean {
+export function getMentionAtCursor(editor: Editor): { path: Path; node: Element } | null {
   const { selection } = editor;
-  if (!selection) return false;
+  if (!selection) return null;
 
   const [start, end] = Range.edges(selection);
 
@@ -16,13 +16,13 @@ export function normalizeMentionSelection(editor: Editor): boolean {
     match: n => Element.isElement(n) && Editor.isBlock(editor, n),
   });
 
-  if (!block) return false;
+  if (!block) return null;
 
   const [, blockPath] = block;
   const blockNode = Editor.node(editor, blockPath)[0];
 
   if (!blockNode || typeof blockNode !== "object" || !("children" in blockNode)) {
-    return false;
+    return null;
   }
 
   // 블록의 모든 노드를 순회하며 멘션 찾기
@@ -45,19 +45,49 @@ export function normalizeMentionSelection(editor: Editor): boolean {
       const isEndInMention = endStartCompare > 0 && endCompare <= 0;
       // 선택 범위가 멘션을 포함하는지 확인
       const isMentionInSelection = startCompare < 0 && endCompare > 0;
+      // 커서가 멘션 경계에 있는지 확인
+      const isAtMentionBoundary = Point.equals(start, mentionStart) || Point.equals(start, mentionEnd);
 
-      if (isStartInMention || isEndInMention || isMentionInSelection) {
-        // 멘션 앞으로 이동
-        Transforms.setSelection(editor, {
-          anchor: mentionStart,
-          focus: mentionStart,
-        });
-        return true;
+      if (isStartInMention || isEndInMention || isMentionInSelection || isAtMentionBoundary) {
+        return { path: childPath, node: child as Element };
       }
     }
   }
 
-  return false;
+  return null;
+}
+
+/**
+ * 멘션을 선택합니다.
+ * @param editor Slate 에디터 인스턴스
+ * @param mentionPath 멘션 경로
+ * @returns 선택 성공 여부
+ */
+export function selectMention(editor: Editor, mentionPath: Path): boolean {
+  try {
+    const mentionStart = Editor.start(editor, mentionPath);
+    const mentionEnd = Editor.end(editor, mentionPath);
+    Transforms.setSelection(editor, {
+      anchor: mentionStart,
+      focus: mentionEnd,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 멘션 내부 선택을 감지하고 멘션을 선택합니다.
+ * @param editor Slate 에디터 인스턴스
+ * @returns 멘션 내부 선택이 감지되어 선택했는지 여부
+ */
+export function normalizeMentionSelection(editor: Editor): boolean {
+  const mention = getMentionAtCursor(editor);
+  if (!mention) return false;
+
+  // 멘션을 선택
+  return selectMention(editor, mention.path);
 }
 
 /**
@@ -71,11 +101,10 @@ export function handleMentionNavigation(
   direction: "ArrowLeft" | "ArrowRight"
 ): boolean {
   const { selection } = editor;
-  if (!selection || !Range.isCollapsed(selection)) {
-    return false;
-  }
+  if (!selection) return false;
 
-  const [start] = Range.edges(selection);
+  const [start, end] = Range.edges(selection);
+  const isCollapsed = Range.isCollapsed(selection);
 
   // 현재 블록 찾기
   const block = Editor.above(editor, {
@@ -100,23 +129,33 @@ export function handleMentionNavigation(
       const mentionStart = Editor.start(editor, childPath);
       const mentionEnd = Editor.end(editor, childPath);
 
+      // 현재 선택이 이 멘션 전체를 선택하고 있는지 확인
+      const isMentionSelected =
+        Point.equals(start, mentionStart) && Point.equals(end, mentionEnd);
+
       if (direction === "ArrowRight") {
-        // 오른쪽 방향키: 커서가 멘션 바로 앞에 있으면 멘션 끝으로
-        if (Point.equals(start, mentionStart)) {
+        if (isMentionSelected) {
+          // 이미 선택된 멘션에서 오른쪽 방향키: 멘션 끝으로 통과
           Transforms.setSelection(editor, {
             anchor: mentionEnd,
             focus: mentionEnd,
           });
           return true;
+        } else if (isCollapsed && Point.equals(start, mentionStart)) {
+          // 멘션 바로 앞에서 오른쪽 방향키: 멘션 선택
+          return selectMention(editor, childPath);
         }
       } else if (direction === "ArrowLeft") {
-        // 왼쪽 방향키: 커서가 멘션 바로 뒤에 있으면 멘션 앞으로
-        if (Point.equals(start, mentionEnd)) {
+        if (isMentionSelected) {
+          // 이미 선택된 멘션에서 왼쪽 방향키: 멘션 앞으로 통과
           Transforms.setSelection(editor, {
             anchor: mentionStart,
             focus: mentionStart,
           });
           return true;
+        } else if (isCollapsed && Point.equals(start, mentionEnd)) {
+          // 멘션 바로 뒤에서 왼쪽 방향키: 멘션 선택
+          return selectMention(editor, childPath);
         }
       }
     }
@@ -132,10 +171,25 @@ export function handleMentionNavigation(
  */
 export function handleMentionDeletion(editor: Editor): boolean {
   const { selection } = editor;
-  if (!selection || !Range.isCollapsed(selection)) {
-    return false;
+  if (!selection) return false;
+
+  // 선택된 멘션이 있는지 확인 (멘션 전체가 선택된 경우)
+  if (!Range.isCollapsed(selection)) {
+    const [start, end] = Range.edges(selection);
+    const mention = getMentionAtCursor(editor);
+    if (mention) {
+      const mentionStart = Editor.start(editor, mention.path);
+      const mentionEnd = Editor.end(editor, mention.path);
+      // 선택 범위가 멘션 전체를 포함하는지 확인
+      if (Point.equals(start, mentionStart) && Point.equals(end, mentionEnd)) {
+        // 선택된 멘션 삭제
+        Transforms.removeNodes(editor, { at: mention.path });
+        return true;
+      }
+    }
   }
 
+  // 커서가 접혀있는 경우 기존 로직 사용
   const [start] = Range.edges(selection);
   const before = Editor.before(editor, start);
 
