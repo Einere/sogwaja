@@ -66,6 +66,44 @@ CREATE TABLE IF NOT EXISTS experiment_photos (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Create experiment_equipment table (archive snapshot)
+CREATE TABLE IF NOT EXISTS experiment_equipment (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  experiment_id UUID NOT NULL REFERENCES recipe_experiments(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  quantity NUMERIC NOT NULL,
+  unit TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create experiment_ingredients table (archive snapshot)
+CREATE TABLE IF NOT EXISTS experiment_ingredients (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  experiment_id UUID NOT NULL REFERENCES recipe_experiments(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  amount NUMERIC NOT NULL,
+  unit TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create experiment_outputs table (archive snapshot)
+CREATE TABLE IF NOT EXISTS experiment_outputs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  experiment_id UUID NOT NULL REFERENCES recipe_experiments(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  quantity NUMERIC NOT NULL,
+  unit TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create experiment_steps table (archive snapshot)
+CREATE TABLE IF NOT EXISTS experiment_steps (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  experiment_id UUID NOT NULL REFERENCES recipe_experiments(id) ON DELETE CASCADE,
+  content JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -94,6 +132,10 @@ ALTER TABLE recipe_outputs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE recipe_steps ENABLE ROW LEVEL SECURITY;
 ALTER TABLE recipe_experiments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE experiment_photos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE experiment_equipment ENABLE ROW LEVEL SECURITY;
+ALTER TABLE experiment_ingredients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE experiment_outputs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE experiment_steps ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies for recipes
 CREATE POLICY "Users can view their own recipes"
@@ -341,6 +383,98 @@ CREATE POLICY "Users can delete photos for their experiments"
     )
   );
 
+-- Create RLS policies for experiment_equipment
+CREATE POLICY "Users can view equipment for their experiments"
+  ON experiment_equipment FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM recipe_experiments
+      JOIN recipes ON recipes.id = recipe_experiments.recipe_id
+      WHERE recipe_experiments.id = experiment_equipment.experiment_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can insert equipment for their experiments"
+  ON experiment_equipment FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM recipe_experiments
+      JOIN recipes ON recipes.id = recipe_experiments.recipe_id
+      WHERE recipe_experiments.id = experiment_equipment.experiment_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+
+-- Create RLS policies for experiment_ingredients
+CREATE POLICY "Users can view ingredients for their experiments"
+  ON experiment_ingredients FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM recipe_experiments
+      JOIN recipes ON recipes.id = recipe_experiments.recipe_id
+      WHERE recipe_experiments.id = experiment_ingredients.experiment_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can insert ingredients for their experiments"
+  ON experiment_ingredients FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM recipe_experiments
+      JOIN recipes ON recipes.id = recipe_experiments.recipe_id
+      WHERE recipe_experiments.id = experiment_ingredients.experiment_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+
+-- Create RLS policies for experiment_outputs
+CREATE POLICY "Users can view outputs for their experiments"
+  ON experiment_outputs FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM recipe_experiments
+      JOIN recipes ON recipes.id = recipe_experiments.recipe_id
+      WHERE recipe_experiments.id = experiment_outputs.experiment_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can insert outputs for their experiments"
+  ON experiment_outputs FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM recipe_experiments
+      JOIN recipes ON recipes.id = recipe_experiments.recipe_id
+      WHERE recipe_experiments.id = experiment_outputs.experiment_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+
+-- Create RLS policies for experiment_steps
+CREATE POLICY "Users can view steps for their experiments"
+  ON experiment_steps FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM recipe_experiments
+      JOIN recipes ON recipes.id = recipe_experiments.recipe_id
+      WHERE recipe_experiments.id = experiment_steps.experiment_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can insert steps for their experiments"
+  ON experiment_steps FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM recipe_experiments
+      JOIN recipes ON recipes.id = recipe_experiments.recipe_id
+      WHERE recipe_experiments.id = experiment_steps.experiment_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_recipes_user_id ON recipes(user_id);
 -- Composite index for RLS policies that check both id and user_id
@@ -354,4 +488,8 @@ CREATE INDEX IF NOT EXISTS idx_recipe_experiments_created_at ON recipe_experimen
 CREATE INDEX IF NOT EXISTS idx_experiment_photos_experiment_id ON experiment_photos(experiment_id);
 -- Composite index for experiment_photos to optimize queries filtering by experiment_id and ordering by order
 CREATE INDEX IF NOT EXISTS idx_experiment_photos_experiment_id_order ON experiment_photos(experiment_id, "order");
+CREATE INDEX IF NOT EXISTS idx_experiment_equipment_experiment_id ON experiment_equipment(experiment_id);
+CREATE INDEX IF NOT EXISTS idx_experiment_ingredients_experiment_id ON experiment_ingredients(experiment_id);
+CREATE INDEX IF NOT EXISTS idx_experiment_outputs_experiment_id ON experiment_outputs(experiment_id);
+CREATE INDEX IF NOT EXISTS idx_experiment_steps_experiment_id ON experiment_steps(experiment_id);
 

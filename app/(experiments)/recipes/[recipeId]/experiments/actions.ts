@@ -6,6 +6,9 @@ import { AuthorizationError } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import type { Database } from "@/types/database";
+import { getRecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
+import type { RecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
+import type { Json } from "@/types/database";
 
 type Experiment = Database["public"]["Tables"]["recipe_experiments"]["Row"];
 type Photo = Database["public"]["Tables"]["experiment_photos"]["Row"];
@@ -113,6 +116,112 @@ export async function getExperiment(experimentId: string): Promise<ExperimentWit
   };
 }
 
+export async function getExperimentData(experimentId: string): Promise<RecipeData> {
+  const user = await requireServerUser();
+  const supabase = await createClient();
+
+  // Load experiment and verify ownership
+  const { data: experimentData, error: experimentError } = await supabase
+    .from("recipe_experiments")
+    .select(
+      `
+      *,
+      recipes!inner(id, user_id, title, created_at, updated_at)
+    `
+    )
+    .eq("id", experimentId)
+    .eq("recipes.user_id", user.id)
+    .single();
+
+  if (experimentError || !experimentData) {
+    notFound();
+  }
+
+  const recipe = (experimentData.recipes as unknown as {
+    id: string;
+    user_id: string;
+    title: string;
+    created_at: string;
+    updated_at: string;
+  })!;
+
+  // Check if archived data exists by checking experiment_steps table
+  // This is the most reliable indicator since steps are always archived
+  const { data: stepsCheck } = await supabase
+    .from("experiment_steps")
+    .select("id")
+    .eq("experiment_id", experimentId)
+    .maybeSingle();
+
+  // If no archived steps exist, this is an old experiment - use current recipe data
+  if (!stepsCheck) {
+    return getRecipeData(recipe.id);
+  }
+
+  // Load archived data in parallel
+  const [
+    { data: equipmentData },
+    { data: ingredientsData },
+    { data: outputsData },
+    { data: stepsData },
+  ] = await Promise.all([
+    // Load archived equipment
+    supabase
+      .from("experiment_equipment")
+      .select("*")
+      .eq("experiment_id", experimentId)
+      .order("created_at"),
+    // Load archived ingredients
+    supabase
+      .from("experiment_ingredients")
+      .select("*")
+      .eq("experiment_id", experimentId)
+      .order("created_at"),
+    // Load archived outputs
+    supabase
+      .from("experiment_outputs")
+      .select("*")
+      .eq("experiment_id", experimentId)
+      .order("created_at"),
+    // Load archived steps
+    supabase.from("experiment_steps").select("*").eq("experiment_id", experimentId).maybeSingle(),
+  ]);
+
+  // Always use archived data if it exists (even if some arrays are empty)
+  // Convert archived data to match RecipeData format
+  return {
+    recipe,
+    equipment:
+      equipmentData?.map(eq => ({
+        id: eq.id,
+        recipe_id: recipe.id,
+        name: eq.name,
+        quantity: eq.quantity,
+        unit: eq.unit,
+        created_at: eq.created_at,
+      })) || [],
+    ingredients:
+      ingredientsData?.map(ing => ({
+        id: ing.id,
+        recipe_id: recipe.id,
+        name: ing.name,
+        amount: ing.amount,
+        unit: ing.unit,
+        created_at: ing.created_at,
+      })) || [],
+    outputs:
+      outputsData?.map(out => ({
+        id: out.id,
+        recipe_id: recipe.id,
+        name: out.name,
+        quantity: out.quantity,
+        unit: out.unit,
+        created_at: out.created_at,
+      })) || [],
+    steps: (stepsData?.content as Json) || null,
+  };
+}
+
 export async function createExperiment(
   recipeId: string,
   memo: string | null,
@@ -121,17 +230,8 @@ export async function createExperiment(
   const user = await requireServerUser();
   const supabase = await createClient();
 
-  // Verify recipe ownership
-  const { data: recipe, error: recipeError } = await supabase
-    .from("recipes")
-    .select("id")
-    .eq("id", recipeId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (recipeError || !recipe) {
-    throw new AuthorizationError();
-  }
+  // Verify recipe ownership and get current recipe data for archiving
+  const recipeData = await getRecipeData(recipeId);
 
   // Create experiment
   const { data: experiment, error: experimentError } = await supabase
@@ -146,6 +246,77 @@ export async function createExperiment(
   if (experimentError) {
     // TODO: supabase 에러가 직접적으로 노출되지 않도록 수정하기
     throw new Error(experimentError.message);
+  }
+
+  // Archive recipe data snapshot
+  if (experiment) {
+    // Archive equipment
+    if (recipeData.equipment.length > 0) {
+      const archivedEquipment = recipeData.equipment.map(eq => ({
+        experiment_id: experiment.id,
+        name: eq.name,
+        quantity: eq.quantity,
+        unit: eq.unit,
+      }));
+
+      const { error: equipmentError } = await supabase
+        .from("experiment_equipment")
+        .insert(archivedEquipment);
+
+      if (equipmentError) {
+        console.error("Error archiving equipment:", equipmentError);
+        // Continue even if archiving fails
+      }
+    }
+
+    // Archive ingredients
+    if (recipeData.ingredients.length > 0) {
+      const archivedIngredients = recipeData.ingredients.map(ing => ({
+        experiment_id: experiment.id,
+        name: ing.name,
+        amount: ing.amount,
+        unit: ing.unit,
+      }));
+
+      const { error: ingredientsError } = await supabase
+        .from("experiment_ingredients")
+        .insert(archivedIngredients);
+
+      if (ingredientsError) {
+        console.error("Error archiving ingredients:", ingredientsError);
+        // Continue even if archiving fails
+      }
+    }
+
+    // Archive outputs
+    if (recipeData.outputs.length > 0) {
+      const archivedOutputs = recipeData.outputs.map(out => ({
+        experiment_id: experiment.id,
+        name: out.name,
+        quantity: out.quantity,
+        unit: out.unit,
+      }));
+
+      const { error: outputsError } = await supabase
+        .from("experiment_outputs")
+        .insert(archivedOutputs);
+
+      if (outputsError) {
+        console.error("Error archiving outputs:", outputsError);
+        // Continue even if archiving fails
+      }
+    }
+
+    // Archive steps (always archive, even if null, to mark that archiving was attempted)
+    const { error: stepsError } = await supabase.from("experiment_steps").insert({
+      experiment_id: experiment.id,
+      content: recipeData.steps || null,
+    });
+
+    if (stepsError) {
+      console.error("Error archiving steps:", stepsError);
+      // Continue even if archiving fails
+    }
   }
 
   // Upload photos if any

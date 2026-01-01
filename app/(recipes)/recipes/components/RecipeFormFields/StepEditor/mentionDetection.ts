@@ -1,5 +1,6 @@
 import { Editor, Range, Point, Element } from "slate";
 import type { MentionDetectionResult } from "./types";
+import { isCursorAtMention, isSearchRangeOverlappingMentions } from "./mentionUtils";
 
 /**
  * 커서 위치에서 역방향으로 @ 문자를 찾고 멘션 범위를 계산합니다.
@@ -12,6 +13,11 @@ export function detectMention(editor: Editor): MentionDetectionResult | null {
     return null;
   }
 
+  // 커서가 멘션에 있으면 드롭다운 표시하지 않음
+  if (isCursorAtMention(editor)) {
+    return null;
+  }
+
   const [start] = Range.edges(selection);
 
   // 현재 블록 찾기
@@ -19,9 +25,7 @@ export function detectMention(editor: Editor): MentionDetectionResult | null {
     match: n => Element.isElement(n) && Editor.isBlock(editor, n),
   });
 
-  if (!block) {
-    return null;
-  }
+  if (!block) return null;
 
   const [, blockPath] = block;
   const startOfBlock = Editor.start(editor, blockPath);
@@ -53,14 +57,21 @@ export function detectMention(editor: Editor): MentionDetectionResult | null {
     searchText = char + searchText;
     searchPoint = before;
   }
-  if (!foundAt) {
+
+  if (!foundAt) return null;
+
+  // 검색 범위가 멘션 요소와 겹치는지 확인
+  const searchRange = Editor.range(editor, foundAt, start);
+  if (isSearchRangeOverlappingMentions(editor, searchRange, blockPath)) {
     return null;
   }
 
   // @ 바로 앞에 공백, 개행 문자, 또는 시작이 있는지 확인
   const beforeAt = Editor.before(editor, foundAt);
   const isStart = !beforeAt || Point.equals(beforeAt, startOfBlock);
-  const beforeChar = beforeAt ? Editor.string(editor, Editor.range(editor, beforeAt, foundAt)) : "";
+  const beforeChar = beforeAt 
+    ? Editor.string(editor, Editor.range(editor, beforeAt, foundAt)) 
+    : "";
 
   // 블록 시작이거나, 빈 문자열(개행 직후), 공백/개행 문자가 있으면 허용
   if (!isStart && beforeChar !== "" && !/[\s\n\r]/.test(beforeChar)) {
@@ -69,14 +80,10 @@ export function detectMention(editor: Editor): MentionDetectionResult | null {
 
   // @ 뒤의 텍스트가 유효한 멘션 패턴인지 확인
   const mentionMatch = searchText.match(/^([\w_가-힣]*)$/);
-  if (!mentionMatch) {
-    return null;
-  }
-
-  const range = Editor.range(editor, foundAt, start);
+  if (!mentionMatch) return null;
 
   return {
-    range,
+    range: Editor.range(editor, foundAt, start),
     searchText: mentionMatch[1] || "",
   };
 }

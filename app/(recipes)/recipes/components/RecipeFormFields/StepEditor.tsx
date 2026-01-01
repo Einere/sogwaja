@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState, useRef, useEffect } from "react";
-import { createEditor, Descendant, Range, Element } from "slate";
+import { createEditor, Descendant, Range, Element, Path, Point, Editor } from "slate";
 import {
   Editable,
   Slate,
@@ -19,7 +19,9 @@ import {
   normalizeMentionSelection,
   handleMentionNavigation,
   handleMentionDeletion,
+  getMentionAtCursor,
 } from "./StepEditor/mentionNavigation";
+import { findMentionAtSelection, isCursorAtMention } from "./StepEditor/mentionUtils";
 import { calculateDropdownPosition } from "./StepEditor/mentionDropdownPosition";
 import type { MentionItem } from "./StepEditor/types";
 import { withMentions } from "./StepEditor/editorPlugins";
@@ -55,12 +57,19 @@ export default function StepEditor({
     top: number;
     left: number;
   } | null>(null);
+  const [selectedMentionPath, setSelectedMentionPath] = useState<Path | null>(null);
+  const selectedMentionPathRef = useRef<Path | null>(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
   const isComposingRef = useRef(false);
   const pendingMentionRef = useRef<{
     item: { id: string; name: string; displayName: string; type: "equipment" | "ingredient" };
     range: Range;
   } | null>(null);
+
+  // selectedMentionPath와 ref 동기화
+  useEffect(() => {
+    selectedMentionPathRef.current = selectedMentionPath;
+  }, [selectedMentionPath]);
 
   const editor = useMemo(
     () => withMentions(withHistory(withReact(createEditor()))) as ReactEditor,
@@ -86,12 +95,19 @@ export default function StepEditor({
     }
   }, [target, editor]);
 
-  const renderElement = useCallback((props: RenderElementProps) => {
-    if ("type" in props.element && props.element.type === "mention") {
-      return <MentionElement {...props} />;
-    }
-    return <DefaultElement {...props} />;
-  }, []);
+  const renderElement = useCallback(
+    (props: RenderElementProps) => {
+      if ("type" in props.element && props.element.type === "mention") {
+        // 현재 멘션이 선택된 멘션인지 확인
+        const isSelected =
+          selectedMentionPath !== null &&
+          Path.equals(ReactEditor.findPath(editor, props.element), selectedMentionPath);
+        return <MentionElement {...props} selected={isSelected} />;
+      }
+      return <DefaultElement {...props} />;
+    },
+    [editor, selectedMentionPath]
+  );
 
   const renderLeaf = useCallback((props: RenderLeafProps) => {
     return <Leaf {...props} />;
@@ -105,7 +121,33 @@ export default function StepEditor({
     const { selection } = editor;
     if (!selection) {
       setTarget(null);
+      setSelectedMentionPath(null);
       return;
+    }
+
+    // 멘션이 선택되었거나 커서가 멘션 내부/경계에 있는지 확인
+    const mention = findMentionAtSelection(editor);
+    if (mention) {
+      const [start, end] = Range.edges(selection);
+      const [mentionStart, mentionEnd] = Range.edges(mention.range);
+
+      // 멘션 전체 선택
+      if (
+        !Range.isCollapsed(selection) &&
+        Point.equals(start, mentionStart) &&
+        Point.equals(end, mentionEnd)
+      ) {
+        setTarget(null);
+        setSelectedMentionPath(mention.path);
+        return;
+      }
+
+      // 커서가 멘션 내부/경계에 있음
+      if (isCursorAtMention(editor)) {
+        setTarget(null);
+        setSelectedMentionPath(null);
+        return;
+      }
     }
 
     // @ 입력 감지 및 드롭다운 표시
@@ -114,12 +156,8 @@ export default function StepEditor({
       setTarget(mentionDetection.range);
       setSearch(mentionDetection.searchText);
       setIndex(0);
+      setSelectedMentionPath(null);
       return;
-    }
-
-    // @ 입력이 감지되지 않았을 때만 멘션 내부 선택 정규화
-    if (target === null) {
-      normalizeMentionSelection(editor);
     }
 
     setTarget(null);
@@ -127,8 +165,49 @@ export default function StepEditor({
 
   const handleSelect = useCallback(() => {
     if (readOnly) return;
-    // 선택이 변경될 때마다 멘션 내부 선택 정규화
-    normalizeMentionSelection(editor);
+
+    const { selection } = editor;
+    if (!selection) {
+      setSelectedMentionPath(null);
+      return;
+    }
+
+    // 멘션 선택 상태 업데이트 및 자동 선택
+    const mention = findMentionAtSelection(editor);
+    if (mention) {
+      const [start, end] = Range.edges(selection);
+      const [mentionStart, mentionEnd] = Range.edges(mention.range);
+
+      // 멘션이 선택되었는지 확인 (전체 범위가 선택된 경우)
+      if (!Range.isCollapsed(selection)) {
+        if (Point.equals(start, mentionStart) && Point.equals(end, mentionEnd)) {
+          setSelectedMentionPath(mention.path);
+        } else {
+          setSelectedMentionPath(null);
+        }
+      } else {
+        // 커서가 멘션 내부에 있으면 멘션 선택
+        const isInsideMention =
+          Point.compare(start, mentionStart) > 0 && Point.compare(start, mentionEnd) < 0;
+
+        if (isInsideMention) {
+          // 이미 선택된 멘션이 아니면 선택
+          const isAlreadySelected =
+            selectedMentionPathRef.current !== null &&
+            Path.equals(selectedMentionPathRef.current, mention.path);
+
+          if (!isAlreadySelected) {
+            normalizeMentionSelection(editor);
+            setSelectedMentionPath(mention.path);
+          }
+        } else {
+          // 커서가 멘션 경계에 있으면 선택하지 않음 (방향키로 선택할 수 있도록)
+          setSelectedMentionPath(null);
+        }
+      }
+    } else {
+      setSelectedMentionPath(null);
+    }
   }, [editor, readOnly]);
 
   const handleInsertMention = useCallback(
@@ -173,6 +252,7 @@ export default function StepEditor({
       if (event.key === "Backspace") {
         if (handleMentionDeletion(editor)) {
           event.preventDefault();
+          setSelectedMentionPath(null);
           return;
         }
       }
@@ -233,7 +313,9 @@ export default function StepEditor({
   return (
     <div
       ref={editorRef}
-      className="border-input relative flex min-h-[200px] flex-1 cursor-text flex-col rounded-lg border"
+      className={`border-input relative flex min-h-[200px] flex-1 flex-col rounded-lg border ${
+        readOnly ? "bg-muted cursor-not-allowed" : "bg-background cursor-text"
+      }`}
     >
       <Slate editor={editor} initialValue={editorValue} onChange={handleChange}>
         <Editable
@@ -241,7 +323,9 @@ export default function StepEditor({
           renderLeaf={renderLeaf}
           placeholder={readOnly ? "" : "조리법 흐름을 입력하세요... @로 멘션할 수 있습니다"}
           readOnly={readOnly}
-          className="min-h-[150px] flex-1 p-4 outline-none"
+          className={`min-h-[150px] flex-1 p-4 outline-none ${
+            readOnly ? "cursor-not-allowed opacity-50" : ""
+          }`}
           onKeyDown={handleKeyDown}
           onSelect={handleSelect}
           onCompositionStart={() => {

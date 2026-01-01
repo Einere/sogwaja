@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui";
 
 interface RenderElementProps extends SlateRenderElementProps {
   element: SlateRenderElementProps["element"] | MentionElement;
+  selected?: boolean;
 }
 
 type RenderLeafProps = SlateRenderLeafProps;
 
-export function MentionElement({ attributes, children, element }: RenderElementProps) {
+export function MentionElement({ attributes, children, element, selected = false }: RenderElementProps) {
   const mentionElement = element as MentionElement;
   const isEquipment = mentionElement.mentionType === "equipment";
 
@@ -20,7 +21,7 @@ export function MentionElement({ attributes, children, element }: RenderElementP
       {...attributes}
       variant={isEquipment ? "equipment" : "ingredient"}
       size="sm"
-      className="text-base md:text-sm"
+      className={`text-base md:text-sm ${selected ? "ring-2 ring-primary" : ""}`}
       contentEditable={false}
       style={{ userSelect: "none" }}
       role="textbox"
