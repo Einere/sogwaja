@@ -15,13 +15,13 @@ export function findMentionAtSelection(editor: Editor): {
 
   // Slate.js의 Editor.above로 현재 위치의 멘션 부모 찾기
   const mentionEntry = Editor.above(editor, {
-    match: n => Element.isElement(n) && n.type === "mention",
+    match: n => Element.isElement(n) && "type" in n && n.type === "mention",
   });
 
   if (!mentionEntry) return null;
 
   const [node, path] = mentionEntry;
-  if (node.type !== "mention") return null;
+  if (!("type" in node) || node.type !== "mention") return null;
 
   const range = Editor.range(editor, path);
   return {
