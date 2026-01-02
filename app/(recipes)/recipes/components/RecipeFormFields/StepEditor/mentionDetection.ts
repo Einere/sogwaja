@@ -30,60 +30,50 @@ export function detectMention(editor: Editor): MentionDetectionResult | null {
   const [, blockPath] = block;
   const startOfBlock = Editor.start(editor, blockPath);
 
-  // 역방향으로 @ 찾기: 최대 50자까지 역방향으로 검색
-  let searchPoint = start;
+  // 역방향으로 @ 찾기 (최대 50자)
+  let point = start;
   let searchText = "";
-  let foundAt: typeof start | null = null;
+  let atPoint: Point | null = null;
 
   for (let i = 0; i < 50; i++) {
-    const before = Editor.before(editor, searchPoint);
-    if (!before || Point.compare(before, startOfBlock) < 0) {
-      break;
-    }
+    const before = Editor.before(editor, point);
+    if (!before || Point.compare(before, startOfBlock) < 0) break;
 
-    const charRange = Editor.range(editor, before, searchPoint);
-    const char = Editor.string(editor, charRange);
+    const char = Editor.string(editor, Editor.range(editor, before, point));
 
     if (char === "@") {
-      foundAt = before;
+      atPoint = before;
       break;
     }
 
-    // 공백을 만나면 중단
-    if (/\s/.test(char)) {
-      break;
-    }
+    if (/\s/.test(char)) break;
 
     searchText = char + searchText;
-    searchPoint = before;
+    point = before;
   }
 
-  if (!foundAt) return null;
+  if (!atPoint) return null;
 
-  // 검색 범위가 멘션 요소와 겹치는지 확인
-  const searchRange = Editor.range(editor, foundAt, start);
+  // 검색 범위가 멘션과 겹치는지 확인
+  const searchRange = Editor.range(editor, atPoint, start);
   if (isSearchRangeOverlappingMentions(editor, searchRange, blockPath)) {
     return null;
   }
 
-  // @ 바로 앞에 공백, 개행 문자, 또는 시작이 있는지 확인
-  const beforeAt = Editor.before(editor, foundAt);
+  // @ 앞 문맥 확인
+  const beforeAt = Editor.before(editor, atPoint);
   const isStart = !beforeAt || Point.equals(beforeAt, startOfBlock);
-  const beforeChar = beforeAt 
-    ? Editor.string(editor, Editor.range(editor, beforeAt, foundAt)) 
-    : "";
+  const beforeChar = beforeAt ? Editor.string(editor, Editor.range(editor, beforeAt, atPoint)) : "";
 
-  // 블록 시작이거나, 빈 문자열(개행 직후), 공백/개행 문자가 있으면 허용
   if (!isStart && beforeChar !== "" && !/[\s\n\r]/.test(beforeChar)) {
     return null;
   }
 
-  // @ 뒤의 텍스트가 유효한 멘션 패턴인지 확인
-  const mentionMatch = searchText.match(/^([\w_가-힣]*)$/);
-  if (!mentionMatch) return null;
+  // 유효한 멘션 패턴 확인
+  if (!/^[\w_가-힣]*$/.test(searchText)) return null;
 
   return {
-    range: Editor.range(editor, foundAt, start),
-    searchText: mentionMatch[1] || "",
+    range: searchRange,
+    searchText,
   };
 }

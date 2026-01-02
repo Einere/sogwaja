@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="60e285b3-a5e6-4467-814c-f4eea7f80dca" name="Changes" comment="" />
+    <list default="true" id="60e285b3-a5e6-4467-814c-f4eea7f80dca" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(recipes)/recipes/components/RecipeFormFields/StepEditor/mentionActions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(recipes)/recipes/components/RecipeFormFields/StepEditor/mentionActions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(recipes)/recipes/components/RecipeFormFields/StepEditor/mentionInsertion.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(recipes)/recipes/components/RecipeFormFields/StepEditor/mentionInsertion.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,9 +23,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="MIXED" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="36eFK4LP6XC0SEHKeKCe3MInwS1" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -29,7 +33,17 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "git-widget-placeholder": "main"
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "/Users/einere/WebstormProjects/sogwaja/node_modules/prettier",
+    "settings.editor.selected.configurable": "settings.javascript.prettier",
+    "ts.external.directory.path": "/Users/einere/WebstormProjects/sogwaja/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="SharedIndexes">
@@ -48,6 +62,7 @@
       <option name="presentableId" value="Default" />
       <updated>1765359062318</updated>
       <workItem from="1765359063447" duration="1778000" />
+      <workItem from="1767360699712" duration="3001000" />
     </task>
     <servers />
   </component>
@@ -76,6 +91,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="tmp: 조리법 흐름 개선중..." />
+    <option name="LAST_COMMIT_MESSAGE" value="tmp: 조리법 흐름 개선중..." />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
