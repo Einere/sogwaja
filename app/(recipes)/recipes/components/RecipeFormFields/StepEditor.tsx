@@ -15,13 +15,12 @@ import type { Equipment, Ingredient } from "./StepEditor/types";
 import { detectMention } from "./StepEditor/mentionDetection";
 import { createMentionItems, filterMentionItems } from "./StepEditor/mentionFilter";
 import { insertMention } from "./StepEditor/mentionInsertion";
+import type { MentionEditor } from "./StepEditor/mentionActions";
 import {
-  normalizeMentionSelection,
-  handleMentionNavigation,
-  handleMentionDeletion,
-  getMentionAtCursor,
-} from "./StepEditor/mentionNavigation";
-import { findMentionAtSelection, isCursorAtMention } from "./StepEditor/mentionUtils";
+  findMentionAtSelection,
+  isCursorAtMention,
+  isMentionFullySelected,
+} from "./StepEditor/mentionUtils";
 import { calculateDropdownPosition } from "./StepEditor/mentionDropdownPosition";
 import type { MentionItem } from "./StepEditor/types";
 import { withMentions } from "./StepEditor/editorPlugins";
@@ -58,7 +57,7 @@ export default function StepEditor({
     left: number;
   } | null>(null);
   const [selectedMentionPath, setSelectedMentionPath] = useState<Path | null>(null);
-  const selectedMentionPathRef = useRef<Path | null>(null);
+  const previousSelectedMentionPathRef = useRef<Path | null>(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
   const isComposingRef = useRef(false);
   const pendingMentionRef = useRef<{
@@ -66,13 +65,8 @@ export default function StepEditor({
     range: Range;
   } | null>(null);
 
-  // selectedMentionPath와 ref 동기화
-  useEffect(() => {
-    selectedMentionPathRef.current = selectedMentionPath;
-  }, [selectedMentionPath]);
-
   const editor = useMemo(
-    () => withMentions(withHistory(withReact(createEditor()))) as ReactEditor,
+    () => withMentions(withHistory(withReact(createEditor()))) as ReactEditor & MentionEditor,
     []
   );
 
@@ -113,113 +107,126 @@ export default function StepEditor({
     return <Leaf {...props} />;
   }, []);
 
-  const handleChange = (newValue: Descendant[]) => {
-    onChange({ children: newValue });
+  const handleChange = useCallback(
+    (newValue: Descendant[]) => {
+      onChange({ children: newValue });
+      if (readOnly) return;
 
-    if (readOnly) return;
-
-    const { selection } = editor;
-    if (!selection) {
-      setTarget(null);
-      setSelectedMentionPath(null);
-      return;
-    }
-
-    // 멘션이 선택되었거나 커서가 멘션 내부/경계에 있는지 확인
-    const mention = findMentionAtSelection(editor);
-    if (mention) {
-      const [start, end] = Range.edges(selection);
-      const [mentionStart, mentionEnd] = Range.edges(mention.range);
-
-      // 멘션 전체 선택
-      if (
-        !Range.isCollapsed(selection) &&
-        Point.equals(start, mentionStart) &&
-        Point.equals(end, mentionEnd)
-      ) {
-        setTarget(null);
-        setSelectedMentionPath(mention.path);
-        return;
-      }
-
-      // 커서가 멘션 내부/경계에 있음
-      if (isCursorAtMention(editor)) {
+      const { selection } = editor;
+      if (!selection) {
         setTarget(null);
         setSelectedMentionPath(null);
+        previousSelectedMentionPathRef.current = null;
         return;
       }
-    }
 
-    // @ 입력 감지 및 드롭다운 표시
-    const mentionDetection = detectMention(editor);
-    if (mentionDetection) {
-      setTarget(mentionDetection.range);
-      setSearch(mentionDetection.searchText);
-      setIndex(0);
-      setSelectedMentionPath(null);
-      return;
-    }
+      // 멘션 상태 확인 및 업데이트
+      const mention = findMentionAtSelection(editor);
+      const wasMentionSelected = selectedMentionPath !== null;
 
-    setTarget(null);
-  };
+      if (mention) {
+        const isFullySelected = isMentionFullySelected(editor, selection, mention.range);
+
+        if (isFullySelected) {
+          // 멘션 전체 선택: 드롭다운 숨김, 선택 상태 유지
+          setTarget(null);
+          setSelectedMentionPath(mention.path);
+          previousSelectedMentionPathRef.current = mention.path;
+          return;
+        }
+
+        if (isCursorAtMention(editor)) {
+          // 커서가 멘션 내부: 드롭다운 숨김
+          setTarget(null);
+          setSelectedMentionPath(null);
+          previousSelectedMentionPathRef.current = null;
+          return;
+        }
+      }
+
+      // @ 입력 감지
+      const mentionDetection = detectMention(editor);
+      if (mentionDetection) {
+        setTarget(mentionDetection.range);
+        setSearch(mentionDetection.searchText);
+        setIndex(0);
+        setSelectedMentionPath(null);
+        previousSelectedMentionPathRef.current = null;
+        return;
+      }
+
+      // 멘션 선택 상태 업데이트
+      if (mention && !Range.isCollapsed(selection)) {
+        const isFullySelected = isMentionFullySelected(editor, selection, mention.range);
+        setSelectedMentionPath(isFullySelected ? mention.path : null);
+        previousSelectedMentionPathRef.current = isFullySelected ? mention.path : null;
+      } else {
+        // 선택이 해제되었을 때: 이전에 멘션이 선택되어 있었고, 현재 collapsed 선택이면 커서를 멘션 끝으로 이동
+        if (wasMentionSelected && Range.isCollapsed(selection) && selectedMentionPath !== null) {
+          const prevPath = selectedMentionPath;
+          try {
+            const prevMentionNode = Editor.node(editor, prevPath)[0];
+            if (
+              Element.isElement(prevMentionNode) &&
+              "type" in prevMentionNode &&
+              prevMentionNode.type === "mention"
+            ) {
+              const [start] = Range.edges(selection);
+              const prevMentionRange = Editor.range(editor, prevPath);
+              const [, prevMentionEnd] = Range.edges(prevMentionRange);
+
+              // 커서가 이전 멘션 범위 밖에 있으면 멘션 끝으로 이동
+              if (Point.compare(start, prevMentionEnd) > 0) {
+                editor.mentionActions.collapseToMentionEnd(prevPath);
+                previousSelectedMentionPathRef.current = prevPath;
+                setSelectedMentionPath(null);
+                return;
+              }
+            }
+          } catch {
+            // 경로가 유효하지 않으면 무시
+          }
+          previousSelectedMentionPathRef.current = prevPath;
+        } else if (wasMentionSelected) {
+          previousSelectedMentionPathRef.current = selectedMentionPath;
+        }
+        setSelectedMentionPath(null);
+      }
+
+      setTarget(null);
+    },
+    [editor, onChange, readOnly, selectedMentionPath]
+  );
 
   const handleSelect = useCallback(() => {
     if (readOnly) return;
 
     const { selection } = editor;
     if (!selection) {
-      setSelectedMentionPath(null);
       return;
     }
 
-    // 멘션 선택 상태 업데이트 및 자동 선택
     const mention = findMentionAtSelection(editor);
-    if (mention) {
-      const [start, end] = Range.edges(selection);
-      const [mentionStart, mentionEnd] = Range.edges(mention.range);
+    const [start] = Range.edges(selection);
 
-      // 멘션이 선택되었는지 확인 (전체 범위가 선택된 경우)
-      if (!Range.isCollapsed(selection)) {
-        if (Point.equals(start, mentionStart) && Point.equals(end, mentionEnd)) {
-          setSelectedMentionPath(mention.path);
-        } else {
-          setSelectedMentionPath(null);
-        }
-      } else {
-        // 커서가 멘션 내부에 있으면 멘션 선택
-        const isInsideMention =
-          Point.compare(start, mentionStart) > 0 && Point.compare(start, mentionEnd) < 0;
+    if (!mention) {
+      return;
+    }
 
-        if (isInsideMention) {
-          // 이미 선택된 멘션이 아니면 선택
-          const isAlreadySelected =
-            selectedMentionPathRef.current !== null &&
-            Path.equals(selectedMentionPathRef.current, mention.path);
+    const [mentionStart, mentionEnd] = Range.edges(mention.range);
 
-          if (!isAlreadySelected) {
-            normalizeMentionSelection(editor);
-            setSelectedMentionPath(mention.path);
-          }
-        } else {
-          // 커서가 멘션 경계에 있으면 선택하지 않음 (방향키로 선택할 수 있도록)
-          setSelectedMentionPath(null);
-        }
-      }
-    } else {
-      setSelectedMentionPath(null);
+    if (!Range.isCollapsed(selection)) {
+      // 범위 선택: 멘션 전체 선택 여부 확인 (onChange에서 처리)
+      return;
+    }
+
+    // 커서만 있음: 멘션 내부면 자동 선택
+    const isInside = Point.compare(start, mentionStart) > 0 && Point.compare(start, mentionEnd) < 0;
+
+    if (isInside) {
+      editor.mentionActions.normalizeMentionSelection();
     }
   }, [editor, readOnly]);
-
-  const handleInsertMention = useCallback(
-    (
-      item: { id: string; name: string; displayName: string; type: "equipment" | "ingredient" },
-      replaceRange?: Range
-    ) => {
-      insertMention(editor, item, replaceRange || target || undefined);
-      setTarget(null);
-    },
-    [editor, target]
-  );
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -240,19 +247,12 @@ export default function StepEditor({
         return;
       }
 
-      // 방향키로 멘션 네비게이션 처리
-      if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-        if (handleMentionNavigation(editor, event.key)) {
-          event.preventDefault();
-          return;
-        }
-      }
-
       // 백스페이스로 멘션 삭제 처리
       if (event.key === "Backspace") {
-        if (handleMentionDeletion(editor)) {
+        if (editor.mentionActions.handleMentionDeletion()) {
           event.preventDefault();
           setSelectedMentionPath(null);
+          previousSelectedMentionPathRef.current = null;
           return;
         }
       }
@@ -273,7 +273,7 @@ export default function StepEditor({
             event.preventDefault();
             // 조합이 완료된 후에만 멘션 삽입
             if (!isComposingRef.current) {
-              handleInsertMention(filteredItems[index], target);
+              insertMention(editor, filteredItems[index], target);
             }
             break;
           case "Escape":
@@ -284,7 +284,7 @@ export default function StepEditor({
         }
       }
     },
-    [target, index, filteredItems, handleInsertMention, editor, readOnly]
+    [target, index, filteredItems, editor, readOnly]
   );
 
   // 조합 완료 후 pending 멘션 처리
@@ -296,12 +296,12 @@ export default function StepEditor({
       // 약간의 지연을 두어 조합이 완전히 완료된 후 처리
       setTimeout(() => {
         if (pendingMentionRef.current) {
-          handleInsertMention(pendingMentionRef.current.item, pendingMentionRef.current.range);
+          insertMention(editor, pendingMentionRef.current.item, pendingMentionRef.current.range);
           pendingMentionRef.current = null;
         }
       }, 0);
     }
-  }, [handleInsertMention]);
+  }, [editor]);
 
   const editorValue = useMemo(() => {
     if (value && Array.isArray(value.children)) {
@@ -313,7 +313,7 @@ export default function StepEditor({
   return (
     <div
       ref={editorRef}
-      className={`border-input relative flex min-h-[200px] flex-1 flex-col rounded-lg border ${
+      className={`border-input relative flex min-h-[200px] flex-1 flex-col rounded-lg border p-4 ${
         readOnly ? "bg-muted cursor-not-allowed" : "bg-background cursor-text"
       }`}
     >
@@ -323,7 +323,7 @@ export default function StepEditor({
           renderLeaf={renderLeaf}
           placeholder={readOnly ? "" : "조리법 흐름을 입력하세요... @로 멘션할 수 있습니다"}
           readOnly={readOnly}
-          className={`min-h-[150px] flex-1 p-4 outline-none ${
+          className={`min-h-[150px] flex-1 outline-none ${
             readOnly ? "cursor-not-allowed opacity-50" : ""
           }`}
           onKeyDown={handleKeyDown}
@@ -341,7 +341,7 @@ export default function StepEditor({
             items={filteredItems}
             selectedIndex={index}
             position={dropdownPosition}
-            onSelect={(item: MentionItem) => handleInsertMention(item, target)}
+            onSelect={(item: MentionItem) => insertMention(editor, item, target)}
           />
         )}
       </Slate>

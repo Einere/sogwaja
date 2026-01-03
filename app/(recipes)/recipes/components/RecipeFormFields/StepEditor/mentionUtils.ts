@@ -61,7 +61,7 @@ export function isCursorAtMention(editor: Editor): boolean {
 }
 
 /**
- * 검색 범위가 멘션 요소와 겹치는지 확인
+ * 검색 범위가 멘션 요소와 겹치는지 확인 (Editor.nodes 활용)
  * @param editor Slate 에디터
  * @param searchRange 검색할 범위
  * @param blockPath 블록 경로
@@ -71,26 +71,35 @@ export function isSearchRangeOverlappingMentions(
   searchRange: Range,
   blockPath: Path
 ): boolean {
-  const blockNode = Editor.node(editor, blockPath)[0];
-  
-  if (!blockNode || typeof blockNode !== "object" || !("children" in blockNode)) {
-    return false;
-  }
-
-  // 블록의 모든 멘션 요소 확인
-  for (let i = 0; i < blockNode.children.length; i++) {
-    const child = blockNode.children[i];
-    if (typeof child === "object" && "type" in child && child.type === "mention") {
-      const childPath = [...blockPath, i];
-      const mentionRange = Editor.range(editor, childPath);
-      
-      // 범위가 겹치는지 확인
-      if (Range.intersection(searchRange, mentionRange) !== null) {
-        return true;
-      }
+  // Slate.js의 Editor.nodes를 사용하여 블록 내 모든 멘션 찾기
+  for (const [node, path] of Editor.nodes(editor, {
+    at: blockPath,
+    match: n => Element.isElement(n) && "type" in n && n.type === "mention",
+  })) {
+    const mentionRange = Editor.range(editor, path);
+    if (Range.intersection(searchRange, mentionRange)) {
+      return true;
     }
   }
-
   return false;
+}
+
+/**
+ * 멘션이 완전히 선택되었는지 확인
+ */
+export function isMentionFullySelected(
+  editor: Editor,
+  selection: Range,
+  mentionRange: Range
+): boolean {
+  if (Range.isCollapsed(selection)) return false;
+  
+  const [selStart, selEnd] = Range.edges(selection);
+  const [mentionStart, mentionEnd] = Range.edges(mentionRange);
+  
+  return (
+    Point.equals(selStart, mentionStart) && 
+    Point.equals(selEnd, mentionEnd)
+  );
 }
 
