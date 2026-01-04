@@ -1,18 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SsgoiProvider from "@/components/layout/SsgoiProvider";
 import SkipLink from "@/components/layout/SkipLink";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { gowunDodum } from "./fonts";
 
 export const metadata: Metadata = {
   title: "구움과자 조리법",
@@ -33,11 +23,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${gowunDodum.className} antialiased`}>
         <SsgoiProvider>
           <SkipLink />
           <div className="bg-muted min-h-screen">
-            <div className="bg-background mx-auto min-h-screen max-w-md" id="main-content" role="main">
+            <div
+              className="bg-background mx-auto min-h-screen max-w-md"
+              id="main-content"
+              role="main"
+            >
               {children}
             </div>
           </div>

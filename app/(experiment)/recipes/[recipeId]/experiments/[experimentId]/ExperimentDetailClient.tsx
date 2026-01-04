@@ -1,18 +1,25 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { deleteExperiment } from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
 import EquipmentEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/EquipmentEditor";
 import IngredientEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/IngredientEditor";
 import OutputEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/OutputEditor";
-import StepEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/StepEditor";
 import { LinkButton, Button } from "@/components/ui";
 import { ArrowLeftIcon } from "@/components/icons";
 import type { Database } from "@/types/database";
 import type { Json } from "@/types/database";
 import type { Descendant } from "slate";
-import type { ExperimentWithPhotos } from "../../../../../(experiments)/recipes/[recipeId]/experiments/ExperimentsClient";
+import type { ExperimentWithPhotos } from "@/app/(experiments)/recipes/[recipeId]/experiments/ExperimentsClient";
 import Image from "next/image";
+
+const StepEditor = dynamic(
+  () => import("@/app/(recipes)/recipes/components/RecipeFormFields/StepEditor"),
+  {
+    ssr: false,
+  }
+);
 
 type Recipe = Database["public"]["Tables"]["recipes"]["Row"];
 type Equipment = Database["public"]["Tables"]["recipe_equipment"]["Row"];
@@ -157,7 +164,9 @@ export default function ExperimentDetailClient({
                     height={192}
                     alt={`실험 사진 ${index + 1}`}
                     className="h-48 w-48 flex-shrink-0 rounded object-cover"
-                    loading="lazy"
+                    sizes="(max-width: 768px) 192px, 192px"
+                    priority={index === 0}
+                    quality={85}
                   />
                 ))}
               </div>
