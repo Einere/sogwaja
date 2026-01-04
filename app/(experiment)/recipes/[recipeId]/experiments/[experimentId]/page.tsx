@@ -5,7 +5,6 @@ import {
   getExperimentData,
 } from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
 import ExperimentDetailClient from "./ExperimentDetailClient";
-import { SsgoiTransition } from "@ssgoi/react";
 
 interface ExperimentDetailPageProps {
   params: Promise<{ recipeId: string; experimentId: string }>;
