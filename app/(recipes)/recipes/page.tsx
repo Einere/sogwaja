@@ -1,10 +1,16 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { getServerUser } from "@/lib/supabase/auth";
 import { getRecipes } from "@/app/(recipes)/recipes/actions";
 import RecipeListHeader from "@/app/(recipes)/recipes/components/RecipeListHeader";
 import RecipeListContent from "@/app/(recipes)/recipes/components/RecipeListContent";
 import EmptyState from "@/components/shared/EmptyState";
 import { LinkButton } from "@/components/ui";
+
+export const metadata: Metadata = {
+  title: "조리법 목록",
+  description: "저장된 조리법을 확인하고 관리하세요",
+};
 
 export default async function RecipesPage() {
   // TODO: auth guard 로직은 분리해야 함.

@@ -4,10 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="60e285b3-a5e6-4467-814c-f4eea7f80dca" name="Changes" comment="">
+    <list default="true" id="60e285b3-a5e6-4467-814c-f4eea7f80dca" name="Changes" comment="feat: Next.js 성능 최적화 및 이미지 최적화&#10;&#10;- Image 컴포넌트 최적화&#10;  - ExperimentDetailClient의 이미지에 sizes, priority, quality 속성 추가&#10;  - 첫 번째 이미지에 priority 적용하여 LCP 개선&#10;  - 반응형 이미지 최적화를 위한 sizes 속성 추가&#10;&#10;- 코드 스플리팅&#10;  - StepEditor를 동적 import로 변경 (읽기 전용 모드에서만 사용)&#10;  - Dialog/AlertDialog 동적 로딩 준비 (향후 사용 시 코드 스플리팅)&#10;&#10;- SEO 및 Metadata 개선&#10;  - 주요 페이지에 개별 metadata 추가&#10;    - 조리법 목록, 편집, 실험 목록, 실험 상세 페이지&#10;  - 동적 라우트 페이지에 generateMetadata 구현&#10;&#10;- Next.js Config 최적화&#10;  - 이미지 최적화 설정 강화 (deviceSizes, imageSizes, formats, minimumCacheTTL)&#10;  - compress 및 poweredByHeader 설정 추가&#10;&#10;- 개발 도구&#10;  - 번들 분석을 위한 analyze 스크립트 추가">
+      <changelist_data name="Einere" email="kjwsx23@gmail.com" date="1767539696000" automatic="true" />
+      <change afterPath="$PROJECT_DIR$/app/fonts.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/ui/AlertDialog.dynamic.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/ui/Dialog.dynamic.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(recipes)/recipes/components/RecipeFormFields/StepEditor/mentionActions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(recipes)/recipes/components/RecipeFormFields/StepEditor/mentionActions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(recipes)/recipes/components/RecipeFormFields/StepEditor/mentionInsertion.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(recipes)/recipes/components/RecipeFormFields/StepEditor/mentionInsertion.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(experiment)/recipes/[recipeId]/experiments/[experimentId]/ExperimentDetailClient.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(experiment)/recipes/[recipeId]/experiments/[experimentId]/ExperimentDetailClient.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(experiment)/recipes/[recipeId]/experiments/[experimentId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(experiment)/recipes/[recipeId]/experiments/[experimentId]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(experiments)/recipes/[recipeId]/experiments/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(experiments)/recipes/[recipeId]/experiments/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(recipe-editor)/recipes/[recipeId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(recipe-editor)/recipes/[recipeId]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(recipes)/recipes/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(recipes)/recipes/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +28,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="540d6bdacb0a4b0a6e1161d334d209e8bf8aab52" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -34,7 +45,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "perf/nextjs-perf2",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -63,6 +74,7 @@
       <updated>1765359062318</updated>
       <workItem from="1765359063447" duration="1778000" />
       <workItem from="1767360699712" duration="3001000" />
+      <workItem from="1767540159174" duration="297000" />
     </task>
     <servers />
   </component>
@@ -80,7 +92,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="main" />
+                        <option value="perf/nextjs-perf" />
                       </list>
                     </value>
                   </entry>
@@ -94,7 +106,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="tmp: 조리법 흐름 개선중..." />
-    <option name="LAST_COMMIT_MESSAGE" value="tmp: 조리법 흐름 개선중..." />
+    <MESSAGE value="feat: Next.js 성능 최적화 및 이미지 최적화&#10;&#10;- Image 컴포넌트 최적화&#10;  - ExperimentDetailClient의 이미지에 sizes, priority, quality 속성 추가&#10;  - 첫 번째 이미지에 priority 적용하여 LCP 개선&#10;  - 반응형 이미지 최적화를 위한 sizes 속성 추가&#10;&#10;- 코드 스플리팅&#10;  - StepEditor를 동적 import로 변경 (읽기 전용 모드에서만 사용)&#10;  - Dialog/AlertDialog 동적 로딩 준비 (향후 사용 시 코드 스플리팅)&#10;&#10;- SEO 및 Metadata 개선&#10;  - 주요 페이지에 개별 metadata 추가&#10;    - 조리법 목록, 편집, 실험 목록, 실험 상세 페이지&#10;  - 동적 라우트 페이지에 generateMetadata 구현&#10;&#10;- Next.js Config 최적화&#10;  - 이미지 최적화 설정 강화 (deviceSizes, imageSizes, formats, minimumCacheTTL)&#10;  - compress 및 poweredByHeader 설정 추가&#10;&#10;- 개발 도구&#10;  - 번들 분석을 위한 analyze 스크립트 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Next.js 성능 최적화 및 이미지 최적화&#10;&#10;- Image 컴포넌트 최적화&#10;  - ExperimentDetailClient의 이미지에 sizes, priority, quality 속성 추가&#10;  - 첫 번째 이미지에 priority 적용하여 LCP 개선&#10;  - 반응형 이미지 최적화를 위한 sizes 속성 추가&#10;&#10;- 코드 스플리팅&#10;  - StepEditor를 동적 import로 변경 (읽기 전용 모드에서만 사용)&#10;  - Dialog/AlertDialog 동적 로딩 준비 (향후 사용 시 코드 스플리팅)&#10;&#10;- SEO 및 Metadata 개선&#10;  - 주요 페이지에 개별 metadata 추가&#10;    - 조리법 목록, 편집, 실험 목록, 실험 상세 페이지&#10;  - 동적 라우트 페이지에 generateMetadata 구현&#10;&#10;- Next.js Config 최적화&#10;  - 이미지 최적화 설정 강화 (deviceSizes, imageSizes, formats, minimumCacheTTL)&#10;  - compress 및 poweredByHeader 설정 추가&#10;&#10;- 개발 도구&#10;  - 번들 분석을 위한 analyze 스크립트 추가" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

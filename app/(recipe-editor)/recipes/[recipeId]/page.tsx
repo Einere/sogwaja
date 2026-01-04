@@ -1,10 +1,21 @@
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { getServerUser } from "@/lib/supabase/auth";
 import { getRecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
 import RecipeEditorClient from "./RecipeEditorClient";
 
 interface RecipeEditorPageProps {
   params: Promise<{ recipeId: string }>;
+}
+
+export async function generateMetadata({ params }: RecipeEditorPageProps): Promise<Metadata> {
+  const { recipeId } = await params;
+  const { recipe } = await getRecipeData(recipeId);
+
+  return {
+    title: `${recipe.title} - 편집`,
+    description: `${recipe.title} 조리법을 편집하세요`,
+  };
 }
 
 export default async function RecipeEditorPage({ params }: RecipeEditorPageProps) {

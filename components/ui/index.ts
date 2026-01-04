@@ -29,4 +29,4 @@ export {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
-} from "./AlertDialog";
+} from "./AlertDialog.dynamic";
