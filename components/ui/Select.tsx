@@ -82,6 +82,8 @@ function SelectContent({
         )}
         position={position}
         align={align}
+        role="listbox"
+        aria-label="선택 옵션"
         {...props}
       >
         <SelectScrollUpButton />

@@ -74,6 +74,8 @@ export function Button({
       )}
       ref={ref}
       disabled={isDisabled}
+      aria-busy={loading}
+      aria-disabled={isDisabled}
       {...props}
     />
   );

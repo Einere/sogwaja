@@ -50,7 +50,7 @@ export default function RecipeForm({
         };
 
   return (
-    <main className="space-y-6 px-4 py-6">
+    <div className="space-y-6 px-4 py-6">
       <EquipmentEditor
         equipment={equipment}
         onUpdate={onEquipmentChange}
@@ -82,6 +82,6 @@ export default function RecipeForm({
           ingredients={ingredients}
         />
       </section>
-    </main>
+    </div>
   );
 }

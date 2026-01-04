@@ -20,7 +20,7 @@ export default function RecipeHeader({ title, onTitleChange, saving = false }: R
           className="flex w-fit items-center gap-1"
           aria-label="조리법 목록으로 돌아가기"
         >
-          <ArrowLeftIcon className="h-4 w-4" />
+          <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
           목록으로
         </LinkButton>
         {saving && (
@@ -29,6 +29,7 @@ export default function RecipeHeader({ title, onTitleChange, saving = false }: R
             role="status"
             aria-live="polite"
             aria-label="저장 중"
+            aria-busy="true"
           >
             저장 중...
           </span>
