@@ -77,6 +77,7 @@ interface UseRecipeEditorResult {
 export function useRecipeEditor(recipeId: string, initialData: RecipeData): UseRecipeEditorResult {
   const [recipe, setRecipe] = useState<Recipe | null>(initialData.recipe);
   const [saving, setSaving] = useState(false);
+  // TODO: 초기화 시 자동저장을 막기 위해 이런 복잡한 상태를 활용하는 것 보다, 조리법을 프로퍼티로 받는 방식을 사용하는게 어떨지?
   const isInitializingRef = useRef(true);
 
   const initialValues = createInitialValues(initialData);
