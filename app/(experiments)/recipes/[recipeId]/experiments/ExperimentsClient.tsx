@@ -63,7 +63,7 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
             className="flex w-fit items-center gap-1"
             aria-label="조리법으로 돌아가기"
           >
-            <ArrowLeftIcon className="h-4 w-4" />
+            <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
             돌아가기
           </LinkButton>
           <h1 className="text-center text-xl font-bold">실험 목록</h1>
@@ -117,7 +117,7 @@ export default function ExperimentsClient({ experiments, recipeId }: Experiments
                       variant="ghost"
                       size="sm"
                       className="text-error hover:text-error"
-                      aria-label="실험 삭제"
+                      aria-label={`${new Date(experiment.created_at).toLocaleDateString("ko-KR")} 실험 삭제`}
                     >
                       삭제
                     </Button>

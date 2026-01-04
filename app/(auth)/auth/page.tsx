@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { GoogleIcon, AppleIcon } from "@/components/icons";
+import { GoogleIcon } from "@/components/icons";
 import { Button } from "@/components/ui";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
-  const handleSocialLogin = async (provider: "google" | "apple") => {
+  const handleSocialLogin = async (provider: "google") => {
     try {
       setLoading(true);
 
@@ -43,7 +43,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <main className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="bg-background rounded-lg p-8 shadow-md">
           <h1 className="mb-8 text-center text-2xl font-bold">구움과자 조리법</h1>
@@ -51,33 +51,26 @@ export default function LoginPage() {
             조리법을 저장하고 관리하려면 로그인이 필요합니다.
           </p>
 
-          <div className="space-y-4">
+          <form aria-label="로그인 폼">
             <Button
+              type="button"
               onClick={() => handleSocialLogin("google")}
               disabled={loading}
               variant="outline"
               className="flex w-full items-center justify-center gap-3"
+              aria-label={loading ? "Google 로그인 중" : "Google로 로그인"}
+              aria-busy={loading}
             >
               <GoogleIcon />
               Google로 로그인
             </Button>
-
-            <Button
-              onClick={() => handleSocialLogin("apple")}
-              disabled={loading}
-              variant="primary"
-              className="flex w-full items-center justify-center gap-3 bg-black hover:bg-black/90"
-            >
-              <AppleIcon />
-              Apple로 로그인
-            </Button>
-          </div>
+          </form>
 
           <p className="text-muted-foreground mt-6 text-center text-xs">
             로그인 시 조리법 저장 및 관리 기능을 사용할 수 있습니다.
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

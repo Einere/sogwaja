@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SsgoiProvider from "@/components/layout/SsgoiProvider";
+import SkipLink from "@/components/layout/SkipLink";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,8 +35,11 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SsgoiProvider>
+          <SkipLink />
           <div className="bg-muted min-h-screen">
-            <div className="bg-background mx-auto min-h-screen max-w-md">{children}</div>
+            <div className="bg-background mx-auto min-h-screen max-w-md" id="main-content" role="main">
+              {children}
+            </div>
           </div>
         </SsgoiProvider>
       </body>

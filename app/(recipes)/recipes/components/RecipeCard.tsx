@@ -56,6 +56,7 @@ export default function RecipeCard({ recipe, onDelete, isDeleting = false }: Rec
             size="sm"
             className="text-error hover:text-error"
             aria-label={`${recipe.title} 삭제`}
+            aria-busy={isDeleting}
           >
             {isDeleting ? "삭제 중..." : "삭제"}
           </Button>

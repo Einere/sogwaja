@@ -55,7 +55,7 @@ export default function NewExperimentPage() {
           aria-label="조리법으로 돌아가기"
           prefetch={true}
         >
-          <ArrowLeftIcon className="h-4 w-4" />
+          <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
           돌아가기
         </LinkButton>
         <h1 className="text-center text-xl font-bold">실험 결과 저장</h1>
@@ -106,6 +106,7 @@ export default function NewExperimentPage() {
                   }
                 }}
                 aria-label="사진 추가"
+                aria-disabled={isPending}
                 role="button"
               >
                 <input
@@ -116,12 +117,15 @@ export default function NewExperimentPage() {
                   disabled={isPending}
                   className="hidden"
                   aria-label="사진 추가"
+                  aria-describedby="photo-upload-help"
                 />
-                <PlusIcon className="text-muted-foreground h-8 w-8" />
+                <PlusIcon className="text-muted-foreground h-8 w-8" aria-hidden="true" />
               </label>
             )}
           </div>
-          <p className="text-muted-foreground text-xs">최대 9장까지 업로드 가능합니다.</p>
+          <p id="photo-upload-help" className="text-muted-foreground text-xs">
+            최대 9장까지 업로드 가능합니다.
+          </p>
           {form.formState.errors.photos && (
             // TODO: 모든 폼 인풋 경고 요소에 대해, 접근성 준수하기
             <p role="alert" className="text-error mt-1 text-sm">

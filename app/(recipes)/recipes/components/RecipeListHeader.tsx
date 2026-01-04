@@ -19,7 +19,7 @@ export default function RecipeListHeader() {
           className="flex items-center gap-1"
           aria-label="새 조리법 만들기"
         >
-          <PlusIcon className="h-4 w-4" />새 조리법
+          <PlusIcon className="h-4 w-4" aria-hidden="true" />새 조리법
         </LinkButton>
       </div>
       <div className="flex gap-2" role="group" aria-label="정렬 옵션">

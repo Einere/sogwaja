@@ -75,7 +75,7 @@ export default function ExperimentDetailClient({
             className="flex w-fit items-center gap-1"
             aria-label="실험 목록으로 돌아가기"
           >
-            <ArrowLeftIcon className="h-4 w-4" />
+            <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
             목록으로
           </LinkButton>
           <h1 className="text-center text-xl font-bold">실험 결과</h1>
@@ -84,7 +84,7 @@ export default function ExperimentDetailClient({
             variant="ghost"
             size="sm"
             className="text-error hover:text-error w-fit justify-end justify-self-end text-end"
-            aria-label="실험 삭제"
+            aria-label={`${recipe.title} 실험 삭제`}
           >
             삭제
           </Button>
@@ -149,13 +149,13 @@ export default function ExperimentDetailClient({
                 role="list"
                 aria-label="실험 사진"
               >
-                {experiment.photos.map((photo: Photo) => (
+                {experiment.photos.map((photo: Photo, index: number) => (
                   <Image
                     key={photo.id}
                     src={photo.url}
                     width={192}
                     height={192}
-                    alt="실험 사진"
+                    alt={`실험 사진 ${index + 1}`}
                     className="h-48 w-48 flex-shrink-0 rounded object-cover"
                     loading="lazy"
                   />
