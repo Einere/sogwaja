@@ -3,6 +3,7 @@ import "./globals.css";
 import SsgoiProvider from "@/components/layout/SsgoiProvider";
 import SkipLink from "@/components/layout/SkipLink";
 import { gowunDodum } from "./fonts";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "구움과자 조리법",
@@ -36,6 +37,7 @@ export default function RootLayout({
             </div>
           </div>
         </SsgoiProvider>
+        <Analytics/>
       </body>
     </html>
   );
