@@ -2,12 +2,12 @@ import React from "react";
 
 export interface IconProps {
   className?: string;
-  "aria-hidden"?: boolean;
+  "aria-hidden"?: "true" | "false";
 }
 
 export default function AppleIcon({
   className = "w-5 h-5",
-  "aria-hidden": ariaHidden = true,
+  "aria-hidden": ariaHidden = "true",
 }: IconProps) {
   return (
     <svg

@@ -3,7 +3,7 @@ import { IconProps } from "./AppleIcon";
 
 export default function PlusIcon({
   className = "w-4 h-4",
-  "aria-hidden": ariaHidden = true,
+  "aria-hidden": ariaHidden = "true",
 }: IconProps) {
   return (
     <svg

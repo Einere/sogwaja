@@ -3,7 +3,7 @@ import { IconProps } from "./AppleIcon";
 
 export default function PencilIcon({
   className = "w-6 h-6",
-  "aria-hidden": ariaHidden = true,
+  "aria-hidden": ariaHidden = "true",
 }: IconProps) {
   return (
     <svg
