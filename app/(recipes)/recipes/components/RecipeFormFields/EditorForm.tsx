@@ -39,19 +39,13 @@ export default function EditorForm({
   submitLabel = "추가",
   ariaLabel,
 }: EditorFormProps) {
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      onSubmit();
-    }
-  };
-
   return (
     <div className="flex gap-2" role="group" aria-label={ariaLabel || "새 항목 추가"}>
       <Input
         type="text"
         value={name}
         onChange={e => onNameChange(e.target.value)}
-        onKeyPress={handleKeyPress}
+        onKeyDown={onSubmit}
         className="flex-1 text-sm"
         placeholder={namePlaceholder}
         aria-label={`${namePlaceholder} 입력`}
@@ -61,8 +55,7 @@ export default function EditorForm({
         inputMode="numeric"
         value={value}
         onChange={e => onValueChange(e.target.value)}
-        // TODO: onKeyPress 대체하기(onKeyDown 사용)
-        onKeyPress={handleKeyPress}
+        onKeyDown={onSubmit}
         className="w-24 text-sm"
         placeholder={valuePlaceholder}
         aria-label={`${valuePlaceholder} 입력`}
