@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { Database } from "@/types/database";
+import { DEFAULT_UNITS, getUnitOptions } from "@/lib/constants/recipe";
 import EditorItem from "./EditorItem";
 import EditorForm from "./EditorForm";
 
@@ -22,13 +23,9 @@ export default function EquipmentEditor({
 }: EquipmentEditorProps) {
   const [newName, setNewName] = useState("");
   const [newQuantity, setNewQuantity] = useState("");
-  const [newUnit, setNewUnit] = useState("개");
+  const [newUnit, setNewUnit] = useState<string>(DEFAULT_UNITS.EQUIPMENT);
 
-  const UNIT_OPTIONS = [
-    { value: "개", label: "개" },
-    { value: "g", label: "g" },
-    { value: "ml", label: "ml" },
-  ];
+  const unitOptions = useMemo(() => getUnitOptions(), []);
 
   const handleAdd = () => {
     if (!newName.trim() || !newQuantity) return;
@@ -45,7 +42,7 @@ export default function EquipmentEditor({
     onUpdate([...equipment, newEquipment]);
     setNewName("");
     setNewQuantity("");
-    setNewUnit("개");
+    setNewUnit(DEFAULT_UNITS.EQUIPMENT);
   };
 
   const handleRemove = (id: string) => {
@@ -82,7 +79,7 @@ export default function EquipmentEditor({
             valuePlaceholder="개수"
             unitPlaceholder="단위"
             unitType="select"
-            unitOptions={UNIT_OPTIONS}
+            unitOptions={unitOptions}
             ariaLabel={`장비: ${eq.name}, ${eq.quantity} ${eq.unit}`}
           />
         ))}
@@ -98,7 +95,7 @@ export default function EquipmentEditor({
           onSubmit={handleAdd}
           namePlaceholder="장비 이름"
           valuePlaceholder="개수"
-          unitOptions={UNIT_OPTIONS}
+          unitOptions={unitOptions}
           submitLabel="추가"
           ariaLabel="새 장비 추가"
         />

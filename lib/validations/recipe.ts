@@ -1,6 +1,5 @@
 import { z } from "zod";
-
-const UNIT_OPTIONS = ["개", "g", "ml"] as const;
+import { UNIT_OPTIONS } from "@/lib/constants/recipe";
 
 export const IngredientSchema = z.object({
   id: z.string(),

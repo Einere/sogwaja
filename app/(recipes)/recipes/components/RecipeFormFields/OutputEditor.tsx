@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { Database } from "@/types/database";
+import { DEFAULT_UNITS, canAddOutput, hasOutputs, getUnitOptions } from "@/lib/constants/recipe";
 import EditorItem from "./EditorItem";
 import EditorForm from "./EditorForm";
 
@@ -19,12 +20,6 @@ interface OutputEditorProps {
   readOnly?: boolean;
 }
 
-const UNIT_OPTIONS = [
-  { value: "개", label: "개" },
-  { value: "g", label: "g" },
-  { value: "ml", label: "ml" },
-];
-
 export default function OutputEditor({
   outputs,
   onUpdate,
@@ -33,10 +28,15 @@ export default function OutputEditor({
 }: OutputEditorProps) {
   const [newName, setNewName] = useState("");
   const [newQuantity, setNewQuantity] = useState("");
-  const [newUnit, setNewUnit] = useState("개");
+  const [newUnit, setNewUnit] = useState<string>(DEFAULT_UNITS.OUTPUT);
+
+  const unitOptions = useMemo(() => getUnitOptions(), []);
 
   const handleAdd = () => {
     if (!newName.trim() || !newQuantity) return;
+
+    // 결과물은 최대 1개만 추가 가능
+    if (!canAddOutput(outputs)) return;
 
     const newOutput: Output = {
       id: `temp-${Date.now()}`,
@@ -50,7 +50,7 @@ export default function OutputEditor({
     onUpdate([...outputs, newOutput]);
     setNewName("");
     setNewQuantity("");
-    setNewUnit("개");
+    setNewUnit(DEFAULT_UNITS.OUTPUT);
   };
 
   const handleRemove = (id: string) => {
@@ -103,12 +103,12 @@ export default function OutputEditor({
             namePlaceholder="결과물 이름"
             valuePlaceholder="양"
             unitType="select"
-            unitOptions={UNIT_OPTIONS}
+            unitOptions={unitOptions}
             ariaLabel={`결과물: ${out.name}, ${out.quantity} ${out.unit}`}
           />
         ))}
       </div>
-      {!readOnly && (
+      {!readOnly && !hasOutputs(outputs) && (
         <EditorForm
           name={newName}
           value={newQuantity}
@@ -119,7 +119,7 @@ export default function OutputEditor({
           onSubmit={handleAdd}
           namePlaceholder="결과물 이름"
           valuePlaceholder="양"
-          unitOptions={UNIT_OPTIONS}
+          unitOptions={unitOptions}
           submitLabel="추가"
           ariaLabel="새 결과물 추가"
         />

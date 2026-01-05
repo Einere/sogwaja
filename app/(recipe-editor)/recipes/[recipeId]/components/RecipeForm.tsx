@@ -7,6 +7,7 @@ import StepEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/Step
 import type { Database } from "@/types/database";
 import type { Json } from "@/types/database";
 import type { Descendant } from "slate";
+import { type Unit, normalizeUnit } from "@/lib/constants/recipe";
 
 type Equipment = Database["public"]["Tables"]["recipe_equipment"]["Row"];
 type Ingredient = Database["public"]["Tables"]["recipe_ingredients"]["Row"];
@@ -24,9 +25,9 @@ interface RecipeFormProps {
   onStepsChange: (steps: { children: Descendant[] }) => void;
   onOutputQuantityChange: (
     quantity: number,
-    unit: string,
+    unit: Unit,
     originalQuantity?: number,
-    originalUnit?: string
+    originalUnit?: Unit
   ) => void;
   user: { id: string } | null;
 }
@@ -49,6 +50,20 @@ export default function RecipeForm({
           children: [{ type: "paragraph", children: [{ text: "" }] }] as unknown as Descendant[],
         };
 
+  // OutputEditor는 string을 받지만, 비즈니스 로직은 Unit을 사용하므로 변환
+  const handleOutputQuantityChange = (
+    quantity: number,
+    unit: string,
+    originalQuantity?: number,
+    originalUnit?: string
+  ) => {
+    // string을 Unit으로 변환 (유효하지 않으면 기본값 사용)
+    const unitAsUnit = normalizeUnit(unit);
+    const originalUnitAsUnit = originalUnit ? normalizeUnit(originalUnit) : undefined;
+
+    onOutputQuantityChange(quantity, unitAsUnit, originalQuantity, originalUnitAsUnit);
+  };
+
   return (
     <div className="space-y-6 px-4 py-6">
       <EquipmentEditor
@@ -68,7 +83,7 @@ export default function RecipeForm({
       <OutputEditor
         outputs={outputs}
         onUpdate={onOutputsChange}
-        onQuantityChange={onOutputQuantityChange}
+        onQuantityChange={handleOutputQuantityChange}
       />
 
       <section className="space-y-3" aria-labelledby="steps-heading">

@@ -4,6 +4,7 @@ import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { ExperimentFormSchema, type ExperimentFormData } from "@/lib/validations/experiment";
+import { RECIPE_LIMITS, canAddPhotos } from "@/lib/constants/recipe";
 
 interface UseExperimentFormResult {
   form: UseFormReturn<ExperimentFormData>;
@@ -45,7 +46,7 @@ export function useExperimentForm(): UseExperimentFormResult {
 
   const handlePhotoChange = (files: File[]) => {
     const currentPhotos = form.getValues("photos");
-    if (currentPhotos.length + files.length > 9) {
+    if (!canAddPhotos(currentPhotos.length, files.length)) {
       form.setError("photos", {
         type: "manual",
         message: "최대 9장까지 업로드 가능합니다",

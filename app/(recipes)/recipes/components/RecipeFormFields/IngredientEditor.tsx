@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { Database } from "@/types/database";
+import { DEFAULT_UNITS, getUnitOptions } from "@/lib/constants/recipe";
 import EditorItem from "./EditorItem";
 import EditorForm from "./EditorForm";
 
@@ -22,13 +23,9 @@ export default function IngredientEditor({
 }: IngredientEditorProps) {
   const [newName, setNewName] = useState("");
   const [newAmount, setNewAmount] = useState("");
-  const [newUnit, setNewUnit] = useState("g");
+  const [newUnit, setNewUnit] = useState<string>(DEFAULT_UNITS.INGREDIENT);
 
-  const UNIT_OPTIONS = [
-    { value: "개", label: "개" },
-    { value: "g", label: "g" },
-    { value: "ml", label: "ml" },
-  ];
+  const unitOptions = useMemo(() => getUnitOptions(), []);
 
   const handleAdd = () => {
     if (!newName.trim() || !newAmount) return;
@@ -45,7 +42,7 @@ export default function IngredientEditor({
     onUpdate([...ingredients, newIngredient]);
     setNewName("");
     setNewAmount("");
-    setNewUnit("g");
+    setNewUnit(DEFAULT_UNITS.INGREDIENT);
   };
 
   const handleRemove = (id: string) => {
@@ -92,7 +89,7 @@ export default function IngredientEditor({
           onSubmit={handleAdd}
           namePlaceholder="재료 이름"
           valuePlaceholder="양"
-          unitOptions={UNIT_OPTIONS}
+          unitOptions={unitOptions}
           submitLabel="추가"
           ariaLabel="새 재료 추가"
         />
