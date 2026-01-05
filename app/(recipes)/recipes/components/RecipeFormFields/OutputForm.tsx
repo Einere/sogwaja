@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   Input,
   Button,
@@ -9,8 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { getUnitOptions } from "@/lib/constants/recipe";
 
-interface EditorFormProps {
+interface OutputFormProps {
   name: string;
   value: string;
   unit: string;
@@ -18,14 +20,9 @@ interface EditorFormProps {
   onValueChange: (value: string) => void;
   onUnitChange: (value: string) => void;
   onSubmit: () => void;
-  namePlaceholder?: string;
-  valuePlaceholder?: string;
-  unitOptions: { value: string; label: string }[];
-  submitLabel?: string;
-  ariaLabel?: string;
 }
 
-export default function EditorForm({
+export default function OutputForm({
   name,
   value,
   unit,
@@ -33,32 +30,35 @@ export default function EditorForm({
   onValueChange,
   onUnitChange,
   onSubmit,
-  namePlaceholder = "이름",
-  valuePlaceholder = "값",
-  unitOptions,
-  submitLabel = "추가",
-  ariaLabel,
-}: EditorFormProps) {
+}: OutputFormProps) {
+  const unitOptions = useMemo(() => getUnitOptions(), []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      onSubmit();
+    }
+  };
+
   return (
-    <div className="flex gap-2" role="group" aria-label={ariaLabel || "새 항목 추가"}>
+    <div className="flex gap-2" role="group" aria-label="새 결과물 추가">
       <Input
         type="text"
         value={name}
         onChange={e => onNameChange(e.target.value)}
-        onKeyDown={onSubmit}
+        onKeyDown={handleKeyDown}
         className="flex-1 text-sm"
-        placeholder={namePlaceholder}
-        aria-label={`${namePlaceholder} 입력`}
+        placeholder="결과물 이름"
+        aria-label="결과물 이름 입력"
       />
       <Input
         type="number"
         inputMode="numeric"
         value={value}
         onChange={e => onValueChange(e.target.value)}
-        onKeyDown={onSubmit}
+        onKeyDown={handleKeyDown}
         className="w-24 text-sm"
-        placeholder={valuePlaceholder}
-        aria-label={`${valuePlaceholder} 입력`}
+        placeholder="양"
+        aria-label="양 입력"
       />
       <Select value={unit} onValueChange={onUnitChange}>
         <SelectTrigger className="w-20 text-sm" aria-label="단위 선택">
@@ -72,8 +72,8 @@ export default function EditorForm({
           ))}
         </SelectContent>
       </Select>
-      <Button onClick={onSubmit} size="sm" className="text-sm" aria-label={submitLabel}>
-        {submitLabel}
+      <Button onClick={onSubmit} size="sm" className="text-sm" aria-label="추가">
+        추가
       </Button>
     </div>
   );

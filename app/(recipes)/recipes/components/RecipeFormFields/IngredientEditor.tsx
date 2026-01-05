@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import type { Database } from "@/types/database";
-import { DEFAULT_UNITS, getUnitOptions } from "@/lib/constants/recipe";
+import { DEFAULT_UNITS } from "@/lib/constants/recipe";
 import EditorItem from "./EditorItem";
-import EditorForm from "./EditorForm";
+import IngredientForm from "./IngredientForm";
 
 type Ingredient = Database["public"]["Tables"]["recipe_ingredients"]["Row"];
 
@@ -24,8 +24,6 @@ export default function IngredientEditor({
   const [newName, setNewName] = useState("");
   const [newAmount, setNewAmount] = useState("");
   const [newUnit, setNewUnit] = useState<string>(DEFAULT_UNITS.INGREDIENT);
-
-  const unitOptions = useMemo(() => getUnitOptions(), []);
 
   const handleAdd = () => {
     if (!newName.trim() || !newAmount) return;
@@ -79,7 +77,7 @@ export default function IngredientEditor({
         ))}
       </div>
       {!readOnly && (
-        <EditorForm
+        <IngredientForm
           name={newName}
           value={newAmount}
           unit={newUnit}
@@ -87,11 +85,6 @@ export default function IngredientEditor({
           onValueChange={setNewAmount}
           onUnitChange={setNewUnit}
           onSubmit={handleAdd}
-          namePlaceholder="재료 이름"
-          valuePlaceholder="양"
-          unitOptions={unitOptions}
-          submitLabel="추가"
-          ariaLabel="새 재료 추가"
         />
       )}
     </section>
