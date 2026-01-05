@@ -209,7 +209,6 @@ const debouncedSaveTitle = useDebouncedCallback((newTitle: string) => {
 직접 구현해보니, 다음과 같은 도전과제들이 있었습니다.
 
 - 결과물의 수량을 변경 시 재료와 장비의 수량을 비례 계산
-- 단위 불일치 처리 (예: g vs kg, 개 vs 박스)
 - 0 값, 무효 값, 음수 값 등 엣지 케이스 처리
 
 이러한 도전과제들을 다음과 같이 해결했습니다.
