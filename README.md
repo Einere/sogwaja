@@ -294,7 +294,7 @@ return (
 );
 ```
 
-`prefers-reduced-motion` 미디어 쿼리를 감지하여 애니메이션을 비활성화합니다.
+`prefers-reduced-motion` 미디어 쿼리를 감지하여 전환 효과를 비활성화합니다.
 
 **배운 점**
 
