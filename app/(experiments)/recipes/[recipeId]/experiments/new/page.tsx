@@ -7,7 +7,7 @@ import { createExperimentAction } from "@/app/(experiments)/recipes/[recipeId]/e
 import { useExperimentForm } from "@/app/(experiment)/recipes/[recipeId]/experiments/hooks/useExperimentForm";
 import { Textarea, Button, LinkButton } from "@/components/ui";
 import { XIcon, ArrowLeftIcon, PlusIcon } from "@/components/icons";
-import { RECIPE_LIMITS } from "@/lib/constants/recipe";
+import { RECIPE_LIMITS, canAddPhoto } from "@/lib/constants/recipe";
 
 export default function NewExperimentPage() {
   const params = useParams();
@@ -89,7 +89,7 @@ export default function NewExperimentPage() {
                 </button>
               </div>
             ))}
-            {previews.length < RECIPE_LIMITS.MAX_EXPERIMENT_PHOTOS && (
+            {canAddPhoto(previews.length) && (
               <label
                 tabIndex={isPending ? -1 : 0}
                 className={`flex aspect-square w-full items-center justify-center rounded border-2 border-dashed transition-colors ${

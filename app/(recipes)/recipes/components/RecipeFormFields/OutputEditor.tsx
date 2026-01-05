@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import type { Database } from "@/types/database";
-import { UNIT_OPTIONS, DEFAULT_UNITS, RECIPE_LIMITS } from "@/lib/constants/recipe";
+import { DEFAULT_UNITS, canAddOutput, hasOutputs, getUnitOptions } from "@/lib/constants/recipe";
 import EditorItem from "./EditorItem";
 import EditorForm from "./EditorForm";
 
@@ -30,13 +30,13 @@ export default function OutputEditor({
   const [newQuantity, setNewQuantity] = useState("");
   const [newUnit, setNewUnit] = useState<string>(DEFAULT_UNITS.OUTPUT);
 
-  const unitOptions = useMemo(() => UNIT_OPTIONS.map(unit => ({ value: unit, label: unit })), []);
+  const unitOptions = useMemo(() => getUnitOptions(), []);
 
   const handleAdd = () => {
     if (!newName.trim() || !newQuantity) return;
 
     // 결과물은 최대 1개만 추가 가능
-    if (outputs.length >= RECIPE_LIMITS.MAX_OUTPUTS) return;
+    if (!canAddOutput(outputs)) return;
 
     const newOutput: Output = {
       id: `temp-${Date.now()}`,
@@ -108,7 +108,7 @@ export default function OutputEditor({
           />
         ))}
       </div>
-      {!readOnly && outputs.length === 0 && (
+      {!readOnly && !hasOutputs(outputs) && (
         <EditorForm
           name={newName}
           value={newQuantity}

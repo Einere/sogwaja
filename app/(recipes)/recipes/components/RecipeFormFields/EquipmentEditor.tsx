@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import type { Database } from "@/types/database";
-import { UNIT_OPTIONS, DEFAULT_UNITS } from "@/lib/constants/recipe";
+import { DEFAULT_UNITS, getUnitOptions } from "@/lib/constants/recipe";
 import EditorItem from "./EditorItem";
 import EditorForm from "./EditorForm";
 
@@ -25,7 +25,7 @@ export default function EquipmentEditor({
   const [newQuantity, setNewQuantity] = useState("");
   const [newUnit, setNewUnit] = useState<string>(DEFAULT_UNITS.EQUIPMENT);
 
-  const unitOptions = useMemo(() => UNIT_OPTIONS.map(unit => ({ value: unit, label: unit })), []);
+  const unitOptions = useMemo(() => getUnitOptions(), []);
 
   const handleAdd = () => {
     if (!newName.trim() || !newQuantity) return;

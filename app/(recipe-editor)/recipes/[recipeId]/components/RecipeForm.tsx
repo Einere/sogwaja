@@ -7,7 +7,7 @@ import StepEditor from "@/app/(recipes)/recipes/components/RecipeFormFields/Step
 import type { Database } from "@/types/database";
 import type { Json } from "@/types/database";
 import type { Descendant } from "slate";
-import { UNIT_OPTIONS, type Unit } from "@/lib/constants/recipe";
+import { type Unit, normalizeUnit } from "@/lib/constants/recipe";
 
 type Equipment = Database["public"]["Tables"]["recipe_equipment"]["Row"];
 type Ingredient = Database["public"]["Tables"]["recipe_ingredients"]["Row"];
@@ -57,14 +57,9 @@ export default function RecipeForm({
     originalQuantity?: number,
     originalUnit?: string
   ) => {
-    // string을 Unit으로 변환 (UNIT_OPTIONS에 포함된 값만 유효)
-    const unitAsUnit = UNIT_OPTIONS.includes(unit as Unit)
-      ? (unit as Unit)
-      : (UNIT_OPTIONS[0] as Unit);
-    const originalUnitAsUnit =
-      originalUnit && UNIT_OPTIONS.includes(originalUnit as Unit)
-        ? (originalUnit as Unit)
-        : undefined;
+    // string을 Unit으로 변환 (유효하지 않으면 기본값 사용)
+    const unitAsUnit = normalizeUnit(unit);
+    const originalUnitAsUnit = originalUnit ? normalizeUnit(originalUnit) : undefined;
 
     onOutputQuantityChange(quantity, unitAsUnit, originalQuantity, originalUnitAsUnit);
   };

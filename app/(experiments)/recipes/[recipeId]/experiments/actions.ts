@@ -9,7 +9,7 @@ import type { Database } from "@/types/database";
 import { getRecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
 import type { RecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
 import type { Json } from "@/types/database";
-import { RECIPE_LIMITS } from "@/lib/constants/recipe";
+import { isPhotoLimitExceeded } from "@/lib/constants/recipe";
 
 type Experiment = Database["public"]["Tables"]["recipe_experiments"]["Row"];
 type Photo = Database["public"]["Tables"]["experiment_photos"]["Row"];
@@ -385,7 +385,7 @@ export async function createExperimentAction(
   // Filter out empty files
   const photos = photoFiles.filter(file => file.size > 0);
 
-  if (photos.length > RECIPE_LIMITS.MAX_EXPERIMENT_PHOTOS) {
+  if (isPhotoLimitExceeded(photos.length)) {
     return { error: "최대 9장까지 업로드 가능합니다." };
   }
 
