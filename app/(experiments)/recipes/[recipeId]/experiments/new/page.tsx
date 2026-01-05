@@ -7,6 +7,7 @@ import { createExperimentAction } from "@/app/(experiments)/recipes/[recipeId]/e
 import { useExperimentForm } from "@/app/(experiment)/recipes/[recipeId]/experiments/hooks/useExperimentForm";
 import { Textarea, Button, LinkButton } from "@/components/ui";
 import { XIcon, ArrowLeftIcon, PlusIcon } from "@/components/icons";
+import { RECIPE_LIMITS } from "@/lib/constants/recipe";
 
 export default function NewExperimentPage() {
   const params = useParams();
@@ -88,7 +89,7 @@ export default function NewExperimentPage() {
                 </button>
               </div>
             ))}
-            {previews.length < 9 && (
+            {previews.length < RECIPE_LIMITS.MAX_EXPERIMENT_PHOTOS && (
               <label
                 tabIndex={isPending ? -1 : 0}
                 className={`flex aspect-square w-full items-center justify-center rounded border-2 border-dashed transition-colors ${
@@ -124,7 +125,7 @@ export default function NewExperimentPage() {
             )}
           </div>
           <p id="photo-upload-help" className="text-muted-foreground text-xs">
-            최대 9장까지 업로드 가능합니다.
+            최대 {RECIPE_LIMITS.MAX_EXPERIMENT_PHOTOS}장까지 업로드 가능합니다.
           </p>
           {form.formState.errors.photos && (
             // TODO: 모든 폼 인풋 경고 요소에 대해, 접근성 준수하기

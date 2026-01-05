@@ -26,6 +26,7 @@ import {
 } from "@/lib/validations/recipe";
 import type { Database, Json } from "@/types/database";
 import type { Descendant } from "slate";
+import type { Unit } from "@/lib/constants/recipe";
 
 type Recipe = Database["public"]["Tables"]["recipes"]["Row"];
 type Equipment = Database["public"]["Tables"]["recipe_equipment"]["Row"];
@@ -67,9 +68,9 @@ interface UseRecipeEditorResult {
   setSteps: (steps: { children: Descendant[] }) => void;
   handleOutputQuantityChange: (
     quantity: number,
-    unit: string,
+    unit: Unit,
     originalQuantity?: number,
-    originalUnit?: string
+    originalUnit?: Unit
   ) => void;
   form: UseFormReturn<RecipeFormData>;
 }
@@ -268,9 +269,9 @@ export function useRecipeEditor(recipeId: string, initialData: RecipeData): UseR
 
   const handleOutputQuantityChange = (
     quantity: number,
-    unit: string,
+    unit: Unit,
     originalQuantity?: number,
-    originalUnit?: string
+    originalUnit?: Unit
   ) => {
     if (!isValidNumber(quantity)) return;
 

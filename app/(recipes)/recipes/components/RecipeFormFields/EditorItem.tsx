@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { UNIT_OPTIONS } from "@/lib/constants/recipe";
 
 interface EditorItemProps {
   id: string;
@@ -42,11 +43,7 @@ export default function EditorItem({
   valuePlaceholder = "값",
   unitPlaceholder = "단위",
   unitType = "select",
-  unitOptions = [
-    { value: "개", label: "개" },
-    { value: "g", label: "g" },
-    { value: "ml", label: "ml" },
-  ],
+  unitOptions = UNIT_OPTIONS.map(unit => ({ value: unit, label: unit })),
   ariaLabel,
 }: EditorItemProps) {
   const itemId = `editor-item-${id}`;

@@ -2,9 +2,11 @@
  * 결과물의 양이 변경될 때 재료와 장비의 양을 자동으로 계산하는 유틸리티 함수들
  */
 
+import type { Unit } from "@/lib/constants/recipe";
+
 export interface Quantity {
   value: number;
-  unit: string;
+  unit: Unit;
 }
 
 /**
@@ -86,10 +88,10 @@ export function calculateProportionalQuantity(
  * 여러 재료의 양을 한 번에 계산
  */
 export function calculateIngredients(
-  ingredients: Array<{ amount: number; unit: string }>,
+  ingredients: Array<{ amount: number; unit: Unit }>,
   originalOutput: Quantity,
   newOutput: Quantity
-): Array<{ amount: number; unit: string }> {
+): Array<{ amount: number; unit: Unit }> {
   return ingredients.map(ingredient => {
     const calculated = calculateProportionalQuantity(
       { value: ingredient.amount, unit: ingredient.unit },
@@ -109,10 +111,10 @@ export function calculateIngredients(
  * 여러 장비의 개수를 한 번에 계산
  */
 export function calculateEquipment(
-  equipment: Array<{ quantity: number; unit: string }>,
+  equipment: Array<{ quantity: number; unit: Unit }>,
   originalOutput: Quantity,
   newOutput: Quantity
-): Array<{ quantity: number; unit: string }> {
+): Array<{ quantity: number; unit: Unit }> {
   return equipment.map(eq => {
     const calculated = calculateProportionalQuantity(
       { value: eq.quantity, unit: eq.unit },
@@ -132,7 +134,7 @@ export function calculateEquipment(
  * 재료 목록에 비율을 적용하여 업데이트된 목록 반환
  * 전체 객체를 유지하면서 amount와 unit만 업데이트
  */
-export function applyProportionalToIngredients<T extends { amount: number; unit: string }>(
+export function applyProportionalToIngredients<T extends { amount: number; unit: Unit }>(
   ingredients: T[],
   originalOutput: Quantity,
   newOutput: Quantity
@@ -155,7 +157,7 @@ export function applyProportionalToIngredients<T extends { amount: number; unit:
  * 장비 목록에 비율을 적용하여 업데이트된 목록 반환
  * 전체 객체를 유지하면서 quantity와 unit만 업데이트
  */
-export function applyProportionalToEquipment<T extends { quantity: number; unit: string }>(
+export function applyProportionalToEquipment<T extends { quantity: number; unit: Unit }>(
   equipment: T[],
   originalOutput: Quantity,
   newOutput: Quantity
