@@ -38,6 +38,9 @@ export default function OutputEditor({
   const handleAdd = () => {
     if (!newName.trim() || !newQuantity) return;
 
+    // 결과물은 최대 1개만 추가 가능
+    if (outputs.length >= 1) return;
+
     const newOutput: Output = {
       id: `temp-${Date.now()}`,
       recipe_id: "",
@@ -108,7 +111,7 @@ export default function OutputEditor({
           />
         ))}
       </div>
-      {!readOnly && (
+      {!readOnly && outputs.length === 0 && (
         <EditorForm
           name={newName}
           value={newQuantity}
