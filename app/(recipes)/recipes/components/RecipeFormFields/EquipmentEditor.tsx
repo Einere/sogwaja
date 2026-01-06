@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import type { Database } from "@/types/database";
 import { DEFAULT_UNITS, getUnitOptions } from "@/lib/constants/recipe";
 import EditorItem from "./EditorItem";
-import EditorForm from "./EditorForm";
+import EquipmentForm from "./EquipmentForm";
 
 type Equipment = Database["public"]["Tables"]["recipe_equipment"]["Row"];
 
@@ -25,7 +25,7 @@ export default function EquipmentEditor({
   const [newQuantity, setNewQuantity] = useState("");
   const [newUnit, setNewUnit] = useState<string>(DEFAULT_UNITS.EQUIPMENT);
 
-  const unitOptions = useMemo(() => getUnitOptions(), []);
+  const unitOptions = getUnitOptions();
 
   const handleAdd = () => {
     if (!newName.trim() || !newQuantity) return;
@@ -85,7 +85,7 @@ export default function EquipmentEditor({
         ))}
       </div>
       {!readOnly && (
-        <EditorForm
+        <EquipmentForm
           name={newName}
           value={newQuantity}
           unit={newUnit}
@@ -93,11 +93,6 @@ export default function EquipmentEditor({
           onValueChange={setNewQuantity}
           onUnitChange={setNewUnit}
           onSubmit={handleAdd}
-          namePlaceholder="장비 이름"
-          valuePlaceholder="개수"
-          unitOptions={unitOptions}
-          submitLabel="추가"
-          ariaLabel="새 장비 추가"
         />
       )}
     </section>

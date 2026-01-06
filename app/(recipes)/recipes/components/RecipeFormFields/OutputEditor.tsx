@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import type { Database } from "@/types/database";
 import { DEFAULT_UNITS, canAddOutput, hasOutputs, getUnitOptions } from "@/lib/constants/recipe";
 import EditorItem from "./EditorItem";
-import EditorForm from "./EditorForm";
+import OutputForm from "./OutputForm";
 
 type Output = Database["public"]["Tables"]["recipe_outputs"]["Row"];
 
@@ -30,7 +30,7 @@ export default function OutputEditor({
   const [newQuantity, setNewQuantity] = useState("");
   const [newUnit, setNewUnit] = useState<string>(DEFAULT_UNITS.OUTPUT);
 
-  const unitOptions = useMemo(() => getUnitOptions(), []);
+  const unitOptions = getUnitOptions();
 
   const handleAdd = () => {
     if (!newName.trim() || !newQuantity) return;
@@ -109,7 +109,7 @@ export default function OutputEditor({
         ))}
       </div>
       {!readOnly && !hasOutputs(outputs) && (
-        <EditorForm
+        <OutputForm
           name={newName}
           value={newQuantity}
           unit={newUnit}
@@ -117,11 +117,6 @@ export default function OutputEditor({
           onValueChange={setNewQuantity}
           onUnitChange={setNewUnit}
           onSubmit={handleAdd}
-          namePlaceholder="결과물 이름"
-          valuePlaceholder="양"
-          unitOptions={unitOptions}
-          submitLabel="추가"
-          ariaLabel="새 결과물 추가"
         />
       )}
     </section>
