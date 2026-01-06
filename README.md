@@ -147,7 +147,6 @@ for (let i = 0; i < 50; i++) {
 - **상태 관리의 중요성**: 멘션 감지, 드롭다운 표시, 키보드 네비게이션 등 복잡하게 얽힌 플래그 상태들을 잘 관리하는 것이 핵심
 - **다양한 입력 패턴 분석**: 사용자가 `@`를 입력한 후 백스페이스로 삭제하는 경우, 멘션을 다시 입력하는 경우 등 엣지 케이스를 고려해야 함
 
-
 ### 5.2. 자동 저장 시스템
 
 별도의 저장 액션을 취하지 않아도 자동으로 저장되면 사용하기 편리하기 때문에 자동저장 기능을 구현했습니다.
@@ -155,40 +154,42 @@ for (let i = 0; i < 50; i++) {
 이 과정에서, 다음과 같은 도전과제들이 있었습니다.
 
 - 불필요한 저장 요청 최소화 (초기 로드, 동일 값 저장 방지)
+- 폼 상태 초기화 및 갱신 관리
 - 에러 발생 시 이전 상태로 롤백
-- 여러 필드가 동시에 변경될 때 중복 저장 방지
 
 다음 방법들로 과제들을 해결했습니다.
 
-**초기화 상태 관리**
+**폼 상태 초기화 및 갱신 관리**
+
+React Hook Form의 `defaultValues`를 활용하여 초기값과 현재값을 비교합니다. 저장 성공 시 `resetField`를 사용하여 해당 필드의 `defaultValues`만 업데이트하여, 다른 필드에는 영향을 주지 않습니다.
 
 ```typescript
-// useAutoSave.ts
-const isInitializingRef = useRef(true);
-useEffect(() => {
-  if (initialValueRef.current === null) {
-    initialValueRef.current = value;
-    setTimeout(() => {
-      isInitializingRef.current = false;
-    }, 100);
-  }
-}, [value]);
-```
+// useRecipeEditor.ts
+const saveTitle = async (newTitle: string) => {
+  // 현재 form의 defaultValues와 비교하여 변경이 없으면 저장하지 않음
+  const currentDefaultTitle = form.formState.defaultValues?.title;
+  if (currentDefaultTitle === newTitle) return;
 
-조리법 초기 로드 시, 자동 저장이 발생하지 않도록 플래그를 사용합니다. 100ms 지연을 두어 React의 상태 업데이트 사이클과 동기화합니다.
+  // 저장
+  // ...
+
+  // 저장 성공 시 resetField로 해당 필드만 초기값 업데이트
+  form.resetField("title", { defaultValue: newTitle });
+};
+```
 
 **Debounce + 변경 감지**
 
 ```typescript
 // useRecipeEditor.ts
 const debouncedSaveTitle = useDebouncedCallback((newTitle: string) => {
-  if (recipe && newTitle !== recipe.title && !isInitializingRef.current) {
+  if (recipe && newTitle !== recipe.title) {
     saveTitle(newTitle);
   }
 }, AUTO_SAVE_DEBOUNCE_MS);
 ```
 
-연속된 입력을 하나의 요청으로 통합하고, 실제로 값이 변경되었을 때만 저장합니다.
+연속된 입력을 하나의 요청으로 통합하고, 실제로 값이 변경되었을 때만 저장합니다. 각 저장 함수에서 `defaultValues`와 비교하여 중복 저장을 방지합니다.
 
 **Optimistic Update + 롤백**
 
@@ -197,7 +198,7 @@ const debouncedSaveTitle = useDebouncedCallback((newTitle: string) => {
 **배운 점**
 
 - **사용자 경험과 서버 부하의 균형**: 너무 짧은 debounce는 서버 부하를 증가시키고, 너무 길면 사용자가 변경사항이 저장되지 않았다고 느낄 수 있음
-- **상태 동기화의 복잡성**: 클라이언트 상태, 서버 상태, 폼 상태를 일관되게 유지하는 것이 예상보다 복잡함
+- **상태 동기화의 복잡성**: 클라이언트 상태, 서버 상태, 폼 상태를 일관되게 유지하는 것이 예상보다 복잡함. React Hook Form의 `defaultValues`와 `resetField`를 활용하여 폼 상태를 체계적으로 관리
 - **에러 처리 전략**: 네트워크 오류, 서버 오류, 동시성 충돌 등 다양한 에러 시나리오를 고려해야 함
 
 ### 5.3. 비례 계산 시스템
@@ -300,3 +301,55 @@ return (
 
 - **사용자 경험 향상을 위한 세부적인 배려**: 작은 디테일이 전체적인 사용자 경험에 큰 영향을 미침
 - **접근성은 선택이 아닌 필수**: 모든 사용자가 앱을 사용할 수 있도록 고려해야 함
+
+### 5.5. Row Level Security (RLS) 정책 설계
+
+사용자별 데이터 접근 제어를 위해 Supabase의 Row Level Security를 활용했습니다. 모든 테이블에 RLS를 활성화하고, 일관된 보안 정책을 적용했습니다.
+
+이 과정에서, 다음과 같은 도전과제들이 있었습니다.
+
+- 중첩된 관계를 통한 권한 검증 (recipe → user, experiment → recipe → user)
+- 여러 테이블에 걸친 일관된 정책 적용
+- `USING`과 `WITH CHECK`의 적절한 사용
+
+다음 방법들로 과제들을 해결했습니다.
+
+**단계별 권한 체크**
+
+직접 `user_id`를 가진 `recipes` 테이블과 달리, 하위 테이블들은 `recipe_id`를 통해 간접적으로 권한을 확인해야 합니다. `EXISTS` 서브쿼리를 사용하여 부모 테이블의 소유권을 검증합니다.
+
+```sql
+-- recipe_equipment 테이블의 경우
+CREATE POLICY "Users can view equipment for their recipes"
+  ON recipe_equipment FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM recipes
+      WHERE recipes.id = recipe_equipment.recipe_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+```
+
+**2단계 JOIN을 통한 권한 검증**
+
+실험 관련 테이블들은 `recipe_experiments`를 거쳐 `recipes`까지 두 단계를 거쳐야 합니다. 이 경우 `JOIN`을 사용하여 효율적으로 권한을 확인합니다.
+
+```sql
+-- experiment_photos 테이블의 경우
+CREATE POLICY "Users can view photos for their experiments"
+  ON experiment_photos FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM recipe_experiments
+      JOIN recipes ON recipes.id = recipe_experiments.recipe_id
+      WHERE recipe_experiments.id = experiment_photos.experiment_id
+      AND recipes.user_id = auth.uid()
+    )
+  );
+```
+
+**배운 점**
+
+- **데이터베이스 레벨 보안의 중요성**: 애플리케이션 레벨 검증만으로는 충분하지 않음. 클라이언트에서 우회하거나 API 오류로 인한 보안 취약점을 방지하기 위해 데이터베이스 레벨에서 강제하는 것이 필수
+- **일관성 유지의 중요성**: 모든 테이블에 동일한 패턴의 정책을 적용하여 일관성을 유지하는 것이 중요. 이를 통해 보안 정책의 복잡도를 관리할 수 있음
