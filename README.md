@@ -35,7 +35,7 @@
 - SSR/SSG로 첫 화면 렌더링 속도 개선
 - 다만, app-like UX에 대해서는 불리한 점이 있음
 
-### 2.3. 유연하고 확장성있는 에디터 데이터 저장 구조
+### 2.3. 유연하고 확장 가능한 에디터 데이터 저장 구조
 
 Slate.js 에디터의 재귀적인 노드 구조를 JSONB 타입으로 저장합니다.
 
@@ -105,8 +105,7 @@ Slate.js 에디터의 재귀적인 노드 구조를 JSONB 타입으로 저장합
 
 ### 5.1. Slate.js 기반 멘션 시스템
 
-조리 단계는 일반적인 텍스트 에디터와 다르게 인터렉티브한 에디터로 만들고 싶었습니다.
-그래서 생각한 것이 바로 태그(멘션)기능입니다. 멘션을 통해 장비와 재료를 시각적으로 부각시켜 시인성을 높이고자 했습니다.
+조리 단계를 일반적인 텍스트 에디터가 아닌 인터렉티브한 에디터로 구현했습니다. 장비와 재료를 태그(멘션)로 표시하여 시각적으로 부각시키고 시인성을 높이는 것이 목표였습니다.
 
 멘션 기능을 구현하려고 하니, 고려해야할 것들이 많았습니다.
 
@@ -119,16 +118,21 @@ Slate.js 에디터의 재귀적인 노드 구조를 JSONB 타입으로 저장합
 
 **역방향 텍스트 탐색**
 
+커서 위치에서 역방향으로 `@` 문자를 찾아 멘션 입력이 시작되었는지 판단합니다. 최대 50자까지 역방향으로 탐색하며, 공백이나 줄바꿈이 나타나면 탐색을 중단합니다.
+
 ```typescript
 // mentionDetection.ts
-// 커서 위치에서 최대 50자까지 역방향으로 @ 문자 탐색
 for (let i = 0; i < 50; i++) {
   const before = Editor.before(editor, point);
+  if (!before || Point.compare(before, startOfBlock) < 0) break;
+
   const char = Editor.string(editor, Editor.range(editor, before, point));
+
   if (char === "@") {
     atPoint = before;
     break;
   }
+
   // 공백이나 줄바꿈이면 중단
   if (/\s/.test(char)) break;
 }
@@ -136,11 +140,40 @@ for (let i = 0; i < 50; i++) {
 
 **멘션 충돌 방지**
 
-기존 멘션 요소와 겹치지 않도록 Range 기반 검증을 수행합니다.
+기존 멘션 요소와 겹치지 않도록 Range 기반 검증을 수행합니다. 검색 범위가 기존 멘션 요소의 Range와 겹치는지 확인하고, 커서가 멘션 요소 내부에 있으면 드롭다운을 표시하지 않습니다.
+
+```typescript
+// mentionDetection.ts
+// 검색 범위가 멘션과 겹치는지 확인
+const searchRange = Editor.range(editor, atPoint, start);
+if (isSearchRangeOverlappingMentions(editor, searchRange, blockPath)) {
+  return null; // 기존 멘션과 겹치면 멘션 입력 중단
+}
+
+// 커서가 멘션에 있으면 드롭다운 표시하지 않음
+if (isCursorAtMention(editor)) {
+  return null;
+}
+```
 
 **드롭다운 위치 계산**
 
-커서의 실제 DOM 위치를 계산하여 드롭다운을 배치합니다. 스크롤, 뷰포트 경계, 기존 멘션 요소를 고려하여 최적 위치를 결정합니다.
+Slate의 Range를 DOM 좌표로 변환하여 드롭다운을 정확한 위치에 배치합니다. `ReactEditor.toDOMRange`를 사용하여 에디터 내 상대 좌표를 계산하고, `@` 문자의 바로 아래에 드롭다운을 표시합니다.
+
+```typescript
+// mentionDropdownPosition.ts
+export function calculateDropdownPosition(
+  editor: Editor & ReactEditor,
+  range: Range,
+  editorElement: HTMLElement | null
+): DropdownPosition | null {
+  const domRange = ReactEditor.toDOMRange(editor, range);
+  const rect = domRange.getBoundingClientRect();
+  const editorRect = editorElement.getBoundingClientRect();
+
+  // ...
+}
+```
 
 **배운 점**
 
@@ -149,7 +182,7 @@ for (let i = 0; i < 50; i++) {
 
 ### 5.2. 자동 저장 시스템
 
-별도의 저장 액션을 취하지 않아도 자동으로 저장되면 사용하기 편리하기 때문에 자동저장 기능을 구현했습니다.
+사용자가 별도의 저장 액션을 취하지 않아도 자동으로 저장되도록 구현했습니다. 이를 통해 더 편리한 사용자 경험을 제공합니다.
 
 이 과정에서, 다음과 같은 도전과제들이 있었습니다.
 
@@ -170,7 +203,6 @@ const saveTitle = async (newTitle: string) => {
   const currentDefaultTitle = form.formState.defaultValues?.title;
   if (currentDefaultTitle === newTitle) return;
 
-  // 저장
   // ...
 
   // 저장 성공 시 resetField로 해당 필드만 초기값 업데이트
@@ -180,20 +212,33 @@ const saveTitle = async (newTitle: string) => {
 
 **Debounce + 변경 감지**
 
+연속된 입력을 하나의 요청으로 통합하여 서버 부하를 줄입니다. `useDebouncedCallback`을 사용하여 입력이 멈춘 후 일정 시간(기본값 2000ms)이 지난 뒤에만 저장 함수를 호출합니다.
+
 ```typescript
 // useRecipeEditor.ts
 const debouncedSaveTitle = useDebouncedCallback((newTitle: string) => {
-  if (recipe && newTitle !== recipe.title) {
-    saveTitle(newTitle);
-  }
+  // ...
 }, AUTO_SAVE_DEBOUNCE_MS);
 ```
 
-연속된 입력을 하나의 요청으로 통합하고, 실제로 값이 변경되었을 때만 저장합니다. 각 저장 함수에서 `defaultValues`와 비교하여 중복 저장을 방지합니다.
+실제로 값이 변경되었을 때만 저장하기 위해 각 저장 함수에서 `defaultValues`와 비교하여 중복 저장을 방지합니다.
 
 **Optimistic Update + 롤백**
 
 저장 요청 전에 UI를 즉시 업데이트하고, 실패 시 이전 상태로 복원합니다. 이를 통해 사용자는 즉각적인 피드백을 받으면서도 데이터 일관성을 보장합니다.
+
+```typescript
+try {
+  const updatedRecipe = await updateRecipeTitle(recipeId, newTitle);
+  // 즉각적인 피드백
+  setRecipe(updatedRecipe);
+  // ...
+} catch (err) {
+  // 실패 시 이전 상태로 롤백
+  setRecipe(previousRecipe);
+  form.setValue("title", previousRecipe.title, { shouldDirty: false });
+}
+```
 
 **배운 점**
 
@@ -203,9 +248,7 @@ const debouncedSaveTitle = useDebouncedCallback((newTitle: string) => {
 
 ### 5.3. 비례 계산 시스템
 
-저는 종종 구움과자를 다른 수량으로 만듭니다.
-이럴 때 마다 결과물의 수량을 조절하면 장비와 재료의 수량이 자동으로 계산되었으면 좋겠다는 생각이 들었습니다.
-그래서 자동 계산 기능을 구현했습니다.
+구움과자를 다른 수량으로 만들 때마다 결과물의 수량을 조절하면 장비와 재료의 수량이 자동으로 계산되면 편리할 것 같아서 자동 계산 기능을 구현했습니다.
 
 직접 구현해보니, 다음과 같은 도전과제들이 있었습니다.
 
@@ -215,6 +258,8 @@ const debouncedSaveTitle = useDebouncedCallback((newTitle: string) => {
 이러한 도전과제들을 다음과 같이 해결했습니다.
 
 **비율 기반 계산 알고리즘**
+
+원래 결과물 대비 새로운 결과물의 비율을 계산하여 모든 재료와 장비의 수량을 동일한 비율로 조정합니다.
 
 ```typescript
 // calculations.ts
@@ -226,7 +271,7 @@ export function calculateProportionalQuantity(
   // 0으로 나누기 방지
   if (originalOutput.value === 0) {
     if (newOutput.value === 0) return originalQuantity;
-    return originalQuantity; // 비율 계산 불가
+    return originalQuantity;
   }
 
   const ratio = newOutput.value / originalOutput.value;
@@ -260,10 +305,9 @@ export function isValidNumber(value: unknown): value is number {
 
 ### 5.4. 네이티브 앱 경험 구현 (SSGOI)
 
-비록 모바일 웹 앱이기는 하지만, 최대한 네이티브 앱 사용 경험을 제공하고 싶었습니다.
-그래서 네이티브 앱 수준의 화면 전환 효과를 제공하고, 일부 사용자를 위해 감소된 애니메이션 기능을 제공하기로 했습니다.
+모바일 웹 앱에서 네이티브 앱 수준의 사용자 경험을 제공하고 싶어서 화면 전환 효과를 구현했습니다. 또한 접근성을 고려하여 감소된 애니메이션 기능도 제공했습니다.
 
-초기에는 화면 전환 효과는 ViewTransition API를 도입했으나, 결국 조금 더 편리하고 중앙집중 관리가 가능한 SSGOI를 도입했습니다.
+초기에는 브라우저 네이티브 ViewTransition API를 도입했으나, 페이지별 전환 효과를 중앙화할 수 있고 Next.js App Router와의 통합이 용이한 SSGOI를 도입했습니다. SSGOI는 페이지 관계를 선언적으로 정의할 수 있습니다.
 
 **SSGOI 라이브러리 활용**
 
@@ -288,6 +332,7 @@ const config = {
 
 ```typescript
 const prefersReducedMotion = usePrefersReducedMotion();
+
 return (
   <Ssgoi config={prefersReducedMotion ? nullConfig : config}>
     {children}
@@ -310,7 +355,7 @@ return (
 
 - 중첩된 관계를 통한 권한 검증 (recipe → user, experiment → recipe → user)
 - 여러 테이블에 걸친 일관된 정책 적용
-- `USING`과 `WITH CHECK`의 적절한 사용
+- 성능 최적화를 위한 효율적인 쿼리 작성
 
 다음 방법들로 과제들을 해결했습니다.
 
@@ -349,7 +394,10 @@ CREATE POLICY "Users can view photos for their experiments"
   );
 ```
 
+JOIN을 사용하면 옵티마이저가 인덱스를 활용하여 효율적인 실행 계획을 수립할 수 있습니다. 특히 `recipes(id, user_id)` 복합 인덱스와 `recipe_experiments(recipe_id)` 인덱스를 활용하여 2단계 관계를 한 번의 조인으로 처리할 수 있습니다.
+
 **배운 점**
 
 - **데이터베이스 레벨 보안의 중요성**: 애플리케이션 레벨 검증만으로는 충분하지 않음. 클라이언트에서 우회하거나 API 오류로 인한 보안 취약점을 방지하기 위해 데이터베이스 레벨에서 강제하는 것이 필수
 - **일관성 유지의 중요성**: 모든 테이블에 동일한 패턴의 정책을 적용하여 일관성을 유지하는 것이 중요. 이를 통해 보안 정책의 복잡도를 관리할 수 있음
+- **성능 최적화의 필요성**: RLS 정책은 모든 쿼리에 자동으로 적용되므로 성능에 직접적인 영향을 미침. 적절한 인덱스와 효율적인 JOIN을 사용하여 오버헤드를 최소화해야 함
