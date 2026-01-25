@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback, startTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { deleteRecipe } from "../actions";
 import RecipeList from "./RecipeList";
+import RecipeListHeader from "./RecipeListHeader";
 import type { Database } from "@/types/database";
 import type { SortOption } from "../actions";
 
@@ -18,13 +19,25 @@ export default function RecipeListContent({ recipes }: RecipeListContentProps) {
   const [localRecipes, setLocalRecipes] = useState<Recipe[]>(recipes);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // URL에서 초기 정렬 옵션 가져오기
+  const initialSort: SortOption = (searchParams.get("sort") as SortOption) || "updated";
+  const [sortBy, setSortBy] = useState<SortOption>(initialSort);
+
   // 서버에서 받은 recipes가 변경되면 로컬 state 업데이트
   useEffect(() => {
     setLocalRecipes(recipes);
   }, [recipes]);
 
-  // URL에서 정렬 옵션 가져오기
-  const sortBy: SortOption = (searchParams.get("sort") as SortOption) || "updated";
+  // 정렬 변경 핸들러 (URL 동기화 포함, startTransition으로 View Transition 트리거)
+  const handleSortChange = useCallback((sort: SortOption) => {
+    startTransition(() => {
+      setSortBy(sort);
+    });
+    // URL 동기화 (SSR 트리거 없이)
+    const url = new URL(window.location.href);
+    url.searchParams.set("sort", sort);
+    window.history.replaceState(null, "", url.toString());
+  }, []);
 
   // 클라이언트에서 정렬 (서버 요청 없음)
   const sortedRecipes = useMemo(() => {
@@ -65,5 +78,12 @@ export default function RecipeListContent({ recipes }: RecipeListContentProps) {
     }
   };
 
-  return <RecipeList recipes={sortedRecipes} onDelete={handleDelete} deletingId={deletingId} />;
+  return (
+    <>
+      <RecipeListHeader sortBy={sortBy} onSortChange={handleSortChange} />
+      <div className="px-4 py-4">
+        <RecipeList recipes={sortedRecipes} onDelete={handleDelete} deletingId={deletingId} />
+      </div>
+    </>
+  );
 }
