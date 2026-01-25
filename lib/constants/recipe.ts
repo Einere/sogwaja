@@ -10,7 +10,7 @@ export const RECIPE_LIMITS = {
   /** 결과물 최대 개수 */
   MAX_OUTPUTS: 1,
   /** 실험 사진 최대 개수 */
-  MAX_EXPERIMENT_PHOTOS: 9,
+  MAX_EXPERIMENT_PHOTOS: 3,
 } as const;
 
 /**
