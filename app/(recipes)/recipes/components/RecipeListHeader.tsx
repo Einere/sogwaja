@@ -1,14 +1,13 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
 import type { SortOption } from "../actions";
-import { LinkButton } from "@/components/ui";
+import { Button, LinkButton } from "@/components/ui";
 import { PlusIcon } from "@/components/icons";
 
-export default function RecipeListHeader() {
-  const searchParams = useSearchParams();
-  const sortBy: SortOption = (searchParams.get("sort") as SortOption) || "updated";
+interface RecipeListHeaderProps {
+  sortBy: SortOption;
+  onSortChange: (sort: SortOption) => void;
+}
 
+export default function RecipeListHeader({ sortBy, onSortChange }: RecipeListHeaderProps) {
   return (
     <header className="bg-background border-border sticky top-0 z-10 border-b px-4 py-3">
       <div className="mb-3 flex items-center justify-between">
@@ -23,24 +22,24 @@ export default function RecipeListHeader() {
         </LinkButton>
       </div>
       <div className="flex gap-2" role="group" aria-label="정렬 옵션">
-        <LinkButton
-          href="/recipes?sort=name"
+        <Button
           variant={sortBy === "name" ? "primary" : "secondary"}
           size="sm"
           aria-pressed={sortBy === "name"}
           aria-label="가나다순으로 정렬"
+          onClick={() => onSortChange("name")}
         >
           가나다순
-        </LinkButton>
-        <LinkButton
-          href="/recipes?sort=updated"
+        </Button>
+        <Button
           variant={sortBy === "updated" ? "primary" : "secondary"}
           size="sm"
           aria-pressed={sortBy === "updated"}
           aria-label="최근 수정순으로 정렬"
+          onClick={() => onSortChange("updated")}
         >
           최근 수정순
-        </LinkButton>
+        </Button>
       </div>
     </header>
   );

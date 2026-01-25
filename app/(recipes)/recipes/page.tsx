@@ -1,8 +1,6 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getServerUser } from "@/lib/supabase/auth";
 import { getRecipes } from "@/app/(recipes)/recipes/actions";
-import RecipeListHeader from "@/app/(recipes)/recipes/components/RecipeListHeader";
 import RecipeListContent from "@/app/(recipes)/recipes/components/RecipeListContent";
 import EmptyState from "@/components/shared/EmptyState";
 import { LinkButton } from "@/components/ui";
@@ -36,20 +34,8 @@ export default async function RecipesPage() {
 
   return (
     <div className="min-h-screen">
-      {/* TODO: Suspense로 감쌀 필요가 있는지 검증하기 */}
-      <Suspense
-        fallback={
-          <header className="bg-background border-border sticky top-0 z-10 border-b px-4 py-3">
-            <div className="mb-3 flex items-center justify-between">
-              <h1 className="text-2xl font-bold">조리법 목록</h1>
-            </div>
-          </header>
-        }
-      >
-        <RecipeListHeader />
-      </Suspense>
-      <div className="px-4 py-4">
-        {recipes.length === 0 ? (
+      {recipes.length === 0 ? (
+        <div className="px-4 py-4">
           <EmptyState
             title="아직 조리법이 없습니다."
             action={{
@@ -57,10 +43,10 @@ export default async function RecipesPage() {
               href: "/recipes/new",
             }}
           />
-        ) : (
-          <RecipeListContent recipes={recipes} />
-        )}
-      </div>
+        </div>
+      ) : (
+        <RecipeListContent recipes={recipes} />
+      )}
     </div>
   );
 }
