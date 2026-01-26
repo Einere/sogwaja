@@ -9,3 +9,5 @@ export { default as LoadingSpinnerIcon } from "./LoadingSpinnerIcon";
 export { default as ChevronDownIcon } from "./ChevronDownIcon";
 export { default as ChevronUpIcon } from "./ChevronUpIcon";
 export { default as CheckIcon } from "./CheckIcon";
+export { default as PasskeyIcon } from "./PasskeyIcon";
+export { default as SettingsIcon } from "./SettingsIcon";

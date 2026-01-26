@@ -268,6 +268,67 @@ export interface Database {
           created_at?: string;
         };
       };
+      user_passkeys: {
+        Row: {
+          id: string;
+          user_id: string;
+          credential_id: string;
+          public_key: string;
+          counter: number;
+          transports: string[] | null;
+          device_name: string | null;
+          created_at: string;
+          last_used_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          credential_id: string;
+          public_key: string;
+          counter?: number;
+          transports?: string[] | null;
+          device_name?: string | null;
+          created_at?: string;
+          last_used_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          credential_id?: string;
+          public_key?: string;
+          counter?: number;
+          transports?: string[] | null;
+          device_name?: string | null;
+          created_at?: string;
+          last_used_at?: string | null;
+        };
+      };
+      webauthn_challenges: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          challenge: string;
+          type: "registration" | "authentication";
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          challenge: string;
+          type: "registration" | "authentication";
+          expires_at: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          challenge?: string;
+          type?: "registration" | "authentication";
+          expires_at?: string;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;

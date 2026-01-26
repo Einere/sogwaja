@@ -1,13 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { GoogleIcon } from "@/components/icons";
+import { GoogleIcon, PasskeyIcon } from "@/components/icons";
 import { Button } from "@/components/ui";
+import { usePasskey } from "@/lib/hooks/usePasskey";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
+  const {
+    isSupported: isPasskeySupported,
+    isPlatformAvailable,
+    isLoading: isPasskeyLoading,
+    error: passkeyError,
+    authenticateWithPasskey,
+    clearError,
+  } = usePasskey();
+
+  const [showPasskeyOption, setShowPasskeyOption] = useState(false);
+
+  useEffect(() => {
+    // 패스키 지원 여부 확인 후 옵션 표시
+    if (isPasskeySupported && isPlatformAvailable) {
+      setShowPasskeyOption(true);
+    }
+  }, [isPasskeySupported, isPlatformAvailable]);
+
+  const handlePasskeyLogin = async () => {
+    try {
+      clearError();
+      const result = await authenticateWithPasskey();
+
+      if (result.verified && result.token) {
+        // 패스키 인증 성공 - token_hash로 Supabase 세션 생성
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: result.token,
+          type: "email",
+        });
+
+        if (error) {
+          console.error("Session creation error:", error);
+          throw new Error("세션 생성에 실패했습니다.");
+        }
+
+        // 세션 생성 성공 - 레시피 목록으로 이동
+        window.location.href = "/recipes";
+      }
+    } catch (error) {
+      console.error("Passkey login error:", error);
+    }
+  };
 
   const handleSocialLogin = async (provider: "google") => {
     try {
@@ -51,11 +94,11 @@ export default function LoginPage() {
             조리법을 저장하고 관리하려면 로그인이 필요합니다.
           </p>
 
-          <form aria-label="로그인 폼">
+          <div className="space-y-3" aria-label="로그인 폼">
             <Button
               type="button"
               onClick={() => handleSocialLogin("google")}
-              disabled={loading}
+              disabled={loading || isPasskeyLoading}
               variant="outline"
               className="flex w-full items-center justify-center gap-3"
               aria-label={loading ? "Google 로그인 중" : "Google로 로그인"}
@@ -64,7 +107,37 @@ export default function LoginPage() {
               <GoogleIcon />
               Google로 로그인
             </Button>
-          </form>
+
+            {showPasskeyOption && (
+              <>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background text-muted-foreground px-2">또는</span>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={handlePasskeyLogin}
+                  disabled={loading || isPasskeyLoading}
+                  variant="outline"
+                  className="flex w-full items-center justify-center gap-3"
+                  aria-label={isPasskeyLoading ? "패스키 인증 중" : "패스키로 로그인"}
+                  aria-busy={isPasskeyLoading}
+                >
+                  <PasskeyIcon />
+                  패스키로 로그인
+                </Button>
+              </>
+            )}
+
+            {passkeyError && (
+              <p className="text-destructive text-center text-sm">{passkeyError}</p>
+            )}
+          </div>
 
           <p className="text-muted-foreground mt-6 text-center text-xs">
             로그인 시 조리법 저장 및 관리 기능을 사용할 수 있습니다.
