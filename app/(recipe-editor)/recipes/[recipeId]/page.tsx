@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { getServerUser } from "@/lib/supabase/auth";
+import { requireServerUser } from "@/lib/supabase/auth";
 import { getRecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
 import RecipeEditorClient from "./RecipeEditorClient";
 
@@ -19,11 +18,7 @@ export async function generateMetadata({ params }: RecipeEditorPageProps): Promi
 }
 
 export default async function RecipeEditorPage({ params }: RecipeEditorPageProps) {
-  const user = await getServerUser();
-  if (!user) {
-    redirect("/auth");
-  }
-
+  const user = await requireServerUser();
   const { recipeId } = await params;
   const recipeData = await getRecipeData(recipeId);
 

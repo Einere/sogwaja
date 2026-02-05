@@ -1,7 +1,7 @@
 "use client";
 
 import { Ssgoi } from "@ssgoi/react";
-import { drill, slide } from "@ssgoi/react/view-transitions";
+import { drill } from "@ssgoi/react/view-transitions";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 
 const nullConfig = {};
@@ -39,7 +39,6 @@ const config = {
       }),
       symmetric: true,
     },
-
     {
       from: "experiments",
       to: "experiment",
@@ -53,30 +52,6 @@ const config = {
       to: "experiments",
       transition: drill({
         direction: "exit",
-      }),
-      symmetric: true,
-    },
-    {
-      from: "foo",
-      to: "bar",
-      transition: slide({
-        direction: "left",
-        spring: {
-          stiffness: 400, // 빠른 트랜지션
-          damping: 35, // 부드러운 마무리
-        },
-      }),
-      symmetric: true,
-    },
-    {
-      from: "bar",
-      to: "foo",
-      transition: slide({
-        direction: "right",
-        spring: {
-          stiffness: 400, // 빠른 트랜지션
-          damping: 35, // 부드러운 마무리
-        },
       }),
       symmetric: true,
     },

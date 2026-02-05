@@ -1,6 +1,4 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { getServerUser } from "@/lib/supabase/auth";
 import { getExperiments } from "@/app/(experiments)/recipes/[recipeId]/experiments/actions";
 import { getRecipeData } from "@/app/(recipe-editor)/recipes/[recipeId]/actions";
 import ExperimentsClient from "./ExperimentsClient";
@@ -22,11 +20,6 @@ export async function generateMetadata({
 }
 
 export default async function ExperimentsPage({ params }: ExperimentsPageProps) {
-  const user = await getServerUser();
-  if (!user) {
-    redirect("/auth");
-  }
-
   const { recipeId } = await params;
   const experiments = await getExperiments(recipeId);
 
