@@ -1,6 +1,4 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { getServerUser } from "@/lib/supabase/auth";
 import {
   getExperiment,
   getExperimentData,
@@ -14,7 +12,7 @@ interface ExperimentDetailPageProps {
 export async function generateMetadata({
   params,
 }: ExperimentDetailPageProps): Promise<Metadata> {
-  const {  experimentId } = await params;
+  const { experimentId } = await params;
   const experimentData = await getExperimentData(experimentId);
 
   return {
@@ -24,11 +22,6 @@ export async function generateMetadata({
 }
 
 export default async function ExperimentDetailPage({ params }: ExperimentDetailPageProps) {
-  const user = await getServerUser();
-  if (!user) {
-    redirect("/auth");
-  }
-
   const { recipeId, experimentId } = await params;
 
   const [experiment, experimentData] = await Promise.all([
